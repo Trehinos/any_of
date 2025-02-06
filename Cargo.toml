@@ -1,8 +1,8 @@
 [package]
 name = "any_of"
-version = "1.0.0"
+version = "0.11.0"
 edition = "2021"
-description = "A general optional or integral sum type which can be Neither, Left, Right or Both."
+description = "A general optional sum of product type which can be Neither, Left, Right or Both."
 license = "MIT"
 repository = "https://github.com/Trehinos/any_of"
 categories = ["data-structures", "no-std"]
