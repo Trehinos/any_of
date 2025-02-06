@@ -449,7 +449,35 @@ impl<L, R> AnyOf<L, R> {
 
 impl<L, R> Add for AnyOf<L, R> {
     type Output = Self;
-
+    
+    /// Combines (`+` operator) two `Either` values into a single one.
+    ///
+    /// ## General rules
+    ///
+    /// * `Neither` is always substituted by the other operand,
+    /// * `Both` :
+    ///     * as left operand : substitutes the other operand,
+    ///     * as right operand : completes the other operand,
+    /// * `Left` or `Right` :
+    ///     * `L+R` or `R+L` combines to an instance of `Both`,
+    ///     * `L+l` or `r+R` selects the operand placed on the correct side of the operator :
+    ///         * left**Left** + right**Left** = left**Left**
+    ///         * left**Right** + right**Right** = right**Right**
+    ///
+    /// ## All cases
+    ///
+    /// * Neither cases :
+    ///     * Neither + **other** = other
+    ///     * **other** + Neither = other
+    /// * Trivial cases :
+    ///     * **Left(x)** + Left(y) = Left(x)
+    ///     * Right(x) + **Right(y)** = Right(y)
+    ///     * **Both(x, y)** + other = Both(x, y)
+    /// * Merge cases :
+    ///     * Left(x) + Right(y) = Both(x, y)
+    ///     * Right(x) + Left(y) = Both(y, x)
+    ///     * Left(x) + Both(_, y) = Both(x, y)
+    ///     * Right(x) + Both(y, _) = Both(y, x)
     fn add(self, rhs: Self) -> Self::Output {
         self.combine(rhs)
     }
