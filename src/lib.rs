@@ -35,9 +35,6 @@
 //! assert!(both.map_left(|l| l).is_left());
 //! ```
 //!
-//! ## Crate Features
-//! - `std` feature: Enables standard library support for types that require it.
-//!
 //! ## Use Cases
 //! - Representing optional or branching data in a concise manner.
 //! - Handling dynamic states with variants like `Neither`, `Either`, and `Both`.
