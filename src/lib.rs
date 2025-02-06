@@ -448,10 +448,10 @@ impl<L, R> AnyOf<L, R> {
 }
 
 impl<L, R> Add for AnyOf<L, R> {
-    type Output = ();
+    type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
-        self.combine(rhs);
+        self.combine(rhs)
     }
 }
 
