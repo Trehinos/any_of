@@ -424,7 +424,6 @@ impl<L, R> AnyOf<L, R> {
     }
 }
 
-//#[cfg(feature = "std")]
 impl<L, R> Add for AnyOf<L, R> {
     type Output = ();
 
