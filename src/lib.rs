@@ -62,8 +62,7 @@ pub mod either;
 pub mod both;
 
 use core::ops::Add;
-#[cfg(feature = "std")]
-use std::ops::Add;
+
 pub use crate::both::Both;
 pub use crate::either::Either;
 
