@@ -1,14 +1,14 @@
 # AnyOf : a versatile type for Rust
 
-This project implements a flexible and expressive algebraic type : `AnyOf`.
+This project implements a flexible and expressive binary Algebraic Data Type : `AnyOf`.
 
-`AnyOf` is an advanced sum and product types, which enables clear, safe, and concise
+`AnyOf` is an advanced sum and product type, which enables clear, safe, and concise
 representations of data combinations in functional and type-driven programming.
 
 ## Overview
 
 At the core of the project is the `AnyOf` enum, a general-purpose algebraic type, alongside additional types 
-such as `Either` and `Both`. These abstractions allow developers to express dynamic states, optional values,
+such as `Either` and `Both`. These abstractions allow to express dynamic states, optional values,
 and branching logic in a natural and explicit manner.
 
 ### Key Types
@@ -20,11 +20,9 @@ and branching logic in a natural and explicit manner.
         - `Either::Right`: Only the right value is present.
         - `Both`: Both values are present.
     - Conceptually, it combines variants in the following way:
-      ```
-      Both<L, R> = (L, R)
-      Either<L, R> = Left(L) | Right(R)
-      AnyOf<L, R> = Neither | Either<L, R> | Both<L, R>
-      ```
+        ```
+        AnyOf<L, R> = Neither | Either<L, R> | Both<L, R>
+        ```
 
 2. **`Either<L, R>`**
     - A simple sum type representing one of two values.
@@ -32,12 +30,21 @@ and branching logic in a natural and explicit manner.
         - `Left(L)`
         - `Right(R)`
     - Ideal for binary decision-making.
+    - Conceptually, it is the type :
+      ```
+      Either<L, R> = Left(L) | Right(R)
+      ```
 
 3. **`Both<L, R>`**
     - A product type that pairs two values, `left` and `right`, of potentially different types.
+    - Conceptually, it is the type :
+      ```
+      Both<L, R> = (L, R)
+      ```
 
 4. **Enhanced Type Composition**
-    - Complex types like `AnyOf4`, `AnyOf8`, and `AnyOf16` are introduced for handling larger, structured combinations via nested `AnyOf` structures.
+    - Complex types like `AnyOf4`, `AnyOf8`, and `AnyOf16` are implemented for handling larger, 
+    structured combinations via nested `AnyOf` structures.
 
 ### Features and Utilities
 
@@ -62,16 +69,16 @@ and branching logic in a natural and explicit manner.
 
 ## Motivation
 
-The project aims to enrich Rust's type system with expressive and flexible types for representing data combinations and states. 
+The project aims to enrich Rust's type system with expressive and flexible types 
+for representing data combinations and states.
 
-With `AnyOf` and related abstractions, developers can achieve:
-- **Clarity**: Models become easier to understand with precise combinations.
-- **Safety**: Explicitly handle and exhaust all cases, avoiding runtime errors.
-- **Reusability**: Utility functions reduce code repetition and foster cleaner APIs.
+* Unlike the Rust's `Result` type, `Either` has no semantic,
+* `AnyOf<L, R>` can be also be viewed as two options : `(Option<L>, Option<R>)` (a product type of sum type),
 
 ## Status
 
-The library is under active development and is not yet versioned as `1.*.*`. Contributions and feedback are welcome!
+The library is under active development and is not yet versioned as `1.*.*`.  
+Feedback is welcome!
 
 ## License
 
