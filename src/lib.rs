@@ -55,10 +55,10 @@ pub type Couple<T, U> = (T, U);
 /// A shortcut for `Couple<T, T>`.
 pub type Pair<T> = Couple<T, T>;
 
-pub mod either;
 pub mod both;
+pub mod either;
 
-use core::ops::Add;
+use core::ops::{Add, Neg, Sub};
 
 pub use crate::both::Both;
 pub use crate::either::Either;
@@ -148,7 +148,6 @@ impl<L, R> AnyOf<L, R> {
             (Some(l), Some(r)) => Self::Both(Both { left: l, right: r }),
         }
     }
-
 
     /// Creates an `AnyOf::Neither` variant.
     ///
@@ -258,12 +257,10 @@ impl<L, R> AnyOf<L, R> {
     /// assert_eq!(either, Either::Left(42));
     /// ```
     pub fn into_either(self) -> Either<L, R> {
-        match self {
-            AnyOf::Either(e) => match e {
-                Either::Left(l) => Either::Left(l),
-                Either::Right(r) => Either::Right(r),
-            },
-            _ => panic!("Can only convert Either::Either to Either"),
+        if let AnyOf::Either(e) = self {
+            e
+        } else {
+            panic!("Can only convert Either::Either to Either");
         }
     }
 
@@ -309,10 +306,7 @@ impl<L, R> AnyOf<L, R> {
     /// assert!(any_of.is_left());
     /// ```
     pub fn from_either(either: Either<L, R>) -> Self {
-        match either {
-            Either::Left(l) => Self::Either(Either::Left(l)),
-            Either::Right(r) => Self::Either(Either::Right(r)),
-        }
+        Self::Either(either)
     }
 
     /// True if [Either::Left] or [AnyOf::Both].
@@ -340,10 +334,7 @@ impl<L, R> AnyOf<L, R> {
     }
     /// True if [AnyOf::Either].
     pub fn is_one(&self) -> bool {
-        matches!(
-            self,
-            Self::Either(_)
-        )
+        matches!(self, Self::Either(_))
     }
     /// True if [AnyOf::Both]
     pub fn is_both(&self) -> bool {
@@ -393,7 +384,6 @@ impl<L, R> AnyOf<L, R> {
             Self::Both(Both { right: r, .. }) => Some(r),
         }
     }
-
 
     /// Returns the left value if present, or computes it with the provided function.
     pub fn left_or_else(self, f: impl FnOnce() -> L) -> L {
@@ -495,7 +485,16 @@ impl<L, R> AnyOf<L, R> {
         }
     }
 
-    /// Swaps the left and right components, creating a new `AnyOf` with reversed types.
+    /// Swaps (- operator) the left and right components, creating a new `AnyOf` with reversed types.
+    ///
+    /// # Returns
+    ///
+    /// A new `AnyOf<R, L>` instance where the left and right components have been swapped.
+    ///
+    /// - If `self` is `Neither`, the result will also be `Neither`.
+    /// - If `self` is an `Either::Left`, the result will contain the value as an `Either::Right`.
+    /// - If `self` is an `Either::Right`, the result will contain the value as an `Either::Left`.
+    /// - If `self` is a `Both`, the left and right values are swapped in the result.
     pub fn swap(self) -> AnyOf<R, L> {
         match self {
             Self::Neither => AnyOf::<R, L>::Neither,
@@ -615,41 +614,103 @@ impl<L, R> AnyOf<L, R> {
             Self::Both(b) => Self::Both(b),
         }
     }
+
+    /// Filters (`-` operator) the current `AnyOf` instance using another `AnyOf` instance.
+    ///
+    /// ## General rules
+    ///
+    /// The filtering behavior depends on the specific variants of `self` and `other`:
+    ///
+    /// * `other == Neither` filters nothing (self is returned),
+    /// * `other == Both` filters all (`Neither` is returned),
+    /// * `Left` and `Right` as `other` filters the corresponding side of `self`.
+    ///
+    /// ## All cases
+    ///
+    /// - **Neither cases**:
+    ///     * `Neither - other = Neither`
+    ///     * `Left(x) - Left(y) = Neither`
+    ///     * `Right(x) - Right(y) = Neither`
+    ///     * `other - Both(x, y) = Neither`
+    /// - **Trivial case**:
+    ///     * `other - Neither = other`
+    /// - **Filtered cases**:
+    ///     * `Left(x) - Right(y) = Left(x)`
+    ///     * `Right(x) - Left(y) = Right(x)`
+    ///     * `Both(x, y) - Right(y) = Left(x)`
+    ///     * `Both(x, y) - Left(y) = Right(y)`
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use any_of::{AnyOf, Both};
+    /// use any_of::either::Either;
+    ///
+    /// let both = AnyOf::Both(Both { left: 5, right: 10 });
+    /// let left_only = AnyOf::Either(Either::Left(5));
+    /// let right_only = AnyOf::Either(Either::Right(10));
+    /// let neither: AnyOf<i32, i32> = AnyOf::Neither;
+    ///
+    /// // Filtering Both with Right results in Left
+    /// assert_eq!(both - right_only, left_only);
+    ///
+    /// // Filtering Both with Left results in Right
+    /// assert_eq!(both - left_only, right_only);
+    ///
+    /// // Filtering with Neither doesn't affect the original value
+    /// assert_eq!(both - neither, both);
+    /// assert_eq!(left_only - neither, left_only);
+    /// assert_eq!(right_only - neither, right_only);
+    ///
+    /// // Filtering with Both always results in Neither
+    /// assert_eq!(both - both, neither);
+    /// assert_eq!(left_only - both, neither);
+    /// assert_eq!(right_only - both, neither);
+    /// ```
+    pub fn filter(self, other: Self) -> Self {
+        match other {
+            AnyOf::Neither => self,
+            AnyOf::Either(Either::Left(_)) => match self {
+                AnyOf::Either(Either::Left(_)) => AnyOf::Neither,
+                AnyOf::Either(Either::Right(r)) => AnyOf::Either(Either::Right(r)),
+                AnyOf::Both(Both { right: r, .. }) => AnyOf::Either(Either::Right(r)),
+                _ => self,
+            },
+            AnyOf::Either(Either::Right(_)) => match self {
+                AnyOf::Either(Either::Left(l)) => AnyOf::Either(Either::Left(l)),
+                AnyOf::Either(Either::Right(_)) => AnyOf::Neither,
+                AnyOf::Both(Both { left: l, .. }) => AnyOf::Either(Either::Left(l)),
+                _ => self,
+            },
+            AnyOf::Both(_) => AnyOf::Neither,
+        }
+    }
 }
 
 impl<L, R> Add for AnyOf<L, R> {
     type Output = Self;
-    
-    /// Combines (`+` operator) two `Either` values into a single one.
-    ///
-    /// ## General rules
-    ///
-    /// * `Neither` is always substituted by the other operand,
-    /// * `Both` :
-    ///     * as left operand : substitutes the other operand,
-    ///     * as right operand : completes the other operand,
-    /// * `Left` or `Right` :
-    ///     * `L+R` or `R+L` combines to an instance of `Both`,
-    ///     * `L+l` or `r+R` selects the operand placed on the correct side of the operator :
-    ///         * left**Left** + right**Left** = left**Left**
-    ///         * left**Right** + right**Right** = right**Right**
-    ///
-    /// ## All cases
-    ///
-    /// * Neither cases :
-    ///     * Neither + **other** = other
-    ///     * **other** + Neither = other
-    /// * Trivial cases :
-    ///     * **Left(x)** + Left(y) = Left(x)
-    ///     * Right(x) + **Right(y)** = Right(y)
-    ///     * **Both(x, y)** + other = Both(x, y)
-    /// * Merge cases :
-    ///     * Left(x) + Right(y) = Both(x, y)
-    ///     * Right(x) + Left(y) = Both(y, x)
-    ///     * Left(x) + Both(_, y) = Both(x, y)
-    ///     * Right(x) + Both(y, _) = Both(y, x)
+
+    /// See : [Self::combine].
     fn add(self, rhs: Self) -> Self::Output {
         self.combine(rhs)
+    }
+}
+
+impl<L, R> Sub for AnyOf<L, R> {
+    type Output = Self;
+
+    /// See : [Self::filter].
+    fn sub(self, rhs: Self) -> Self::Output {
+        self.filter(rhs)
+    }
+}
+
+impl<L, R> Neg for AnyOf<L, R> {
+    type Output = AnyOf<R, L>;
+
+    /// See : [Self::swap].
+    fn neg(self) -> Self::Output {
+        self.swap()
     }
 }
 
