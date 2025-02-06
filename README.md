@@ -78,8 +78,8 @@ for representing data combinations and states.
 
 ## Status
 
-The library is under active development and is not yet versioned as `1.*.*`.  
-Feedback is welcome!
+The library is still under development, but it follows semantic versioning.
+[Feedback is welcome](mailto:dev-any-of@trehinos.eu)!
 
 ## License
 
