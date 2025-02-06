@@ -48,15 +48,13 @@
 //!     _ => panic!("Expected Right"),
 //! }
 //! ```
-use crate::Couple;
 use crate::either::Either;
-
-
+use crate::Couple;
 
 /// `Both` is a generic struct that allows pairing two values of potentially different types.
 ///
-/// The `Both` struct is a utility for combining two values together, 
-/// making it easier to manipulate pairs of values with helper methods for construction, 
+/// The `Both` struct is a utility for combining two values together,
+/// making it easier to manipulate pairs of values with helper methods for construction,
 /// transformation, and conversion.
 ///
 /// # Examples
@@ -178,5 +176,41 @@ impl<L, R> Both<L, R> {
     /// ```
     pub fn into_right(self) -> Either<L, R> {
         Either::<L, R>::Right(self.right)
+    }
+    
+    /// Applies the provided transformation functions to the `left` and `right` values of this `Both` instance.
+    ///
+    /// # Type Parameters
+    /// - `L2`: The resulting type of the transformed `left` value.
+    /// - `R2`: The resulting type of the transformed `right` value.
+    /// - `FL`: The type of the function used to transform the `left` value.
+    /// - `FR`: The type of the function used to transform the `right` value.
+    ///
+    /// # Arguments
+    /// - `fl`: A function that takes the `left` value and transforms it into a value of type `L2`.
+    /// - `fr`: A function that takes the `right` value and transforms it into a value of type `R2`.
+    ///
+    /// # Returns
+    /// A new `Both` instance with transformed `left` and `right` values.
+    ///
+    /// # Examples
+    /// ```rust
+    /// use any_of::Both;
+    ///
+    /// let both = Both::new(2, "example");
+    /// let transformed = both.map(|left| left * 2, |right| format!("{}!", right));
+    ///
+    /// assert_eq!(transformed.left, 4);
+    /// assert_eq!(transformed.right, "example!");
+    /// ```
+    pub fn map<L2, R2, FL, FR>(self, fl: FL, fr: FR) -> Both<L2, R2>
+    where
+        FL: FnOnce(L) -> L2,
+        FR: FnOnce(R) -> R2,
+    {
+        Both {
+            left: fl(self.left),
+            right: fr(self.right),
+        }
     }
 }

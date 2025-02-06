@@ -108,6 +108,7 @@ impl<LLL, LLR, LRL, LRR, RLL, RLR, RRL, RRR> AnyOf8<LLL, LLR, LRL, LRR, RLL, RLR
 }
 
 /// A type representing a combination of sixteen possible types.
+/// 
 /// This type is highly complex—use cautiously.
 pub type AnyOf16<
     LLLL,

@@ -561,10 +561,7 @@ impl<L, R> AnyOf<L, R> {
             Self::Neither => AnyOf::<L2, R2>::Neither,
             Self::Either(Either::Left(l)) => AnyOf::<L2, R2>::Either(Either::Left(fl(l))),
             Self::Either(Either::Right(r)) => AnyOf::<L2, R2>::Either(Either::Right(fr(r))),
-            Self::Both(Both { left: l, right: r }) => AnyOf::<L2, R2>::Both(Both {
-                left: fl(l),
-                right: fr(r),
-            }),
+            Self::Both(b) => AnyOf::<L2, R2>::Both(b.map(fl, fr)),
         }
     }
 
@@ -585,13 +582,14 @@ impl<L, R> AnyOf<L, R> {
     /// ## All cases
     ///
     /// * Neither cases :
+    ///     * Neither + Neither = Neither
     ///     * Neither + **other** = other
-    ///     * **other** + Neither = other
+    ///     * **self** + Neither = self
     /// * Trivial cases :
     ///     * **Left(x)** + Left(y) = Left(x)
     ///     * Right(x) + **Right(y)** = Right(y)
     ///     * **Both(x, y)** + other = Both(x, y)
-    /// * Merge cases :
+    /// * Combined cases :
     ///     * Left(x) + Right(y) = Both(x, y)
     ///     * Right(x) + Left(y) = Both(y, x)
     ///     * Left(x) + Both(_, y) = Both(x, y)
