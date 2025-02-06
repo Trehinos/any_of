@@ -32,7 +32,7 @@
 //! assert!(neither.map_right(|r| r).is_neither());
 //! assert!(left.map_right(|r| r).is_left());
 //! assert!(left.map_left(|l| l).is_left());
-//! assert!(both.map_left(|l| l).is_left());
+//! assert!(both.map_left(|l| l).is_both());
 //! ```
 //!
 //! ## Use Cases
@@ -98,7 +98,7 @@ pub use crate::either::Either;
 /// assert!(neither.map_right(|r| r).is_neither());
 /// assert!(left.map_right(|r| r).is_left());
 /// assert!(left.map_left(|l| l).is_left());
-/// assert!(both.map_left(|l| l).is_left());
+/// assert!(both.map_left(|l| l).is_both());
 ///
 /// ```
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
