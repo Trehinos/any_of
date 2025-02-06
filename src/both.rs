@@ -47,9 +47,9 @@
 //! }
 //! ```
 
-use core::ops::Not;
 use crate::either::Either;
-use crate::Couple;
+use crate::{Couple, LeftOrRight};
+use core::ops::Not;
 
 /// `Both` is a generic struct that allows pairing two values of potentially different types.
 ///
@@ -177,7 +177,7 @@ impl<L, R> Both<L, R> {
     pub fn into_right(self) -> Either<L, R> {
         Either::<L, R>::Right(self.right)
     }
-    
+
     /// Applies the provided transformation functions to the `left` and `right` values of this `Both` instance.
     ///
     /// # Type Parameters
@@ -213,7 +213,6 @@ impl<L, R> Both<L, R> {
             right: fr(self.right),
         }
     }
-    
 
     /// Swaps the `left` and `right` values of this `Both` instance.
     ///
@@ -235,6 +234,46 @@ impl<L, R> Both<L, R> {
             left: self.right,
             right: self.left,
         }
+    }
+}
+
+impl<L, R> LeftOrRight<L, R> for Both<L, R> {
+    /// Always true
+    fn is_left(&self) -> bool {
+        true
+    }
+
+    /// Always true
+    fn is_right(&self) -> bool {
+        true
+    }
+
+    /// Returns references to the `Left` and `Right` values as a tuple of `Option`.
+    ///
+    /// ## Returns
+    ///
+    /// A tuple containing an `Option` reference to the left value and an `Option`
+    /// reference to the right value. The options will always contain two values.
+    fn any(&self) -> (Option<&L>, Option<&R>) {
+        (self.left(), self.right())
+    }
+
+    /// Returns a reference to the left value.
+    ///
+    /// ## Returns
+    ///
+    /// An `Option` containing a reference to the left value.
+    fn left(&self) -> Option<&L> {
+        Some(&self.left)
+    }
+
+    /// Returns a reference to the right value.
+    ///
+    /// ## Returns
+    ///
+    /// An `Option` containing a reference to the right value.
+    fn right(&self) -> Option<&R> {
+        Some(&self.right)
     }
 }
 

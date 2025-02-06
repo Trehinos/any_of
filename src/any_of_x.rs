@@ -22,11 +22,12 @@
 //!
 //! Example usage:
 //! ```rust
-//! use any_of::any_of_x::AnyOf8;
+//! use any_of::any_of_x::AnyOf4;
+//! use any_of::AnyOf;
 //!
-//! let value: AnyOf8<i32, &str, f64, char, bool, u8, u16, i64> = todo!();
-//! if let Some(inner) = value.lll() {
-//!     println!("The left-left-left value is: {}", inner);
+//! let value: AnyOf4<i32, &str, f64, char> = AnyOf4::new_left(AnyOf::new_left(42));
+//! if let Some(inner) = value.ll() {
+//!     println!("The left-left value is: {}", inner);
 //! }
 //! ```
 //!
@@ -35,6 +36,7 @@
 //! Use `AnyOf16` or higher with caution.
 
 use crate::AnyOf;
+use crate::LeftOrRight;
 
 /// A type representing a combination of four possible types.
 pub type AnyOf4<LL, LR = LL, RL = LR, RR = RL> = AnyOf<AnyOf<LL, LR>, AnyOf<RL, RR>>;
