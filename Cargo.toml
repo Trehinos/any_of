@@ -1,6 +1,15 @@
 [package]
 name = "any_of"
-version = "0.1.0"
+version = "0.9.0"
 edition = "2021"
+description = "A general optional or integral sum type which can be Neither, Left, Right or Both."
+license = "MIT"
+repository = "https://github.com/Trehinos/any_of"
+categories = ["data-structures", "no-std"]
+keywords = ["either", "any", "left", "right", "both"]
+
+[features]
+default = []
+std = []
 
 [dependencies]

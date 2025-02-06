@@ -1,4 +1,7 @@
-#![no_std]
+#![cfg_attr(not(feature = "std"), no_std)]
+
+#[cfg(feature = "std")]
+use std::ops::Add;
 
 use crate::either::{Both, Either};
 
@@ -330,6 +333,15 @@ impl<L, R> AnyOf<L, R> {
             },
             Self::Both(b) => Self::Both(b),
         }
+    }
+}
+
+#[cfg(feature = "std")]
+impl<L, R> Add for AnyOf<L, R> {
+    type Output = ();
+
+    fn add(self, rhs: Self) -> Self::Output {
+        self.combine(rhs);
     }
 }
 
