@@ -1,68 +1,80 @@
-# Any of
+# AnyOf : a Versatile Algebraic Type for Rust
 
-The project revolves around defining and implementing a versatile enum type, `AnyOf`, along with its utilities, which
-provide a robust general-purpose sum type. Sum types are essential tools in functional programming as they allow for
-explicit representation of values that could be one of several distinct cases.
+This project implements a flexible and expressive algebraic type, `AnyOf`, along with complementary structures,
+to enhance Rust's type system for modeling data and state transitions.
 
-## The `AnyOf` Enum
+It provides an advanced sum and product types, `AnyOf` which enables clear, safe,
+and concise representations of data combinations in functional and type-driven programming.
 
-The `AnyOf` enum represents four possible cases:
+## Overview
 
-- **Neither:** Neither of the types is present.
-- **Either::Left:** The left type (`T`) is present.
-- **Either::Right:** The right type (`U`) is present.
-- **Both:** Both types (`T` and `U`) are present.
+At the core of the project is the `AnyOf` enum, a general-purpose algebraic type, alongside additional types 
+such as `Either` and `Both`. These abstractions allow developers to express dynamic states, optional values,
+and branching logic in a natural and explicit manner.
 
-Conceptually, this can be represented as:
+### Key Types
 
-```
-AnyOf<T, U> = Neither | Left(T) | Right(U) | Both(T, U)
-```
+1. **`AnyOf<L, R>`**
+    - A flexible type that represents four possible states:
+        - `Neither`: No value is present.
+        - `Either::Left`: Only the left value is present.
+        - `Either::Right`: Only the right value is present.
+        - `Both`: Both values are present.
+    - Conceptually, it combines variants in the following way:
+      ```
+      Both<L, R> = (L, R)
+      Either<L, R> = Left(L) | Right(R)
+      AnyOf<L, R> = Neither | Either<L, R> | Both<L, R>
+      ```
 
-This provides a significant degree of flexibility in modeling data, particularly for scenarios where you need to express
-combinations of two types.
+2. **`Either<L, R>`**
+    - A simple sum type representing one of two values.
+    - Variants:
+        - `Left(L)`
+        - `Right(R)`
+    - Ideal for binary decision-making.
 
-### Methods and Utilities
+3. **`Both<L, R>`**
+    - A product type that pairs two values, `left` and `right`, of potentially different types.
 
-The methods provided for the `AnyOf` enum are designed to resemble those of the Rust standard library’s `Option` and
-`Result` types. These include methods such as `unwrap`, which simplify working with the possible variants.
+4. **Enhanced Type Composition**
+    - Complex types like `AnyOf4`, `AnyOf8`, and `AnyOf16` are introduced for handling larger, structured combinations via nested `AnyOf` structures.
 
-### The `Either` Struct
+### Features and Utilities
 
-The project also includes the `Either` struct, a simpler sum type that represents two possibilities:
+- Methods inspired by Rust's `Option` and `Result` types:
+    - Creation utilities : `AnyOf::new`, `AnyOf::new_left`, `AnyOf::new_both`, etc.
+    - State checks: `is_neither`, `is_left`, `is_both`, etc.
+    - Transformations: `map_left`, `map_right`, `swap`, etc.
+    - Unwrapping: `unwrap_left`, `unwrap_right`, `unwrap_both`.
 
-- **Left(T):** The left value.
-- **Right(U):** The right value.
+- Flexible combinations :
+    - Operators like `+` to merge and manipulate values in `AnyOf`.
+    - Default value handling and state manipulation methods.
 
-Unlike `AnyOf`, `Either` cannot represent the `Neither` or `Both` cases.
+### Use Cases
 
-### Other types
+`AnyOf` and its related types simplify dynamic state management and are well-suited for:
 
-* Provides the types `Couple<T, U> = (T, U)` and `Pair<T> = Couple<T, T>`,
-* Provides the type `Both` internally used by `AnyOf`.
+- Branching logic in functional programming.
+- Handling optional or partial data.
+- Implementing explicit and exhaustive handling of all potential states.
+- Minimizing boilerplate for complex decision-making.
 
-## Purpose of the Project
+## Motivation
 
-The main goal of this project is to enrich the Rust type system with precise and expressive types like `AnyOf` and
-`Either`. These types allow to avoid ambiguity and write code that is safer and more intentional.
+The project aims to enrich Rust's type system with expressive and flexible types for representing data combinations and states. 
 
-By providing clear and concise sum types, this project aims to empower developers to handle complex logical branches and
-multiple states of data with ease, while leveraging the expressive power of Rust’s type system.
+With `AnyOf` and related abstractions, developers can achieve:
+- **Clarity**: Models become easier to understand with precise combinations.
+- **Safety**: Explicitly handle and exhaust all cases, avoiding runtime errors.
+- **Reusability**: Utility functions reduce code repetition and foster cleaner APIs.
 
-### Benefits
+## Status
 
-- Clear representation of combinations of values.
-- Safer code through explicit handling of all possible states.
-- Reusable utilities and methods that reduce boilerplate.
-
-This project is ideal for users looking to handle advanced sum types effectively, offering flexibility and clarity for a
-wide range of use cases in functional and type-driven Rust programming.
-
-## Current status
-
-Still in active development before 1.0.0.
+The library is under active development and is not yet versioned as `1.*.*`. Contributions and feedback are welcome!
 
 ## License
 
 &copy; 2025 Sébastien Geldreich  
-MIT License
+Distributed under the MIT License.
