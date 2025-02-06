@@ -253,7 +253,7 @@ impl<L, R> AnyOf<L, R> {
     /// ```rust
     /// use any_of::{AnyOf, Either};
     ///
-    /// let either = AnyOf::new_left(42).into_either();
+    /// let either: Either<i32, ()> = AnyOf::new_left(42).into_either();
     /// assert_eq!(either, Either::Left(42));
     /// ```
     pub fn into_either(self) -> Either<L, R> {
@@ -301,7 +301,7 @@ impl<L, R> AnyOf<L, R> {
     /// ```rust
     /// use any_of::{AnyOf, Either};
     ///
-    /// let either = Either::Left(42);
+    /// let either: Either<i32, ()> = Either::Left(42);
     /// let any_of = AnyOf::from_either(either);
     /// assert!(any_of.is_left());
     /// ```
