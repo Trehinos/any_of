@@ -302,7 +302,7 @@ impl<L, R> AnyOf<L, R> {
     /// use any_of::{AnyOf, Either};
     ///
     /// let either: Either<i32, ()> = Either::Left(42);
-    /// let any_of = AnyOf::from_either(either);
+    /// let any_of: AnyOf<i32, ()> = AnyOf::from_either(either);
     /// assert!(any_of.is_left());
     /// ```
     pub fn from_either(either: Either<L, R>) -> Self {
