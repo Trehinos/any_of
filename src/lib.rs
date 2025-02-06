@@ -713,3 +713,6 @@ impl<L, R> Neg for AnyOf<L, R> {
 }
 
 pub mod any_of_x;
+
+#[cfg(test)]
+mod tests;
