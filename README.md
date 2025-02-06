@@ -1,8 +1,8 @@
 # AnyOf : a versatile type for Rust
 
-This project implements a flexible and expressive binary Algebraic Data Type : `AnyOf`.
+This project implements a flexible and expressive Algebraic Data Type : `AnyOf`.
 
-`AnyOf` is an advanced sum of product type, which enables clear, safe, and concise
+`AnyOf` is an optional sum of product type of two types, which enables clear, safe, and concise
 representations of data combinations in functional and type-driven programming.
 
 ## Overview
