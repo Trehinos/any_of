@@ -16,7 +16,7 @@
 //! ## Example Usage
 //!
 //! ```rust
-//! use any_of::{AnyOf, either::Either, both::Both};
+//! use any_of::{AnyOf, Either, Both};
 //!
 //! let neither: AnyOf<i32, &str> = AnyOf::Neither;
 //! let neither: AnyOf<i32, &str> = AnyOf::new(None, None);
