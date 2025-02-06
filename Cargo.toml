@@ -8,8 +8,4 @@ repository = "https://github.com/Trehinos/any_of"
 categories = ["data-structures", "no-std"]
 keywords = ["either", "any", "left", "right", "both"]
 
-[features]
-default = []
-std = []
-
 [dependencies]

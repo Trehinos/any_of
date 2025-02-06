@@ -50,7 +50,7 @@
 //! - [AnyOf::unwrap_right] and [AnyOf::right]
 //! - [AnyOf::unwrap_both] and [AnyOf::both_or_none]
 //!
-#![cfg_attr(not(feature = "std"), no_std)]
+#![no_std]
 
 /// The `(T, U)` tuple.
 pub type Couple<T, U> = (T, U);
