@@ -2,7 +2,7 @@
 
 This project implements a flexible and expressive binary Algebraic Data Type : `AnyOf`.
 
-`AnyOf` is an advanced sum and product type, which enables clear, safe, and concise
+`AnyOf` is an advanced sum of product type, which enables clear, safe, and concise
 representations of data combinations in functional and type-driven programming.
 
 ## Overview
@@ -20,9 +20,9 @@ and branching logic in a natural and explicit manner.
         - `Either::Right`: Only the right value is present.
         - `Both`: Both values are present.
     - Conceptually, it combines variants in the following way:
-        ```
-        AnyOf<L, R> = Neither | Either<L, R> | Both<L, R>
-        ```
+      ```
+      AnyOf<L, R> = Neither | Either<L, R> | Both<L, R>
+      ```
 
 2. **`Either<L, R>`**
     - A simple sum type representing one of two values.
