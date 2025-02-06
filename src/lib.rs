@@ -498,11 +498,8 @@ impl<L, R> AnyOf<L, R> {
     pub fn swap(self) -> AnyOf<R, L> {
         match self {
             Self::Neither => AnyOf::<R, L>::Neither,
-            Self::Either(Either::Left(l)) => AnyOf::<R, L>::Either(Either::Right(l)),
-            Self::Either(Either::Right(r)) => AnyOf::<R, L>::Either(Either::Left(r)),
-            Self::Both(Both { left: l, right: r }) => {
-                AnyOf::<R, L>::Both(Both { left: r, right: l })
-            }
+            Self::Either(e) => AnyOf::<R, L>::Either(e.swap()),
+            Self::Both(b) => AnyOf::<R, L>::Both(b.swap()),
         }
     }
 
@@ -559,8 +556,7 @@ impl<L, R> AnyOf<L, R> {
     {
         match self {
             Self::Neither => AnyOf::<L2, R2>::Neither,
-            Self::Either(Either::Left(l)) => AnyOf::<L2, R2>::Either(Either::Left(fl(l))),
-            Self::Either(Either::Right(r)) => AnyOf::<L2, R2>::Either(Either::Right(fr(r))),
+            Self::Either(e) => AnyOf::<L2, R2>::Either(e.map(fl, fr)),
             Self::Both(b) => AnyOf::<L2, R2>::Both(b.map(fl, fr)),
         }
     }

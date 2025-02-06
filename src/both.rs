@@ -25,9 +25,7 @@
 //! # Usage Examples
 //!
 //! ```rust
-//! use any_of::Both;
-//! use any_of::Couple;
-//! use any_of::either::Either;
+//! use any_of::{Both, Couple, Either};
 //!
 //! let both = Both::new(10, "right");
 //! assert_eq!(both.left, 10);
@@ -211,6 +209,29 @@ impl<L, R> Both<L, R> {
         Both {
             left: fl(self.left),
             right: fr(self.right),
+        }
+    }
+    
+
+    /// Swaps the `left` and `right` values of this `Both` instance.
+    ///
+    /// # Returns
+    /// A new `Both` instance where the `left` and `right` values are swapped.
+    ///
+    /// # Examples
+    /// ```rust
+    /// use any_of::Both;
+    ///
+    /// let both = Both::new(42, "example");
+    /// let swapped = both.swap();
+    ///
+    /// assert_eq!(swapped.left, "example");
+    /// assert_eq!(swapped.right, 42);
+    /// ```
+    pub fn swap(self) -> Both<R, L> {
+        Both {
+            left: self.right,
+            right: self.left,
         }
     }
 }
