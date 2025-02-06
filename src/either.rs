@@ -1,3 +1,69 @@
+//! This module provides the `Either` enum, a utility type that represents a value 
+//! that can be one of two variants: `Left` or `Right`.
+//!
+//! This is useful for scenarios where a value can have one of two possible types, often used as a lightweight 
+//! alternative to `Result` or for decision trees in functional programming.
+//!
+//! The `Either` enum has the following scenarios of use:
+//! - `Left`: A variant for holding a value of type `L`.
+//! - `Right`: A variant for holding a value of type `R`.
+//!
+//! # Public API
+//! This module provides numerous utility methods for creating, inspecting, and 
+//! transforming instances of `Either`.
+//!
+//! ## Creation
+//! - [`Either::new_left`]: Creates an `Either` value in the `Left` variant.
+//! - [`Either::new_right`]: Creates an `Either` value in the `Right` variant.
+//!
+//! ## Inspection
+//! - [`Either::is_left`]: Returns `true` if the value is `Left`.
+//! - [`Either::is_right`]: Returns `true` if the value is `Right`.
+//! - [`Either::left`]: Returns a reference to the left value if it exists.
+//! - [`Either::right`]: Returns a reference to the right value if it exists.
+//! - [`Either::any`]: Returns a tuple of `Option` references to either the left 
+//!   or the right value, depending on the variant.
+//!
+//! ## Default Values
+//! - [`Either::left_or`]: Returns the left value or a provided default.
+//! - [`Either::right_or`]: Returns the right value or a provided default.
+//! - [`Either::left_or_else`]: Returns the left value or computes a default using 
+//!   a closure.
+//! - [`Either::right_or_else`]: Returns the right value or computes a default 
+//!   using a closure.
+//!
+//! ## Unwrapping
+//! - [`Either::unwrap_left`]: Extracts the left value, panicking if the value is 
+//!   a `Right`.
+//! - [`Either::unwrap_right`]: Extracts the right value, panicking if the value is 
+//!   a `Left`.
+//!
+//! ## Transformation
+//! - [`Either::swap`]: Swaps the `Left` variant for `Right` and vice versa.
+//! - [`Either::map_left`]: Applies a function to transform the `Left` value.
+//! - [`Either::map_right`]: Applies a function to transform the `Right` value.
+//! - [`Either::map`]: Applies separate functions to transform either the `Left` 
+//!   or `Right` value depending on the variant.
+//!
+//! # Examples
+//! Usage of the `Either` enum looks like this:
+//!
+//! ```rust
+//! use any_of::Either;
+//!
+//! let left_value: Either<i32, &str> = Either::new_left(10);
+//! assert!(left_value.is_left());
+//! assert_eq!(left_value.left(), Some(&10));
+//!
+//! let right_value: Either<i32, &str> = Either::new_right("Hello");
+//! assert!(right_value.is_right());
+//! assert_eq!(right_value.right(), Some(&"Hello"));
+//!
+//! // Swapping sides
+//! let swapped = right_value.swap();
+//! assert!(swapped.is_left());
+//! ```
+//!
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
 pub enum Either<L, R> {

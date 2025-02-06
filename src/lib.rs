@@ -52,7 +52,10 @@
 //!
 #![cfg_attr(not(feature = "std"), no_std)]
 
+/// The `(T, U)` tuple. 
 pub type Couple<T, U> = (T, U);
+
+/// A shortcut for `Couple<T, T>`.
 pub type Pair<T> = Couple<T, T>;
 
 pub mod either;
@@ -60,8 +63,8 @@ pub mod both;
 
 #[cfg(feature = "std")]
 use std::ops::Add;
-use crate::both::Both;
-use crate::either::Either;
+pub use crate::both::Both;
+pub use crate::either::Either;
 
 /// Represents a type that can hold one of several variants: `Neither`, `Either` (with `Left` or `Right`),
 /// or `Both` (containing both `Left` and `Right` values).
