@@ -46,6 +46,8 @@
 //!     _ => panic!("Expected Right"),
 //! }
 //! ```
+
+use core::ops::Not;
 use crate::either::Either;
 use crate::Couple;
 
@@ -233,5 +235,14 @@ impl<L, R> Both<L, R> {
             left: self.right,
             right: self.left,
         }
+    }
+}
+
+impl<L, R> Not for Both<L, R> {
+    type Output = Both<R, L>;
+
+    /// See : [Self::swap].
+    fn not(self) -> Self::Output {
+        self.swap()
     }
 }

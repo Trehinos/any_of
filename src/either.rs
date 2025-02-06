@@ -65,6 +65,8 @@
 //! ```
 //!
 
+use core::ops::Not;
+
 /// The `Either` enum is a utility type that can hold a value of one of two variants: `Left(L)` or `Right(R)`.
 ///
 /// It serves as a straightforward alternative to `Result`, providing a way to perform operations 
@@ -309,5 +311,14 @@ impl<L, R> Either<L, R> {
             Self::Left(l) => Either::<L2, R2>::Left(fl(l)),
             Self::Right(r) => Either::<L2, R2>::Right(fr(r)),
         }
+    }
+}
+
+impl<L, R> Not for Either<L, R> {
+    type Output = Either<R, L>;
+
+    /// See : [Self::swap].
+    fn not(self) -> Self::Output {
+        self.swap()
     }
 }
