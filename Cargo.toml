@@ -1,6 +1,6 @@
 [package]
 name = "any_of"
-version = "0.9.1"
+version = "0.9.2"
 edition = "2021"
 description = "A general optional or integral sum type which can be Neither, Left, Right or Both."
 license = "MIT"
