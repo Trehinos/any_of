@@ -58,7 +58,7 @@ pub type Pair<T> = Couple<T, T>;
 pub mod both;
 pub mod either;
 
-use core::ops::{Add, Neg, Sub};
+use core::ops::{BitAnd, BitOr, Not};
 
 pub use crate::both::Both;
 pub use crate::either::Either;
@@ -485,7 +485,7 @@ impl<L, R> AnyOf<L, R> {
         }
     }
 
-    /// Swaps (- operator) the left and right components, creating a new `AnyOf` with reversed types.
+    /// Swaps (! operator) the left and right components, creating a new `AnyOf` with reversed types.
     ///
     /// # Returns
     ///
@@ -561,7 +561,7 @@ impl<L, R> AnyOf<L, R> {
         }
     }
 
-    /// Combines (`+` operator) two `Either` values into a single one.
+    /// Combines (`&` operator) two `Either` values into a single one.
     ///
     /// ## General rules
     ///
@@ -570,26 +570,26 @@ impl<L, R> AnyOf<L, R> {
     ///     * as left operand : substitutes the other operand,
     ///     * as right operand : completes the other operand,
     /// * `Left` or `Right` :
-    ///     * `L+R` or `R+L` combines to an instance of `Both`,
-    ///     * `L+l` or `r+R` selects the operand placed on the correct side of the operator :
+    ///     * `L & R` or `R & L` combines to an instance of `Both`,
+    ///     * `L & l` or `r & R` selects the operand placed on the correct side of the operator :
     ///         * left**Left** + right**Left** = left**Left**
     ///         * left**Right** + right**Right** = right**Right**
     ///
     /// ## All cases
     ///
     /// * Neither cases :
-    ///     * Neither + Neither = Neither
-    ///     * Neither + **other** = other
-    ///     * **self** + Neither = self
+    ///     * Neither & Neither = Neither
+    ///     * Neither & **other** = other
+    ///     * **self** & Neither = self
     /// * Trivial cases :
-    ///     * **Left(x)** + Left(y) = Left(x)
-    ///     * Right(x) + **Right(y)** = Right(y)
-    ///     * **Both(x, y)** + other = Both(x, y)
+    ///     * **Left(x)** & Left(y) = Left(x)
+    ///     * Right(x) & **Right(y)** = Right(y)
+    ///     * **Both(x, y)** & other = Both(x, y)
     /// * Combined cases :
-    ///     * Left(x) + Right(y) = Both(x, y)
-    ///     * Right(x) + Left(y) = Both(y, x)
-    ///     * Left(x) + Both(_, y) = Both(x, y)
-    ///     * Right(x) + Both(y, _) = Both(y, x)
+    ///     * Left(x) & Right(y) = Both(x, y)
+    ///     * Right(x) & Left(y) = Both(y, x)
+    ///     * Left(x) & Both(_, y) = Both(x, y)
+    ///     * Right(x) & Both(y, _) = Both(y, x)
     pub fn combine(self, other: Self) -> Self {
         match self {
             Self::Neither => other,
@@ -609,7 +609,7 @@ impl<L, R> AnyOf<L, R> {
         }
     }
 
-    /// Filters (`-` operator) the current `AnyOf` instance using another `AnyOf` instance.
+    /// Filters (`|` operator) the current `AnyOf` instance using another `AnyOf` instance.
     ///
     /// ## General rules
     ///
@@ -622,17 +622,17 @@ impl<L, R> AnyOf<L, R> {
     /// ## All cases
     ///
     /// - **Neither cases**:
-    ///     * `Neither - other = Neither`
-    ///     * `Left(x) - Left(y) = Neither`
-    ///     * `Right(x) - Right(y) = Neither`
-    ///     * `other - Both(x, y) = Neither`
+    ///     * `Neither | other = Neither`
+    ///     * `Left(x) | Left(y) = Neither`
+    ///     * `Right(x) | Right(y) = Neither`
+    ///     * `other | Both(x, y) = Neither`
     /// - **Trivial case**:
-    ///     * `other - Neither = other`
+    ///     * `other | Neither = other`
     /// - **Filtered cases**:
-    ///     * `Left(x) - Right(y) = Left(x)`
-    ///     * `Right(x) - Left(y) = Right(x)`
-    ///     * `Both(x, y) - Right(y) = Left(x)`
-    ///     * `Both(x, y) - Left(y) = Right(y)`
+    ///     * `Left(x) | Right(y) = Left(x)`
+    ///     * `Right(x) | Left(y) = Right(x)`
+    ///     * `Both(x, y) | Right(y) = Left(x)`
+    ///     * `Both(x, y) | Left(y) = Right(y)`
     ///
     /// # Examples
     ///
@@ -646,20 +646,20 @@ impl<L, R> AnyOf<L, R> {
     /// let neither: AnyOf<i32, i32> = AnyOf::Neither;
     ///
     /// // Filtering Both with Right results in Left
-    /// assert_eq!(both - right_only, left_only);
+    /// assert_eq!(both | right_only, left_only);
     ///
     /// // Filtering Both with Left results in Right
-    /// assert_eq!(both - left_only, right_only);
+    /// assert_eq!(both | left_only, right_only);
     ///
     /// // Filtering with Neither doesn't affect the original value
-    /// assert_eq!(both - neither, both);
-    /// assert_eq!(left_only - neither, left_only);
-    /// assert_eq!(right_only - neither, right_only);
+    /// assert_eq!(both | neither, both);
+    /// assert_eq!(left_only | neither, left_only);
+    /// assert_eq!(right_only | neither, right_only);
     ///
     /// // Filtering with Both always results in Neither
-    /// assert_eq!(both - both, neither);
-    /// assert_eq!(left_only - both, neither);
-    /// assert_eq!(right_only - both, neither);
+    /// assert_eq!(both | both, neither);
+    /// assert_eq!(left_only | both, neither);
+    /// assert_eq!(right_only | both, neither);
     /// ```
     pub fn filter(self, other: Self) -> Self {
         match other {
@@ -681,29 +681,29 @@ impl<L, R> AnyOf<L, R> {
     }
 }
 
-impl<L, R> Add for AnyOf<L, R> {
+impl<L, R> BitAnd for AnyOf<L, R> {
     type Output = Self;
 
     /// See : [Self::combine].
-    fn add(self, rhs: Self) -> Self::Output {
+    fn bitand(self, rhs: Self) -> Self::Output {
         self.combine(rhs)
     }
 }
 
-impl<L, R> Sub for AnyOf<L, R> {
+impl<L, R> BitOr for AnyOf<L, R> {
     type Output = Self;
 
     /// See : [Self::filter].
-    fn sub(self, rhs: Self) -> Self::Output {
+    fn bitor(self, rhs: Self) -> Self::Output {
         self.filter(rhs)
     }
 }
 
-impl<L, R> Neg for AnyOf<L, R> {
+impl<L, R> Not for AnyOf<L, R> {
     type Output = AnyOf<R, L>;
 
     /// See : [Self::swap].
-    fn neg(self) -> Self::Output {
+    fn not(self) -> Self::Output {
         self.swap()
     }
 }

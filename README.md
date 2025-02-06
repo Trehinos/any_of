@@ -2,8 +2,8 @@
 
 This project implements a flexible [Algebraic Data Type](https://en.wikipedia.org/wiki/Algebraic_data_type) : `AnyOf`.
 
-`AnyOf` is an optional sum of product type of two types, which enables **clear and safe** data representations
-in functional and type-driven programming.
+`AnyOf` is an optional **sum of product of two types**,  
+which enables clear and safe data representations in functional and type-driven programming.
 
 ## Overview
 
@@ -20,9 +20,15 @@ These abstractions allow to express dynamic states, optional values, and branchi
         - `Either::Left`: Only the left value is present.
         - `Either::Right`: Only the right value is present.
         - `Both`: Both values are present.
-    - Conceptually, it combines variants in the following way:
-      ```
+    - ```
+      # Conceptually, it combines variants in the following way
       AnyOf<L, R> = Neither | Either<L, R> | Both<L, R>
+      
+      # Its cases are:
+      AnyOf<L, R> = Neither | Either::Left(L) | Either::Right(R) | Both(L, R)
+      
+      # It can also be viewed as a product of two optional types:
+      AnyOf<L, R>::any = (Option<L>, Option<R>)
       ```
 
 2. **`Either<L, R>`**
@@ -38,7 +44,7 @@ These abstractions allow to express dynamic states, optional values, and branchi
 
 3. **`Both<L, R>`**
     - A product type that pairs two values, `left` and `right`, of potentially different types.
-    - Conceptually, it is the type :
+    - Conceptually, it is the type:
       ```
       Both<L, R> = (L, R)
       ```
@@ -50,13 +56,16 @@ These abstractions allow to express dynamic states, optional values, and branchi
 ### Features and Utilities
 
 - Methods inspired by Rust's `Option` and `Result` types:
-    - Creation utilities : `new`, `new_left`, `new_both`, etc.
+    - Creation utilities: `new`, `new_left`, `new_both`, etc.
     - State checks: `is_neither`, `is_left`, `is_both`, etc.
     - Transformations: `map_left`, `map_right`, `swap`, etc.
     - Unwrapping: `unwrap_left`, `unwrap_right`, `unwrap_both`.
 
-- Flexible combinations :
-    - Operators like `+` to merge, or `-` to filter or swap values in `AnyOf`.
+- Flexible combinations:
+    - Operators like:
+      - `&` to combine, or,
+      - `|` to filter, or,
+      - `!` to swap values in `AnyOf`.
     - Default value handling and state manipulation methods.
 
 ### Use Cases
@@ -74,11 +83,12 @@ The project aims to enrich Rust's type system with expressive and flexible types
 for representing data combinations and states.
 
 * Unlike the Rust's `Result` type, the types `Either` or `AnyOf` has no error semantic,
-* `AnyOf<L, R>` can be also be viewed as two options : `(Option<L>, Option<R>)` (a product type of sum type),
+* `AnyOf<L, R>` can be also be viewed as two options: `(Option<L>, Option<R>)` (a product of two optional types),
 
 ## Status
 
-The library is still under development, but it follows semantic versioning.
+The library is still under development, but it follows semantic versioning.  
+So the API will be stable in the same major version.
 
 [Feedback is welcome](mailto:dev-any-of@trehinos.eu)!
 

@@ -1,11 +1,11 @@
 [package]
 name = "any_of"
-version = "1.0.0"
+version = "1.1.0"
 edition = "2021"
 description = "A general optional sum of product type which can be Neither, Left, Right or Both."
 license = "MIT"
 repository = "https://github.com/Trehinos/any_of"
-categories = ["data-structures", "no-std"]
-keywords = ["either", "any", "left", "right", "both"]
+categories = ["data-structures", "no-std", "rust-patterns"]
+keywords = ["either", "any", "left_right", "both", "ADT"]
 
 [dependencies]
