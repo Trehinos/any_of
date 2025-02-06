@@ -1,15 +1,16 @@
 # AnyOf : a versatile type for Rust
 
-This project implements a flexible and expressive Algebraic Data Type : `AnyOf`.
+This project implements a flexible [Algebraic Data Type](https://en.wikipedia.org/wiki/Algebraic_data_type) : `AnyOf`.
 
-`AnyOf` is an optional sum of product type of two types, which enables clear, safe, and concise
-representations of data combinations in functional and type-driven programming.
+`AnyOf` is an optional sum of product type of two types, which enables **clear and safe** data representations
+in functional and type-driven programming.
 
 ## Overview
 
-At the core of the project is the `AnyOf` enum, a general-purpose algebraic type, alongside additional types 
-such as `Either` and `Both`. These abstractions allow to express dynamic states, optional values,
-and branching logic in a natural and explicit manner.
+At the core of the project is the `AnyOf` enum, a general-purpose algebraic type,
+alongside additional types such as `Either` and `Both`.
+
+These abstractions allow to express dynamic states, optional values, and branching logic in a natural and explicit manner.
 
 ### Key Types
 
@@ -49,13 +50,13 @@ and branching logic in a natural and explicit manner.
 ### Features and Utilities
 
 - Methods inspired by Rust's `Option` and `Result` types:
-    - Creation utilities : `AnyOf::new`, `AnyOf::new_left`, `AnyOf::new_both`, etc.
+    - Creation utilities : `new`, `new_left`, `new_both`, etc.
     - State checks: `is_neither`, `is_left`, `is_both`, etc.
     - Transformations: `map_left`, `map_right`, `swap`, etc.
     - Unwrapping: `unwrap_left`, `unwrap_right`, `unwrap_both`.
 
 - Flexible combinations :
-    - Operators like `+` to merge and manipulate values in `AnyOf`.
+    - Operators like `+` to merge, or `-` to filter or swap values in `AnyOf`.
     - Default value handling and state manipulation methods.
 
 ### Use Cases
@@ -72,7 +73,7 @@ and branching logic in a natural and explicit manner.
 The project aims to enrich Rust's type system with expressive and flexible types 
 for representing data combinations and states.
 
-* Unlike the Rust's `Result` type, `Either` has no semantic,
+* Unlike the Rust's `Result` type, the types `Either` or `AnyOf` has no error semantic,
 * `AnyOf<L, R>` can be also be viewed as two options : `(Option<L>, Option<R>)` (a product type of sum type),
 
 ## Status
