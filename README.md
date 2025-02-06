@@ -10,9 +10,10 @@ which enables clear and safe data representations in functional and type-driven 
 ## Overview
 
 At the core of the project is the `AnyOf` enum, a general-purpose algebraic type,
-alongside additional types such as `Either` and `Both`.
+alongside additional types as `Either` and `Both`.
 
-These abstractions allow to express dynamic states, optional values, and branching logic in a natural and explicit manner.
+These abstractions allow to express dynamic states, optional values, and branching logic in a natural and explicit
+manner.
 
 ### Key Types
 
@@ -34,13 +35,11 @@ These abstractions allow to express dynamic states, optional values, and branchi
       ```
       AnyOf<L, R>::any = (Option<L>, Option<R>)
       ```
-      - with:
-        ```
-        Neither::any = (None, None)
-        Either::Left(L)::any = (Some(L), None)
-        Either::Right(R)::any = (None, Some(R))
-        Both::any = (Some(L), Some(R))
-        ```
+      Cases :
+        - `Neither::any` = `(None, None)`
+        - `Either::Left(L)::any` = `(Some(L), None)`
+        - `Either::Right(R)::any` = `(None, Some(R))`
+        - `Both::any` = `(Some(L), Some(R))`
 
 2. **`Either<L, R>`**
     - A simple sum type representing one of two values.
@@ -61,9 +60,12 @@ These abstractions allow to express dynamic states, optional values, and branchi
       ```
 
 4. **Enhanced Type Composition**
-    - Complex types like `AnyOf4`, `AnyOf8`, and `AnyOf16` are implemented for handling larger, 
-    structured combinations via nested `AnyOf` structures.
-    - The types implement the `LeftOrRight<L, R>` trait. 
+    - Complex types like `AnyOf4`, `AnyOf8`, and `AnyOf16` are implemented for handling larger,
+      structured combinations via nested `AnyOf` structures.
+    - The `LeftOrRight` trait :
+        - Provides the methods `is_right()`, `is_left()`, `any()`, `left()` and `right()`.
+        - Implemented by `AnyOf`, `Either` and `Both`,
+        - Can be implemented by a custom type.
 
 ### Features and Utilities
 
@@ -75,9 +77,9 @@ These abstractions allow to express dynamic states, optional values, and branchi
 
 - Flexible combinations:
     - Operators :
-      - `&` to combine `AnyOf` values, or,
-      - `|` to filter `AnyOf` values, or,
-      - `!` to swap  `AnyOf`, `Either` and `Both` values.
+        - `&` to combine `AnyOf` values, or,
+        - `|` to filter `AnyOf` values, or,
+        - `!` to swap  `AnyOf`, `Either` and `Both` values.
     - Default value handling and state manipulation methods.
 
 ### Use Cases
@@ -91,16 +93,17 @@ These abstractions allow to express dynamic states, optional values, and branchi
 
 ## Motivation
 
-The project aims to enrich Rust's type system with expressive and flexible types 
+The project aims to enrich Rust's type system with expressive and flexible types
 for representing data combinations and states.
 
 * Unlike the Rust's `Result` type, the types `Either` or `AnyOf` has no error semantic,
-* `AnyOf<L, R>` can be also be viewed as two options: `(Option<L>, Option<R>)` (a product of two optional types),
+* `AnyOf<L, R>::any` = `(Option<L>, Option<R>)` (a product of two optional types),
 
 ## Status
 
-The library is still under development, but it follows semantic versioning.  
-So the API will be stable in the same major version.
+The library is terminated. It may evolve but not actively.
+
+The project follows semantic versioning, so the API will be stable in a given major version.
 
 [Feedback is welcome](mailto:dev-any-of@trehinos.eu)!
 
