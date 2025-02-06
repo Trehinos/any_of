@@ -1,16 +1,68 @@
+//! # any_of
+//!
+//! `any_of` is a flexible and lightweight Rust crate designed to handle scenarios
+//! where a variable may have one out of several possible values, or none at all.
+//! It provides the `AnyOf` enum with variants to represent these possibilities.
+//!
+//! ## Features
+//! - **Enum Variants**:
+//!   - `Neither` to represent the absence of values.
+//!   - `Either` to represent a single value (`Left` or `Right`).
+//!   - `Both` to represent a combination of values (`Left` and `Right`).
+//! - **Convenient Methods**: Create, transform, and check the state of `AnyOf` values
+//!   easily with utility functions like `new`, `is_neither`, `is_both`, `map_left`, etc.
+//! - **Extensible with Type Parameters**: Allows customization of the `Left` and `Right` types.
+//!
+//! ## Example Usage
+//!
+//! ```rust
+//! use any_of::{AnyOf, either::Either, both::Both};
+//!
+//! let neither: AnyOf<i32, &str> = AnyOf::Neither;
+//! let neither: AnyOf<i32, &str> = AnyOf::new(None, None);
+//! let left: AnyOf<i32, &str> = AnyOf::Either(Either::Left(42));
+//! let left: AnyOf<i32, &str> = AnyOf::new(Some(42), None);
+//! let both: AnyOf<i32, &str> = AnyOf::Both(Both { left: 42, right: "Hello" });
+//! let both: AnyOf<i32, &str> = AnyOf::new(Some(42), Some("Hello"));
+//!
+//! assert!(neither.is_neither());
+//! assert!(left.is_left());
+//! assert!(both.is_both());
+//!
+//! assert!(neither.map_right(|r| r).is_neither());
+//! assert!(left.map_right(|r| r).is_neither());
+//! assert!(left.map_left(|l| l).is_left());
+//! assert!(both.map_left(|l| l).is_left());
+//! ```
+//!
+//! ## Crate Features
+//! - `std` feature: Enables standard library support for types that require it.
+//!
+//! ## Use Cases
+//! - Representing optional or branching data in a concise manner.
+//! - Handling dynamic states with variants like `Neither`, `Either`, and `Both`.
+//! - Reducing boilerplate for mapping and transforming multiple optional values.
+//!
+//! ## Notable methods :
+//! - [AnyOf::new]
+//! - [AnyOf::combine]
+//! - [AnyOf::unwrap_left] and [AnyOf::left]
+//! - [AnyOf::unwrap_right] and [AnyOf::right]
+//! - [AnyOf::unwrap_both] and [AnyOf::both_or_none]
+//!
 #![cfg_attr(not(feature = "std"), no_std)]
-
-#[cfg(feature = "std")]
-use std::ops::Add;
-
-use crate::either::{Both, Either};
 
 pub type Couple<T, U> = (T, U);
 pub type Pair<T> = Couple<T, T>;
 
 pub mod either;
+pub mod both;
 
-#[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
+#[cfg(feature = "std")]
+use std::ops::Add;
+use crate::both::Both;
+use crate::either::Either;
+
 /// Represents a type that can hold one of several variants: `Neither`, `Either` (with `Left` or `Right`),
 /// or `Both` (containing both `Left` and `Right` values).
 ///
@@ -30,13 +82,14 @@ pub mod either;
 /// # Examples
 ///
 /// ```rust
-/// use any_of::AnyOf;
-/// use any_of::either::Either;
-/// use any_of::either::Both;
+/// use any_of::{AnyOf, either::Either, both::Both};
 ///
 /// let neither: AnyOf<i32, &str> = AnyOf::Neither;
+/// let neither: AnyOf<i32, &str> = AnyOf::new(None, None);
 /// let left: AnyOf<i32, &str> = AnyOf::Either(Either::Left(42));
+/// let left: AnyOf<i32, &str> = AnyOf::new(Some(42), None);
 /// let both: AnyOf<i32, &str> = AnyOf::Both(Both { left: 42, right: "Hello" });
+/// let both: AnyOf<i32, &str> = AnyOf::new(Some(42), Some("Hello"));
 ///
 /// assert!(neither.is_neither());
 /// assert!(left.is_left());
@@ -48,6 +101,7 @@ pub mod either;
 /// assert!(both.map_left(|l| l).is_left());
 ///
 /// ```
+#[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
 pub enum AnyOf<L, R = L> {
     Neither,
     Either(Either<L, R>),
@@ -55,6 +109,37 @@ pub enum AnyOf<L, R = L> {
 }
 
 impl<L, R> AnyOf<L, R> {
+    /// Creates a new `AnyOf` instance based on the presence of `left` and `right` values.
+    ///
+    /// # Parameters
+    ///
+    /// - `left`: An `Option` containing the left value of type `L`, or `None` if absent.
+    /// - `right`: An `Option` containing the right value of type `R`, or `None` if absent.
+    ///
+    /// # Returns
+    ///
+    /// - Returns `AnyOf::Neither` if both `left` and `right` are `None`.
+    /// - Returns `AnyOf::Either(Either::Left)` if `left` has a value and `right` is `None`.
+    /// - Returns `AnyOf::Either(Either::Right)` if `right` has a value and `left` is `None`.
+    /// - Returns `AnyOf::Both` if both `left` and `right` have values.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use any_of::{AnyOf, either::Either, both::Both};
+    ///
+    /// let neither: AnyOf<i32, &str> = AnyOf::new(None, None);
+    /// assert!(neither.is_neither());
+    ///
+    /// let left: AnyOf<i32, &str> = AnyOf::new(Some(42), None);
+    /// assert!(left.is_left());
+    ///
+    /// let right: AnyOf<i32, &str> = AnyOf::new(None, Some("Hello"));
+    /// assert!(right.is_right());
+    ///
+    /// let both: AnyOf<i32, &str> = AnyOf::new(Some(42), Some("Hello"));
+    /// assert!(both.is_both());
+    /// ```
     pub fn new(left: Option<L>, right: Option<R>) -> Self {
         match (left, right) {
             (None, None) => Self::Neither,
