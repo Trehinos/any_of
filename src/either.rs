@@ -1,7 +1,7 @@
-//! This module provides the `Either` enum, a utility type that represents a value 
+//! This module provides the `Either` enum, a utility type that represents a value
 //! that can be one of two variants: `Left` or `Right`.
 //!
-//! This is useful for scenarios where a value can have one of two possible types, often used as a lightweight 
+//! This is useful for scenarios where a value can have one of two possible types, often used as a lightweight
 //! alternative to `Result` or for decision trees in functional programming.
 //!
 //! The `Either` enum has the following scenarios of use:
@@ -9,7 +9,7 @@
 //! - `Right`: A variant for holding a value of type `R`.
 //!
 //! # Public API
-//! This module provides numerous utility methods for creating, inspecting, and 
+//! This module provides numerous utility methods for creating, inspecting, and
 //! transforming instances of `Either`.
 //!
 //! ## Creation
@@ -21,28 +21,28 @@
 //! - [`Either::is_right`]: Returns `true` if the value is `Right`.
 //! - [`Either::left`]: Returns a reference to the left value if it exists.
 //! - [`Either::right`]: Returns a reference to the right value if it exists.
-//! - [`Either::any`]: Returns a tuple of `Option` references to either the left 
+//! - [`Either::any`]: Returns a tuple of `Option` references to either the left
 //!   or the right value, depending on the variant.
 //!
 //! ## Default Values
 //! - [`Either::left_or`]: Returns the left value or a provided default.
 //! - [`Either::right_or`]: Returns the right value or a provided default.
-//! - [`Either::left_or_else`]: Returns the left value or computes a default using 
+//! - [`Either::left_or_else`]: Returns the left value or computes a default using
 //!   a closure.
-//! - [`Either::right_or_else`]: Returns the right value or computes a default 
+//! - [`Either::right_or_else`]: Returns the right value or computes a default
 //!   using a closure.
 //!
 //! ## Unwrapping
-//! - [`Either::unwrap_left`]: Extracts the left value, panicking if the value is 
+//! - [`Either::unwrap_left`]: Extracts the left value, panicking if the value is
 //!   a `Right`.
-//! - [`Either::unwrap_right`]: Extracts the right value, panicking if the value is 
+//! - [`Either::unwrap_right`]: Extracts the right value, panicking if the value is
 //!   a `Left`.
 //!
 //! ## Transformation
 //! - [`Either::swap`]: Swaps the `Left` variant for `Right` and vice versa.
 //! - [`Either::map_left`]: Applies a function to transform the `Left` value.
 //! - [`Either::map_right`]: Applies a function to transform the `Right` value.
-//! - [`Either::map`]: Applies separate functions to transform either the `Left` 
+//! - [`Either::map`]: Applies separate functions to transform either the `Left`
 //!   or `Right` value depending on the variant.
 //!
 //! ## Examples
@@ -50,6 +50,7 @@
 //!
 //! ```rust
 //! use any_of::Either;
+//! use any_of::concepts::LeftOrRight;
 //!
 //! let left_value: Either<i32, &str> = Either::new_left(10);
 //! assert!(left_value.is_left());
@@ -66,11 +67,12 @@
 //!
 
 use core::ops::Not;
+use crate::LeftOrRight;
 
 /// The `Either` enum is a utility type that can hold a value of one of two variants: `Left(L)` or `Right(R)`.
 ///
-/// It serves as a straightforward alternative to `Result`, providing a way to perform operations 
-/// on values of two possible types. Unlike `Result`, it does not imply any specific meaning 
+/// It serves as a straightforward alternative to `Result`, providing a way to perform operations
+/// on values of two possible types. Unlike `Result`, it does not imply any specific meaning
 /// to the variants.
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
 pub enum Either<L, R> {
@@ -103,64 +105,6 @@ impl<L, R> Either<L, R> {
     /// A new instance of `Either` with the value in the `Right` variant.
     pub fn new_right(right: R) -> Self {
         Self::Right(right)
-    }
-
-    /// Checks if the `Either` value is the `Left` variant.
-    ///
-    /// ## Returns
-    ///
-    /// `true` if the value is `Left`, otherwise `false`.
-    pub fn is_left(&self) -> bool {
-        matches!(self, Self::Left(_))
-    }
-
-    /// Checks if the `Either` value is the `Right` variant.
-    ///
-    /// ## Returns
-    ///
-    /// `true` if the value is `Right`, otherwise `false`.
-    pub fn is_right(&self) -> bool {
-        matches!(self, Self::Right(_))
-    }
-
-    /// Returns references to the `Left` and `Right` values as a tuple of `Option`.
-    ///
-    /// ## Returns
-    ///
-    /// A tuple containing an `Option` reference to the left value and an `Option`
-    /// reference to the right value. Only one of the options will contain a value
-    /// depending on the variant.
-    pub fn any(&self) -> (Option<&L>, Option<&R>) {
-        match self {
-            Self::Left(l) => (Some(l), None),
-            Self::Right(r) => (None, Some(r)),
-        }
-    }
-
-    /// Returns a reference to the left value if it exists.
-    ///
-    /// ## Returns
-    ///
-    /// An `Option` containing a reference to the left value if the variant is `Left`,
-    /// otherwise `None`.
-    pub fn left(&self) -> Option<&L> {
-        match self {
-            Self::Left(l) => Some(l),
-            Self::Right(_) => None,
-        }
-    }
-
-    /// Returns a reference to the right value if it exists.
-    ///
-    /// ## Returns
-    ///
-    /// An `Option` containing a reference to the right value if the variant is `Right`,
-    /// otherwise `None`.
-    pub fn right(&self) -> Option<&R> {
-        match self {
-            Self::Left(_) => None,
-            Self::Right(r) => Some(r),
-        }
     }
 
     /// Returns the left value or computes a default using the provided closure.
@@ -312,6 +256,41 @@ impl<L, R> Either<L, R> {
             Self::Right(r) => Either::<L2, R2>::Right(fr(r)),
         }
     }
+}
+
+impl<L, R> LeftOrRight<L, R> for Either<L, R> {
+
+    /// See [crate::LeftOrRight::is_left].
+    fn is_left(&self) -> bool {
+        matches!(self, Self::Left(_))
+    }
+
+    /// See [crate::LeftOrRight::is_right].
+    fn is_right(&self) -> bool {
+        matches!(self, Self::Right(_))
+    }
+
+    /// See [crate::LeftOrRight::any].
+    fn any(&self) -> (Option<&L>, Option<&R>) {
+        (self.left(), self.right())
+    }
+
+    /// See [crate::LeftOrRight::left].
+    fn left(&self) -> Option<&L> {
+        match self {
+            Self::Left(l) => Some(l),
+            Self::Right(_) => None,
+        }
+    }
+
+    /// See [crate::LeftOrRight::right].
+    fn right(&self) -> Option<&R> {
+        match self {
+            Self::Left(_) => None,
+            Self::Right(r) => Some(r),
+        }
+    }
+
 }
 
 impl<L, R> Not for Either<L, R> {

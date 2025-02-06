@@ -22,16 +22,25 @@ These abstractions allow to express dynamic states, optional values, and branchi
         - `Either::Left`: Only the left value is present.
         - `Either::Right`: Only the right value is present.
         - `Both`: Both values are present.
-    - ```
-      # Conceptually, it combines variants in the following way
+    - Conceptually, it combines variants in the following way:
+      ```
       AnyOf<L, R> = Neither | Either<L, R> | Both<L, R>
-      
-      # Its cases are:
-      AnyOf<L, R> = Neither | Either::Left(L) | Either::Right(R) | Both(L, R)
-      
-      # It can also be viewed as a product of two optional types:
+      ```
+    - Its cases are:
+      ```
+      AnyOf(L, R) = Neither | Either::Left(L) | Either::Right(R) | Both(L, R)
+      ```
+    - It can also be viewed as a product of two optional types:
+      ```
       AnyOf<L, R>::any = (Option<L>, Option<R>)
       ```
+      - with:
+        ```
+        Neither::any = (None, None)
+        Either::Left(L)::any = (Some(L), None)
+        Either::Right(R)::any = (None, Some(R))
+        Both::any = (Some(L), Some(R))
+        ```
 
 2. **`Either<L, R>`**
     - A simple sum type representing one of two values.
@@ -54,6 +63,7 @@ These abstractions allow to express dynamic states, optional values, and branchi
 4. **Enhanced Type Composition**
     - Complex types like `AnyOf4`, `AnyOf8`, and `AnyOf16` are implemented for handling larger, 
     structured combinations via nested `AnyOf` structures.
+    - The types implement the `LeftOrRight<L, R>` trait. 
 
 ### Features and Utilities
 
@@ -64,10 +74,10 @@ These abstractions allow to express dynamic states, optional values, and branchi
     - Unwrapping: `unwrap_left`, `unwrap_right`, `unwrap_both`.
 
 - Flexible combinations:
-    - Operators like:
-      - `&` to combine, or,
-      - `|` to filter, or,
-      - `!` to swap values in `AnyOf`.
+    - Operators :
+      - `&` to combine `AnyOf` values, or,
+      - `|` to filter `AnyOf` values, or,
+      - `!` to swap  `AnyOf`, `Either` and `Both` values.
     - Default value handling and state manipulation methods.
 
 ### Use Cases

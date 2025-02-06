@@ -16,7 +16,7 @@
 //! ## Example Usage
 //!
 //! ```rust
-//! use any_of::{AnyOf, Either, Both};
+//! use any_of::{AnyOf, Either, Both, LeftOrRight};
 //!
 //! let neither: AnyOf<i32, &str> = AnyOf::Neither;
 //! let neither: AnyOf<i32, &str> = AnyOf::new(None, None);
@@ -49,19 +49,20 @@
 //!
 #![no_std]
 
-/// The `(T, U)` tuple.
-pub type Couple<T, U> = (T, U);
+pub mod concepts;
 
-/// A shortcut for `Couple<T, T>`.
-pub type Pair<T> = Couple<T, T>;
+pub mod either;
 
 pub mod both;
-pub mod either;
 
 use core::ops::{BitAnd, BitOr, Not};
 
-pub use crate::both::Both;
-pub use crate::either::Either;
+pub use crate::{
+    any_of_x::{AnyOf16, AnyOf4, AnyOf8},
+    both::Both,
+    concepts::{Couple, LeftOrRight, Pair},
+    either::Either,
+};
 
 /// Represents a type that can hold one of several variants: `Neither`, `Either` (with `Left` or `Right`),
 /// or `Both` (containing both `Left` and `Right` values).
@@ -82,7 +83,7 @@ pub use crate::either::Either;
 /// # Examples
 ///
 /// ```rust
-/// use any_of::{AnyOf, either::Either, both::Both};
+/// use any_of::{AnyOf, Either, Both, LeftOrRight};
 ///
 /// let neither: AnyOf<i32, &str> = AnyOf::Neither;
 /// let neither: AnyOf<i32, &str> = AnyOf::new(None, None);
@@ -126,7 +127,7 @@ impl<L, R> AnyOf<L, R> {
     /// # Examples
     ///
     /// ```rust
-    /// use any_of::{AnyOf, either::Either, both::Both};
+    /// use any_of::{AnyOf, Either, Both, LeftOrRight};
     ///
     /// let neither: AnyOf<i32, &str> = AnyOf::new(None, None);
     /// assert!(neither.is_neither());
@@ -168,7 +169,7 @@ impl<L, R> AnyOf<L, R> {
     /// # Examples
     ///
     /// ```rust
-    /// use any_of::AnyOf;
+    /// use any_of::{AnyOf, LeftOrRight};
     ///
     /// let left: AnyOf<i32, &str> = AnyOf::new_left(42);
     /// assert!(left.is_left());
@@ -182,7 +183,7 @@ impl<L, R> AnyOf<L, R> {
     /// # Examples
     ///
     /// ```rust
-    /// use any_of::AnyOf;
+    /// use any_of::{AnyOf, LeftOrRight};
     ///
     /// let right: AnyOf<i32, &str> = AnyOf::new_right("Hello");
     /// assert!(right.is_right());
@@ -299,7 +300,7 @@ impl<L, R> AnyOf<L, R> {
     /// # Examples
     ///
     /// ```rust
-    /// use any_of::{AnyOf, Either};
+    /// use any_of::{AnyOf, Either, LeftOrRight};
     ///
     /// let either: Either<i32, ()> = Either::Left(42);
     /// let any_of: AnyOf<i32, ()> = AnyOf::from_either(either);
@@ -313,17 +314,9 @@ impl<L, R> AnyOf<L, R> {
     pub fn has_left(&self) -> bool {
         matches!(self, Self::Either(Either::Left(_)) | Self::Both(_))
     }
-    /// True if [Either::Left].
-    pub fn is_left(&self) -> bool {
-        matches!(self, Self::Either(Either::Left(_)))
-    }
     /// True if [Either::Right] or [AnyOf::Both].
     pub fn has_right(&self) -> bool {
         matches!(self, Self::Either(Either::Right(_)) | Self::Both(_))
-    }
-    /// True if [Either::Right].
-    pub fn is_right(&self) -> bool {
-        matches!(self, Self::Either(Either::Right(_)))
     }
     /// True if not [AnyOf::Neither].
     pub fn is_any(&self) -> bool {
@@ -352,37 +345,6 @@ impl<L, R> AnyOf<L, R> {
     /// Returns `Some((&L, &R))` if `self.is_both()` is true, or `None`.
     pub fn both_or_none(&self) -> Option<Couple<&L, &R>> {
         Some((self.left()?, self.right()?))
-    }
-
-    /// Returns the left and/or right part(s) of this instance.
-    ///
-    /// Returns :
-    /// * (None, None) if this instance is [Self::Neither],
-    /// * (Some(&L), None) if this instance is [Either::Left]
-    /// * (None, Some(&R)) if this instance is [Either::Right]
-    /// * (Some(&L), Some(&R)) if this instance is [Self::Both]
-    pub fn any(&self) -> Couple<Option<&L>, Option<&R>> {
-        (self.left(), self.right())
-    }
-
-    /// Returns `Some(&L)` if `self.has_left()` is true, or `None`.
-    pub fn left(&self) -> Option<&L> {
-        match self {
-            Self::Neither => None,
-            Self::Either(Either::Left(l)) => Some(l),
-            Self::Either(Either::Right(_)) => None,
-            Self::Both(Both { left: l, .. }) => Some(l),
-        }
-    }
-
-    /// Returns `Some(&R)` if `self.has_right()` is true, or `None`.
-    pub fn right(&self) -> Option<&R> {
-        match self {
-            Self::Neither => None,
-            Self::Either(Either::Left(_)) => None,
-            Self::Either(Either::Right(r)) => Some(r),
-            Self::Both(Both { right: r, .. }) => Some(r),
-        }
     }
 
     /// Returns the left value if present, or computes it with the provided function.
@@ -705,6 +667,46 @@ impl<L, R> Not for AnyOf<L, R> {
     /// See : [Self::swap].
     fn not(self) -> Self::Output {
         self.swap()
+    }
+}
+
+impl<L, R> LeftOrRight<L, R> for AnyOf<L, R> {
+    /// True if [Either::Left].
+    fn is_left(&self) -> bool {
+        matches!(self, Self::Either(Either::Left(_)))
+    }
+    /// True if [Either::Right].
+    fn is_right(&self) -> bool {
+        matches!(self, Self::Either(Either::Right(_)))
+    }
+
+    /// Returns the left and/or right part(s) of this instance.
+    ///
+    /// Returns :
+    /// * (None, None) if this instance is [Self::Neither],
+    /// * (Some(&L), None) if this instance is [Either::Left]
+    /// * (None, Some(&R)) if this instance is [Either::Right]
+    /// * (Some(&L), Some(&R)) if this instance is [Self::Both]
+    fn any(&self) -> Couple<Option<&L>, Option<&R>> {
+        (self.left(), self.right())
+    }
+
+    /// Returns `Some(&L)` if `self.has_left()` is true, or `None`.
+    fn left(&self) -> Option<&L> {
+        match self {
+            Self::Neither => None,
+            Self::Either(e) => e.left(),
+            Self::Both(b) => b.left(),
+        }
+    }
+
+    /// Returns `Some(&R)` if `self.has_right()` is true, or `None`.
+    fn right(&self) -> Option<&R> {
+        match self {
+            Self::Neither => None,
+            Self::Either(e) => e.right(),
+            Self::Both(b) => b.right(),
+        }
     }
 }
 
