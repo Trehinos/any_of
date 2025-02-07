@@ -1,8 +1,7 @@
 name: BuildTest
 
 on:
-  create: ~
-  workflow_dispatch: ~
+  create:
   push:
     branches: [ "ci", "dev", "master" ]
   pull_request:
