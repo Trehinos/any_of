@@ -66,11 +66,16 @@ interface BitAnd {
 interface BitOr {
     a | b
 }
+interface From< T > {
+    {abstract} {static} from(T) -> Self
+    into(self) -> T
+}
 interface Not {
     !a
 }
 
 Not <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
+From <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
 LeftOrRight <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
 Swap <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
 Map <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
