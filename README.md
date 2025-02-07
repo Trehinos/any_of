@@ -106,7 +106,7 @@ for representing data combinations and states.
 
 ## Status
 
-The library is terminated. It may evolve but not actively.
+The library may evolve but not actively.
 
 The project follows semantic versioning, so the API will be stable in a given major version.
 
