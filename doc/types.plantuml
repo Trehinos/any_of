@@ -2,9 +2,11 @@
 
 struct Couple<T, U> {
     (T, U)
+    __
 }
 struct Pair<T> {
     Couple(T, T)
+    __
 }
 Couple <- Pair
 

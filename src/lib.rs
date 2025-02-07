@@ -666,6 +666,8 @@ impl<L, R> Unwrap<L, R> for AnyOf<L, R> {
     }
 }
 
+pub mod conversions;
+
 pub mod any_of_x;
 
 #[cfg(test)]

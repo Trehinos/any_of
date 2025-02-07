@@ -2,7 +2,17 @@
 
 # `v1` Release phase
 
-## `1.3.1` Any
+## `v1.3` 
+
+## `v1.3.2`
+
+`From` and `Into` implementations.
+
+- Added the `conversions` module with type conversion implementations.
+- Exported the `conversions` module in `src/lib.rs`.
+- Updated `doc/types.plantuml` to reflect new struct member additions.
+
+## `v1.3.1` Any
 
 `Any`, `from_any` and `from_either`.
 
@@ -18,7 +28,7 @@
 - Updated `Swap::Output` type definition in `doc/types.plantuml`.
 - Expanded `AnyOf4`, `AnyOf8`, and `AnyOf16` classes with structured accessor methods in `doc/types.plantuml`.
 
-## `1.3` Traits
+### `v1.3.0` Traits
 
 `Swap`, `Map` and `Unwrap`.
 
