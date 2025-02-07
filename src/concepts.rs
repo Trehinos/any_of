@@ -122,8 +122,9 @@ pub trait Swap<L, R>: LeftOrRight<L, R> {
 }
 
 /// The `Map` trait provides utilities for transforming the `left` or `right` variants
-/// of a dual-variant type (`LeftOrRight`). This allows for ergonomic and type-safe
-/// transformations of either side of the data structure.
+/// of a dual-variant type (`LeftOrRight`).
+///
+/// This allows for ergonomic and type-safe transformations of either side of the data structure.
 ///
 /// ## Provided Methods
 ///
@@ -190,6 +191,42 @@ pub trait Map<L, R>: LeftOrRight<L, R> {
         FR: FnOnce(R) -> R2;
 }
 
+/// The `Unwrap` trait provides utilities for safely extracting values from 
+/// a dual-variant type (`LeftOrRight`).
+/// 
+/// It allows ergonomic operations that retrieve either the left or right value, 
+/// with fallbacks when the expected variant is not present.
+///
+/// ## Usage
+///
+/// The `Unwrap` trait simplifies the handling of `LeftOrRight` types by providing
+/// convenient methods to extract values transparently or substitute a value when
+/// the expected variant does not exist.
+///
+/// ## Examples
+///
+/// ```rust
+/// use any_of::{Either, Unwrap};
+///
+/// let left: Either<i32, &str> = Either::Left(42);
+/// let right: Either<i32, &str> = Either::Right("example");
+///
+/// // Retrieve the left value, or default to 0
+/// assert_eq!(left.left_or_default(), 42);
+/// assert_eq!(right.left_or_default(), 0);
+///
+/// // Use closures to provide alternate values
+/// assert_eq!(right.left_or_else(|| 100), 100);
+/// assert_eq!(left.right_or_else(|| "default"), "default");
+///
+/// // Use custom default values
+/// assert_eq!(left.left_or(99), 42);
+/// assert_eq!(right.right_or("new default"), "example");
+/// ```
+///
+/// This trait is especially useful in scenarios where fallbacks or default
+/// values need to be derived dynamically or when working with optional or
+/// fallible data structures.
 pub trait Unwrap<L, R>: LeftOrRight<L, R> {
     /// Returns the left value or computes a default using the provided closure.
     ///
