@@ -60,7 +60,7 @@ use core::ops::{BitAnd, BitOr, Not};
 pub use crate::{
     any_of_x::{AnyOf16, AnyOf4, AnyOf8},
     both::Both,
-    concepts::{Couple, LeftOrRight, Map, Pair, Swap, Unwrap},
+    concepts::{Any, Couple, LeftOrRight, Map, Pair, Swap, Unwrap},
     either::Either,
 };
 
@@ -206,6 +206,43 @@ impl<L, R> AnyOf<L, R> {
         Self::new(Some(l), Some(r))
     }
 
+    /// Creates an `AnyOf::Both` variant from a `Both` struct.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use any_of::{AnyOf, Both};
+    ///
+    /// let both_struct = Both { left: 42, right: "Hello" };
+    /// let both = AnyOf::from_both(both_struct);
+    /// assert!(both.is_both());
+    /// ```
+    pub fn from_both(both: Both<L, R>) -> Self {
+        Self::new(Some(both.left), Some(both.right))
+    }
+
+    /// Creates a new `AnyOf` instance based on the presence of `left` and `right` values.
+    ///
+    /// See [Self::new].
+    pub fn from_any(any: Any<L, R>) -> Self {
+        Self::new(any.0, any.1)
+    }
+
+    /// Creates an `AnyOf` variant from an `Either` struct.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use any_of::{AnyOf, Either, LeftOrRight};
+    ///
+    /// let either: Either<i32, ()> = Either::Left(42);
+    /// let any_of: AnyOf<i32, ()> = AnyOf::from_either(either);
+    /// assert!(any_of.is_left());
+    /// ```
+    pub fn from_either(either: Either<L, R>) -> Self {
+        Self::Either(either)
+    }
+
     /// Converts the `AnyOf` variant to a `Both` struct.
     ///
     /// # Panics
@@ -226,21 +263,6 @@ impl<L, R> AnyOf<L, R> {
             AnyOf::Both(b) => b,
             _ => panic!("Can only convert Either::Both to Both"),
         }
-    }
-
-    /// Creates an `AnyOf::Both` variant from a `Both` struct.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use any_of::{AnyOf, Both};
-    ///
-    /// let both_struct = Both { left: 42, right: "Hello" };
-    /// let both = AnyOf::from_both(both_struct);
-    /// assert!(both.is_both());
-    /// ```
-    pub fn from_both(both: Both<L, R>) -> Self {
-        Self::new(Some(both.left), Some(both.right))
     }
 
     /// Converts the `AnyOf` variant to an `Either` struct.
@@ -293,21 +315,6 @@ impl<L, R> AnyOf<L, R> {
         let left = both.0.map(|l| Either::Left(l.clone()));
         let right = both.1.map(|r| Either::Right(r.clone()));
         (left, right)
-    }
-
-    /// Creates an `AnyOf` variant from an `Either` struct.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// use any_of::{AnyOf, Either, LeftOrRight};
-    ///
-    /// let either: Either<i32, ()> = Either::Left(42);
-    /// let any_of: AnyOf<i32, ()> = AnyOf::from_either(either);
-    /// assert!(any_of.is_left());
-    /// ```
-    pub fn from_either(either: Either<L, R>) -> Self {
-        Self::Either(either)
     }
 
     /// True if [Either::Left] or [AnyOf::Both].

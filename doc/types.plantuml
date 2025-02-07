@@ -1,0 +1,160 @@
+@startuml
+
+struct Couple<T, U> {
+    (T, U)
+}
+struct Pair<T> {
+    Couple(T, T)
+}
+Couple <- Pair
+
+struct Any<T, U> {
+    Couple<Option< T >, Option< U >>
+}
+Couple <-- Any
+
+Any <-- LeftOrRight
+interface LeftOrRight<L, R> {
+    + {abstract} is_left(&self) -> bool
+    + {abstract} is_right(&self) -> bool
+    + {abstract} any(&self) -> Any<& L, & R>
+    + {abstract} left&self) -> Option<& L>
+    + {abstract} right&self) -> Option<& R>
+}
+
+LeftOrRight <|-- Swap
+interface Swap<L, R> {
+    + {abstract}{static} type Output: LeftOrRight<L, R>
+    __
+    + {abstract} swap(self) -> Self::Output
+}
+
+LeftOrRight <|-- Map
+abstract Map<L, R> {
+    + {abstract}{static} type Output<L2, R2>: LeftOrRight<L2, R2>
+    __
+    * FL: FnOnce(L) -> L2
+    * FR: FnOnce(R) -> R2
+    + {abstract} map<FL, FR, L2, R2>(self, fl: FL, fr: FR) -> Self::Output<L2, R2>
+    + map_left<FL, L2>(self, fl: FL) -> Self::Output<L2, R>
+    + map_right<FR, R2>(self, fr: FR) -> Self::Output<L, R2>
+}
+
+LeftOrRight <|-- Unwrap
+abstract Unwrap<L, R> {
+    * FL: FnOnce(L) -> L
+    * FR: FnOnce(R) -> R
+    + {abstract} left_or_else(self, f: FL) -> L
+    + {abstract} right_or_else(self, f: FR) -> R
+    + left_or(self, l: L) -> L
+    + right_or(self, r: R) -> R
+    + left_or_default(self) -> L
+    + right_or_default(self) -> R
+    + expect_left(self, msg: &str) -> L
+    + expect_right(self, msg: &str) -> R
+    + unwrap_left(self) -> L
+    + unwrap_right(self) -> R
+}
+
+diamond "LeftOrRight+Swap+Map+Unwrap+Not"
+
+interface BitAnd {
+    a & b
+}
+interface BitOr {
+    a | b
+}
+interface Not {
+    !a
+}
+
+Not <-- "LeftOrRight+Swap+Map+Unwrap+Not"
+LeftOrRight <-- "LeftOrRight+Swap+Map+Unwrap+Not"
+Swap <-- "LeftOrRight+Swap+Map+Unwrap+Not"
+Map <-- "LeftOrRight+Swap+Map+Unwrap+Not"
+Unwrap <-- "LeftOrRight+Swap+Map+Unwrap+Not"
+
+"LeftOrRight+Swap+Map+Unwrap+Not" <|.. Either
+enum Either<L, R> {
+    * Left(L)
+    * Right(R)
+    __
+    Swap::Output = Either<R, L>
+    Map::Output<L2, R2> = Either<L2, R2>
+    ==
+    __
+    + {static} new_left(l: L) -> Self
+    + {static} new_right(r: R) -> Self
+}
+
+struct Both<L, R> {
+    + left: L
+    + right: R
+    __
+    Swap::Output = Both<R, L>
+    Map::Output<L2, R2> = Both<L2, R2>
+    ==
+    + {static} new(l: L, r: R) -> Self
+    + {static} from_couple(couple: Couple<L, R>) -> Self
+    + into_couple(self) -> Couple<L, R>
+    + into_left(self) -> L
+    + into_right(self) -> R
+}
+"LeftOrRight+Swap+Map+Unwrap+Not" <|.. Both
+
+BitAnd <|.. AnyOf
+BitOr <|.. AnyOf
+"LeftOrRight+Swap+Map+Unwrap+Not" <|. AnyOf
+enum AnyOf<L, R> {
+    * Neither
+    * Either(Either<L, R>)
+    * Both(Both<L, R>)
+    __
+    Swap::Output = AnyOf<R, L>
+    Map::Output<L2, R2> = AnyOf<L2, R2>
+    ==
+    * FB: FnOnce() -> Both<L, R>
+    + {static} new(l: Option<L>, r: Option<R>) -> Self
+    + {static} new_neither() -> Self
+    + {static} new_left(l: L) -> Self
+    + {static} new_right(r: R) -> Self
+    + {static} new_both(l: L, r: R) -> Self
+    + {static} from_both(both: Both<L, R>) -> Self
+    + {static} from_either(either: Either<L, R>) -> Self
+    + {static} from_any(any: Any<L, R>) -> Self
+    + filter_left(self) -> Self
+    + filter_right(self) -> Self
+    + with_left(self, l: L) -> Self
+    + with_right(self, r: R) -> Self
+    + combine(self, other: Self) -> Self
+    + filter(self, other: Self) -> Self
+    + to_either_pair(&self) -> Pair<Option<Either<L, R>>
+    + has_left(&self) -> bool
+    + has_right(&self) -> bool
+    + is_any(&self) -> bool
+    + is_one(&self) -> bool
+    + is_both(&self) -> bool
+    + is_neither(&self) -> bool
+    + is_neither_or_both(&self) -> bool
+    + into_both(self) -> Both<L, R>
+    + into_either(self) -> Either<L, R>
+    + both_or_none(self) -> Option<Couple<&L, &R>>
+    + both_or_else(self, f: FB) -> Both<L, R>
+    + both_or(self, default: Both<L, R>) -> Both<L, R>
+    + unwrap_both(self) -> Both<L, R>
+}
+
+AnyOf o-- AnyOf4
+class AnyOf4< ... > {
+    AnyOf<AnyOf, AnyOf>
+}
+AnyOf o-- AnyOf8
+class AnyOf8< ... > {
+    AnyOf<AnyOf4, AnyOf4>
+}
+AnyOf o-- AnyOf16
+class AnyOf16< ... > {
+    AnyOf<AnyOf8, AnyOf8>
+}
+
+@enduml

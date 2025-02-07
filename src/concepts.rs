@@ -10,6 +10,11 @@ pub type Couple<T, U> = (T, U);
 /// A shortcut for `Couple<T, T>`.
 pub type Pair<T> = Couple<T, T>;
 
+/// A shortcut for `(Option<T>, Option<U>)`.
+///
+/// It is a valid representation of a [crate::AnyOf].
+pub type Any<T, U> = Couple<Option<T>, Option<U>>;
+
 /// The `LeftOrRight` trait provides utility methods for working with types that
 /// can represent one of two possible variants: a "left" variant (`L`) or a
 /// "right" variant (`R`) (or possibly both).

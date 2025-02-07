@@ -83,6 +83,10 @@ manner.
         - `!` to swap  `AnyOf`, `Either` and `Both` values.
     - Default value handling and state manipulation methods.
 
+![Type diagram PNG](doc/any_of-type-diagram.png)
+
+[Download the type diagram](doc/types.plantuml).
+
 ### Use Cases
 
 `AnyOf` and its related types simplify dynamic state management and are well-suited for:
