@@ -1,9 +1,6 @@
 # AnyOf : a versatile type for Rust
 
-| Branch | Status                                                                                                                                                          |
-|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| dev    | [![Rust](https://github.com/Trehinos/any_of/actions/workflows/rust.yml/badge.svg?branch=dev)](https://github.com/Trehinos/any_of/actions/workflows/rust.yml)    |
-| master | [![Rust](https://github.com/Trehinos/any_of/actions/workflows/rust.yml/badge.svg?branch=master)](https://github.com/Trehinos/any_of/actions/workflows/rust.yml) |
+[![Rust](https://github.com/Trehinos/any_of/actions/workflows/rust.yml/badge.svg?branch=ci)](https://github.com/Trehinos/any_of/actions/workflows/rust.yml)
 
 This project implements a flexible [Algebraic Data Type](https://en.wikipedia.org/wiki/Algebraic_data_type) : `AnyOf`.
 
