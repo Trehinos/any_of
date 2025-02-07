@@ -321,10 +321,12 @@ impl<L, R> AnyOf<L, R> {
     pub fn has_left(&self) -> bool {
         matches!(self, Self::Either(Either::Left(_)) | Self::Both(_))
     }
-    /// True if [Either::Right] or [AnyOf::Both].
+    
+    /// True if [Either::Right] or [AnyOf::Both].0
     pub fn has_right(&self) -> bool {
         matches!(self, Self::Either(Either::Right(_)) | Self::Both(_))
     }
+    
     /// True if not [AnyOf::Neither].
     pub fn is_any(&self) -> bool {
         matches!(
@@ -332,18 +334,29 @@ impl<L, R> AnyOf<L, R> {
             Self::Either(Either::Left(_)) | Self::Either(Either::Right(_)) | Self::Both(_)
         )
     }
+
+    // todo(2.0.0) : remove
     /// True if [AnyOf::Either].
+    #[deprecated(since = "1.3.1", note = "Use `is_either` instead. Will be removed in 2.0.0.")]
     pub fn is_one(&self) -> bool {
+        self.is_either()
+    }
+
+    /// True if [AnyOf::Either].
+    pub fn is_either(&self) -> bool {
         matches!(self, Self::Either(_))
     }
+    
     /// True if [AnyOf::Both]
     pub fn is_both(&self) -> bool {
         matches!(self, Self::Both(_))
     }
+    
     /// True if [AnyOf::Neither]
     pub fn is_neither(&self) -> bool {
         matches!(self, Self::Neither)
     }
+    
     /// True if not [AnyOf::Either]
     pub fn is_neither_or_both(&self) -> bool {
         matches!(self, Self::Neither | Self::Both(_))

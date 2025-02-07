@@ -24,7 +24,7 @@ interface LeftOrRight<L, R> {
 
 LeftOrRight <|-- Swap
 interface Swap<L, R> {
-    + {abstract}{static} type Output: LeftOrRight<L, R>
+    + {abstract}{static} type Output: LeftOrRight<R, L>
     __
     + {abstract} swap(self) -> Self::Output
 }
@@ -145,16 +145,47 @@ enum AnyOf<L, R> {
 }
 
 AnyOf o-- AnyOf4
-class AnyOf4< ... > {
-    AnyOf<AnyOf, AnyOf>
+class AnyOf4<LL, LR, RL, RR> {
+    AnyOf<AnyOf<LL, LR>, AnyOf<RL, RR>>
+    __
+    + ll(&self) -> Option<& LL>
+    + lr(&self) -> Option<& LR>
+    + rl(&self) -> Option<& RL>
+    + rr(&self) -> Option<& RR>
 }
 AnyOf o-- AnyOf8
 class AnyOf8< ... > {
     AnyOf<AnyOf4, AnyOf4>
+    __
+    + lll(&self) -> Option<& LLL>
+    + llr(&self) -> Option<& LLR>
+    + lrl(&self) -> Option<& LRL>
+    + lrr(&self) -> Option<& LRR>
+    + rll(&self) -> Option<& RLL>
+    + rlr(&self) -> Option<& RLR>
+    + rrl(&self) -> Option<& RRL>
+    + rrr(&self) -> Option<& RRR>
 }
 AnyOf o-- AnyOf16
 class AnyOf16< ... > {
     AnyOf<AnyOf8, AnyOf8>
+    __
+    + llll(&self) -> Option<& LLLL>
+    + lllr(&self) -> Option<& LLLR>
+    + llrl(&self) -> Option<& LLRL>
+    + llrr(&self) -> Option<& LLRR>
+    + lrll(&self) -> Option<& LRLL>
+    + lrlr(&self) -> Option<& LRLR>
+    + lrrl(&self) -> Option<& LRRL>
+    + lrrr(&self) -> Option<& LRRR>
+    + rlll(&self) -> Option<& RLLL>
+    + rllr(&self) -> Option<& RLLR>
+    + rlrl(&self) -> Option<& RLRL>
+    + rlrr(&self) -> Option<& RLRR>
+    + rrll(&self) -> Option<& RRLL>
+    + rrlr(&self) -> Option<& RRLR>
+    + rrrl(&self) -> Option<& RRRL>
+    + rrrr(&self) -> Option<& RRRR>
 }
 
 @enduml
