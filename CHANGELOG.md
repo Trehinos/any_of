@@ -13,6 +13,10 @@
 - Added `Any<T, U>` type alias in `concepts.rs`.
 - Introduced `from_any` and `from_either` methods to `AnyOf`.
 - Updated `Cargo.toml` and `Cargo.lock` to version `1.4.0-dev`.
+- Added `is_either` method in `src/lib.rs`.
+- Deprecated `is_one` method with a deprecation notice.
+- Updated `Swap::Output` type definition in `doc/types.plantuml`.
+- Expanded `AnyOf4`, `AnyOf8`, and `AnyOf16` classes with structured accessor methods in `doc/types.plantuml`.
 
 ## `1.3` Traits
 
