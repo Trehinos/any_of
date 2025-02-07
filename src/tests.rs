@@ -1,5 +1,4 @@
-use crate::AnyOf;
-use crate::LeftOrRight;
+use crate::{AnyOf, LeftOrRight, Map, Unwrap};
 
 mod utils {
     use core::ops::Add;
@@ -23,7 +22,6 @@ fn test_any_of_right() {
     assert_eq!(mul2.left(), None);
     assert_eq!(mul2.unwrap_right(), 2.2);
 }
-
 
 #[test]
 fn test_any_of_neither() {

@@ -47,8 +47,9 @@
 //! }
 //! ```
 
+use crate::concepts::Swap;
 use crate::either::Either;
-use crate::{Couple, LeftOrRight};
+use crate::{Couple, LeftOrRight, Map, Unwrap};
 use core::ops::Not;
 
 /// `Both` is a generic struct that allows pairing two values of potentially different types.
@@ -177,64 +178,6 @@ impl<L, R> Both<L, R> {
     pub fn into_right(self) -> Either<L, R> {
         Either::<L, R>::Right(self.right)
     }
-
-    /// Applies the provided transformation functions to the `left` and `right` values of this `Both` instance.
-    ///
-    /// # Type Parameters
-    /// - `L2`: The resulting type of the transformed `left` value.
-    /// - `R2`: The resulting type of the transformed `right` value.
-    /// - `FL`: The type of the function used to transform the `left` value.
-    /// - `FR`: The type of the function used to transform the `right` value.
-    ///
-    /// # Arguments
-    /// - `fl`: A function that takes the `left` value and transforms it into a value of type `L2`.
-    /// - `fr`: A function that takes the `right` value and transforms it into a value of type `R2`.
-    ///
-    /// # Returns
-    /// A new `Both` instance with transformed `left` and `right` values.
-    ///
-    /// # Examples
-    /// ```rust
-    /// use any_of::Both;
-    ///
-    /// let both = Both::new(2, "example");
-    /// let transformed = both.map(|left| left * 2, |right| format!("{}!", right));
-    ///
-    /// assert_eq!(transformed.left, 4);
-    /// assert_eq!(transformed.right, "example!");
-    /// ```
-    pub fn map<L2, R2, FL, FR>(self, fl: FL, fr: FR) -> Both<L2, R2>
-    where
-        FL: FnOnce(L) -> L2,
-        FR: FnOnce(R) -> R2,
-    {
-        Both {
-            left: fl(self.left),
-            right: fr(self.right),
-        }
-    }
-
-    /// Swaps the `left` and `right` values of this `Both` instance.
-    ///
-    /// # Returns
-    /// A new `Both` instance where the `left` and `right` values are swapped.
-    ///
-    /// # Examples
-    /// ```rust
-    /// use any_of::Both;
-    ///
-    /// let both = Both::new(42, "example");
-    /// let swapped = both.swap();
-    ///
-    /// assert_eq!(swapped.left, "example");
-    /// assert_eq!(swapped.right, 42);
-    /// ```
-    pub fn swap(self) -> Both<R, L> {
-        Both {
-            left: self.right,
-            right: self.left,
-        }
-    }
 }
 
 impl<L, R> LeftOrRight<L, R> for Both<L, R> {
@@ -274,6 +217,84 @@ impl<L, R> LeftOrRight<L, R> for Both<L, R> {
     /// An `Option` containing a reference to the right value.
     fn right(&self) -> Option<&R> {
         Some(&self.right)
+    }
+}
+
+impl<L, R> Swap<L, R> for Both<L, R> {
+    type Output = Both<R, L>;
+
+
+    /// Swaps the `left` and `right` values of this `Both` instance.
+    ///
+    /// # Returns
+    /// A new `Both` instance where the `left` and `right` values are swapped.
+    ///
+    /// # Examples
+    /// ```rust
+    /// use any_of::Both;
+    /// use any_of::Swap;
+    ///
+    /// let both = Both::new(42, "example");
+    /// let swapped = both.swap();
+    ///
+    /// assert_eq!(swapped.left, "example");
+    /// assert_eq!(swapped.right, 42);
+    /// ```
+    fn swap(self) -> Self::Output {
+        Both {
+            left: self.right,
+            right: self.left,
+        }
+    }
+}
+
+impl<L, R> Map<L, R> for Both<L, R> {
+    type Output<L2, R2> = Both<L2, R2>;
+
+    /// Applies the provided transformation functions to the `left` and `right` values of this `Both` instance.
+    ///
+    /// # Type Parameters
+    /// - `L2`: The resulting type of the transformed `left` value.
+    /// - `R2`: The resulting type of the transformed `right` value.
+    /// - `FL`: The type of the function used to transform the `left` value.
+    /// - `FR`: The type of the function used to transform the `right` value.
+    ///
+    /// # Arguments
+    /// - `fl`: A function that takes the `left` value and transforms it into a value of type `L2`.
+    /// - `fr`: A function that takes the `right` value and transforms it into a value of type `R2`.
+    ///
+    /// # Returns
+    /// A new `Both` instance with transformed `left` and `right` values.
+    ///
+    /// # Examples
+    /// ```rust
+    /// use any_of::{Both, Map};
+    ///
+    /// let both = Both::new(2, "example");
+    /// let transformed = both.map(|left| left * 2, |right| format!("{}!", right));
+    ///
+    /// assert_eq!(transformed.left, 4);
+    /// assert_eq!(transformed.right, "example!");
+    /// ```
+    fn map<FL, FR, L2, R2>(self, fl: FL, fr: FR) -> Self::Output<L2, R2>
+    where
+        FL: FnOnce(L) -> L2,
+        FR: FnOnce(R) -> R2,
+    {
+        Both {
+            left: fl(self.left),
+            right: fr(self.right),
+        }
+    }
+}
+
+impl<L, R> Unwrap<L, R> for Both<L, R> {
+    fn left_or_else(self, _: impl FnOnce() -> L) -> L {
+        self.left
+    }
+
+    fn right_or_else(self, _: impl FnOnce() -> R) -> R {
+        self.right
     }
 }
 

@@ -16,7 +16,7 @@
 //! ## Example Usage
 //!
 //! ```rust
-//! use any_of::{AnyOf, Either, Both, LeftOrRight};
+//! use any_of::{AnyOf, Both, Either, LeftOrRight, Map};
 //!
 //! let neither: AnyOf<i32, &str> = AnyOf::Neither;
 //! let neither: AnyOf<i32, &str> = AnyOf::new(None, None);
@@ -60,7 +60,7 @@ use core::ops::{BitAnd, BitOr, Not};
 pub use crate::{
     any_of_x::{AnyOf16, AnyOf4, AnyOf8},
     both::Both,
-    concepts::{Couple, LeftOrRight, Pair},
+    concepts::{Couple, LeftOrRight, Map, Pair, Swap, Unwrap},
     either::Either,
 };
 
@@ -83,7 +83,7 @@ pub use crate::{
 /// # Examples
 ///
 /// ```rust
-/// use any_of::{AnyOf, Either, Both, LeftOrRight};
+/// use any_of::{AnyOf, Either, Both, LeftOrRight, Map};
 ///
 /// let neither: AnyOf<i32, &str> = AnyOf::Neither;
 /// let neither: AnyOf<i32, &str> = AnyOf::new(None, None);
@@ -347,26 +347,6 @@ impl<L, R> AnyOf<L, R> {
         Some((self.left()?, self.right()?))
     }
 
-    /// Returns the left value if present, or computes it with the provided function.
-    pub fn left_or_else(self, f: impl FnOnce() -> L) -> L {
-        match self {
-            Self::Neither => f(),
-            Self::Either(Either::Left(l)) => l,
-            Self::Either(Either::Right(_)) => f(),
-            Self::Both(Both { left: l, .. }) => l,
-        }
-    }
-
-    /// Returns the right value if present, or computes it with the provided function.
-    pub fn right_or_else(self, f: impl FnOnce() -> R) -> R {
-        match self {
-            Self::Neither => f(),
-            Self::Either(Either::Left(_)) => f(),
-            Self::Either(Either::Right(r)) => r,
-            Self::Both(Both { right: r, .. }) => r,
-        }
-    }
-
     /// Returns both values if present, or computes them with the provided function.
     pub fn both_or_else(self, f: impl FnOnce() -> Both<L, R>) -> Both<L, R> {
         match self {
@@ -377,29 +357,9 @@ impl<L, R> AnyOf<L, R> {
         }
     }
 
-    /// Returns the left value if present, or the provided default value.
-    pub fn left_or(self, other: L) -> L {
-        self.left_or_else(|| other)
-    }
-
-    /// Returns the right value if present, or the provided default value.
-    pub fn right_or(self, other: R) -> R {
-        self.right_or_else(|| other)
-    }
-
     /// Returns both values if present, or the provided default values.
     pub fn both_or(self, other: Both<L, R>) -> Both<L, R> {
         self.both_or_else(|| other)
-    }
-
-    /// Unwraps and returns the left value, panicking if not available.
-    pub fn unwrap_left(self) -> L {
-        self.left_or_else(|| panic!("Can only unwrap left of Either::Left or Either::Both"))
-    }
-
-    /// Unwraps and returns the right value, panicking if not available.
-    pub fn unwrap_right(self) -> R {
-        self.right_or_else(|| panic!("Can only unwrap right of Either::Right or Either::Both"))
     }
 
     /// Unwraps and returns both values, panicking if not available.
@@ -444,82 +404,6 @@ impl<L, R> AnyOf<L, R> {
             Self::Either(Either::Left(_)) => Self::Either(Either::Left(left)),
             Self::Either(Either::Right(r)) => Self::Both(Both { left, right: r }),
             Self::Both(Both { right: r, .. }) => Self::Both(Both { left, right: r }),
-        }
-    }
-
-    /// Swaps (! operator) the left and right components, creating a new `AnyOf` with reversed types.
-    ///
-    /// # Returns
-    ///
-    /// A new `AnyOf<R, L>` instance where the left and right components have been swapped.
-    ///
-    /// - If `self` is `Neither`, the result will also be `Neither`.
-    /// - If `self` is an `Either::Left`, the result will contain the value as an `Either::Right`.
-    /// - If `self` is an `Either::Right`, the result will contain the value as an `Either::Left`.
-    /// - If `self` is a `Both`, the left and right values are swapped in the result.
-    pub fn swap(self) -> AnyOf<R, L> {
-        match self {
-            Self::Neither => AnyOf::<R, L>::Neither,
-            Self::Either(e) => AnyOf::<R, L>::Either(e.swap()),
-            Self::Both(b) => AnyOf::<R, L>::Both(b.swap()),
-        }
-    }
-
-    /// Transforms the `Left` value using a provided function.
-    ///
-    /// ## Arguments
-    ///
-    /// * `f` - A function to transform the left value.
-    ///
-    /// ## Returns
-    ///
-    /// An `AnyOf` where the `Left` value has been transformed. The `Right` value,
-    /// if present, remains unchanged. If self is `Neither`, this function returns `Neither`.
-    pub fn map_left<FL, L2>(self, f: FL) -> AnyOf<L2, R>
-    where
-        FL: FnOnce(L) -> L2,
-    {
-        self.map(f, |r| r)
-    }
-
-    /// Transforms the `Right` value using a provided function.
-    ///
-    /// ## Arguments
-    ///
-    /// * `f` - A function to transform the right value.
-    ///
-    /// ## Returns
-    ///
-    /// An `AnyOf` where the `Right` value has been transformed. The `Left` value,
-    /// if present, remains unchanged. If self is `Neither`, this function returns `Neither`.
-    pub fn map_right<FR, R2>(self, f: FR) -> AnyOf<L, R2>
-    where
-        FR: FnOnce(R) -> R2,
-    {
-        self.map(|l| l, f)
-    }
-
-    /// Transforms the `Left` and `Right` value using separate functions, depending
-    /// on the variant.
-    ///
-    /// ## Arguments
-    ///
-    /// * `fl` - A function to transform the left value.
-    /// * `fr` - A function to transform the right value.
-    ///
-    /// ## Returns
-    ///
-    /// An `AnyOf` where the `Left` and `Right` value has been transformed
-    /// by the corresponding function. If self is `Neither`, this function returns `Neither`.
-    pub fn map<FL, FR, L2, R2>(self, fl: FL, fr: FR) -> AnyOf<L2, R2>
-    where
-        FL: FnOnce(L) -> L2,
-        FR: FnOnce(R) -> R2,
-    {
-        match self {
-            Self::Neither => AnyOf::<L2, R2>::Neither,
-            Self::Either(e) => AnyOf::<L2, R2>::Either(e.map(fl, fr)),
-            Self::Both(b) => AnyOf::<L2, R2>::Both(b.map(fl, fr)),
         }
     }
 
@@ -706,6 +590,78 @@ impl<L, R> LeftOrRight<L, R> for AnyOf<L, R> {
             Self::Neither => None,
             Self::Either(e) => e.right(),
             Self::Both(b) => b.right(),
+        }
+    }
+}
+
+impl<L, R> Swap<L, R> for AnyOf<L, R> {
+    type Output = AnyOf<R, L>;
+
+    /// Swaps (! operator) the left and right components, creating a new `AnyOf` with reversed types.
+    ///
+    /// # Returns
+    ///
+    /// A new `AnyOf<R, L>` instance where the left and right components have been swapped.
+    ///
+    /// - If `self` is `Neither`, the result will also be `Neither`.
+    /// - If `self` is an `Either::Left`, the result will contain the value as an `Either::Right`.
+    /// - If `self` is an `Either::Right`, the result will contain the value as an `Either::Left`.
+    /// - If `self` is a `Both`, the left and right values are swapped in the result.
+    fn swap(self) -> Self::Output {
+        match self {
+            Self::Neither => AnyOf::<R, L>::Neither,
+            Self::Either(e) => AnyOf::<R, L>::Either(e.swap()),
+            Self::Both(b) => AnyOf::<R, L>::Both(b.swap()),
+        }
+    }
+}
+
+impl<L, R> Map<L, R> for AnyOf<L, R> {
+    type Output<L2, R2> = AnyOf<L2, R2>;
+
+    /// Transforms the `Left` and `Right` value using separate functions, depending
+    /// on the variant.
+    ///
+    /// ## Arguments
+    ///
+    /// * `fl` - A function to transform the left value.
+    /// * `fr` - A function to transform the right value.
+    ///
+    /// ## Returns
+    ///
+    /// An `AnyOf` where the `Left` and `Right` value has been transformed
+    /// by the corresponding function. If self is `Neither`, this function returns `Neither`.
+    fn map<FL, FR, L2, R2>(self, fl: FL, fr: FR) -> Self::Output<L2, R2>
+    where
+        FL: FnOnce(L) -> L2,
+        FR: FnOnce(R) -> R2,
+    {
+        match self {
+            Self::Neither => AnyOf::<L2, R2>::Neither,
+            Self::Either(e) => AnyOf::<L2, R2>::Either(e.map(fl, fr)),
+            Self::Both(b) => AnyOf::<L2, R2>::Both(b.map(fl, fr)),
+        }
+    }
+}
+
+impl<L, R> Unwrap<L, R> for AnyOf<L, R> {
+    /// Returns the left value if present, or computes it with the provided function.
+    fn left_or_else(self, f: impl FnOnce() -> L) -> L {
+        match self {
+            Self::Neither => f(),
+            Self::Either(Either::Left(l)) => l,
+            Self::Either(Either::Right(_)) => f(),
+            Self::Both(Both { left: l, .. }) => l,
+        }
+    }
+
+    /// Returns the right value if present, or computes it with the provided function.
+    fn right_or_else(self, f: impl FnOnce() -> R) -> R {
+        match self {
+            Self::Neither => f(),
+            Self::Either(Either::Left(_)) => f(),
+            Self::Either(Either::Right(r)) => r,
+            Self::Both(Both { right: r, .. }) => r,
         }
     }
 }

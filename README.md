@@ -69,6 +69,7 @@ manner.
         - Provides the methods `is_right()`, `is_left()`, `any()`, `left()` and `right()`.
         - Implemented by `AnyOf`, `Either` and `Both`,
         - Can be implemented by a custom type.
+    - Other useful traits : `Unwrap<L, R>`, `Swap<L, R>` and `Map<L, R>`.
 
 ### Features and Utilities
 
