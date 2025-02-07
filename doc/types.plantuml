@@ -102,9 +102,9 @@ struct Both<L, R> {
 }
 "LeftOrRight+Swap+Map+Unwrap+Not" <|.. Both
 
-BitAnd <|.. AnyOf
-BitOr <|.. AnyOf
-"LeftOrRight+Swap+Map+Unwrap+Not" <|. AnyOf
+BitAnd <|... AnyOf
+BitOr <|... AnyOf
+"LeftOrRight+Swap+Map+Unwrap+Not" <|.. AnyOf
 enum AnyOf<L, R> {
     * Neither
     * Either(Either<L, R>)
