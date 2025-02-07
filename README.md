@@ -97,8 +97,8 @@ manner.
 The project aims to enrich Rust's type system with expressive and flexible types
 for representing data combinations and states.
 
-* Unlike the Rust's `Result` type, the types `Either` or `AnyOf` has no error semantic,
-* `AnyOf<L, R>::any` = `(Option<L>, Option<R>)` (a product of two optional types),
+* Unlike the Rust's `Result` type, the types `Either` or `LeftOrRight` has no error semantic,
+* `LeftOrRight<L, R>::any` = `(Option<L>, Option<R>)` (a product of two optional types),
 
 ## Status
 
