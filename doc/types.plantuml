@@ -68,11 +68,11 @@ interface Not {
     !a
 }
 
-Not <-- "LeftOrRight+Swap+Map+Unwrap+Not"
-LeftOrRight <-- "LeftOrRight+Swap+Map+Unwrap+Not"
-Swap <-- "LeftOrRight+Swap+Map+Unwrap+Not"
-Map <-- "LeftOrRight+Swap+Map+Unwrap+Not"
-Unwrap <-- "LeftOrRight+Swap+Map+Unwrap+Not"
+Not <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
+LeftOrRight <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
+Swap <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
+Map <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
+Unwrap <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
 
 "LeftOrRight+Swap+Map+Unwrap+Not" <|.. Either
 enum Either<L, R> {
