@@ -254,7 +254,7 @@ pub trait Unwrap<L, R>: LeftOrRight<L, R> {
     /// ```rust
     /// use any_of::{Either, Unwrap};
     ///
-    /// let left = Either::Left(42);
+    /// let left: Either<i32, &str> = Either::Left(42);
     /// let right: Either<i32, &str> = Either::Right("example");
     ///
     /// // Returns the left value as it exists.
@@ -289,7 +289,7 @@ pub trait Unwrap<L, R>: LeftOrRight<L, R> {
     /// ```rust
     /// use any_of::{Either, Unwrap};
     ///
-    /// let left = Either::Left(42);
+    /// let left: Either<i32, &str> = Either::Left(42);
     /// let right: Either<i32, &str> = Either::Right("example");
     ///
     /// // Returns the default value for &str ("") because the variant is `Left`.
@@ -325,7 +325,7 @@ pub trait Unwrap<L, R>: LeftOrRight<L, R> {
     /// ```rust
     /// use any_of::{Either, Unwrap};
     ///
-    /// let left = Either::Left(42);
+    /// let left: Either<i32, &str> = Either::Left(42);
     /// let right: Either<i32, &str> = Either::Right("example");
     ///
     /// // Successfully extracts the left value.
@@ -360,7 +360,7 @@ pub trait Unwrap<L, R>: LeftOrRight<L, R> {
     /// ```rust
     /// use any_of::{Either, Unwrap};
     ///
-    /// let left = Either::Left(42);
+    /// let left: Either<i32, &str> = Either::Left(42);
     /// let right: Either<i32, &str> = Either::Right("example");
     ///
     /// // Successfully extracts the right value.
