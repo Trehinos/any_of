@@ -562,26 +562,6 @@ impl<L, R> Not for AnyOf<L, R> {
 }
 
 impl<L, R> LeftOrRight<L, R> for AnyOf<L, R> {
-    /// True if [Either::Left].
-    fn is_left(&self) -> bool {
-        matches!(self, Self::Either(Either::Left(_)))
-    }
-    /// True if [Either::Right].
-    fn is_right(&self) -> bool {
-        matches!(self, Self::Either(Either::Right(_)))
-    }
-
-    /// Returns the left and/or right part(s) of this instance.
-    ///
-    /// Returns :
-    /// * (None, None) if this instance is [Self::Neither],
-    /// * (Some(&L), None) if this instance is [Either::Left]
-    /// * (None, Some(&R)) if this instance is [Either::Right]
-    /// * (Some(&L), Some(&R)) if this instance is [Self::Both]
-    fn any(&self) -> Couple<Option<&L>, Option<&R>> {
-        (self.left(), self.right())
-    }
-
     /// Returns `Some(&L)` if `self.has_left()` is true, or `None`.
     fn left(&self) -> Option<&L> {
         match self {

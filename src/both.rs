@@ -181,31 +181,11 @@ impl<L, R> Both<L, R> {
 }
 
 impl<L, R> LeftOrRight<L, R> for Both<L, R> {
-    /// Always true
-    fn is_left(&self) -> bool {
-        true
-    }
-
-    /// Always true
-    fn is_right(&self) -> bool {
-        true
-    }
-
-    /// Returns references to the `Left` and `Right` values as a tuple of `Option`.
-    ///
-    /// ## Returns
-    ///
-    /// A tuple containing an `Option` reference to the left value and an `Option`
-    /// reference to the right value. The options will always contain two values.
-    fn any(&self) -> (Option<&L>, Option<&R>) {
-        (self.left(), self.right())
-    }
-
     /// Returns a reference to the left value.
     ///
     /// ## Returns
     ///
-    /// An `Option` containing a reference to the left value.
+    /// Always Some(L).
     fn left(&self) -> Option<&L> {
         Some(&self.left)
     }
@@ -214,7 +194,7 @@ impl<L, R> LeftOrRight<L, R> for Both<L, R> {
     ///
     /// ## Returns
     ///
-    /// An `Option` containing a reference to the right value.
+    /// Always Some(R).
     fn right(&self) -> Option<&R> {
         Some(&self.right)
     }

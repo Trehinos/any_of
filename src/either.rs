@@ -108,19 +108,7 @@ impl<L, R> Either<L, R> {
     }
 }
 
-impl<L, R> LeftOrRight<L, R> for Either<L, R> {
-    fn is_left(&self) -> bool {
-        matches!(self, Self::Left(_))
-    }
-
-    fn is_right(&self) -> bool {
-        matches!(self, Self::Right(_))
-    }
-
-    fn any(&self) -> (Option<&L>, Option<&R>) {
-        (self.left(), self.right())
-    }
-    
+impl<L, R> LeftOrRight<L, R> for Either<L, R> {    
     fn left(&self) -> Option<&L> {
         match self {
             Self::Left(l) => Some(l),

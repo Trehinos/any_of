@@ -15,11 +15,11 @@ Couple <-- Any
 
 Any <-- LeftOrRight
 interface LeftOrRight<L, R> {
-    + {abstract} is_left(&self) -> bool
-    + {abstract} is_right(&self) -> bool
-    + {abstract} any(&self) -> Any<& L, & R>
     + {abstract} left&self) -> Option<& L>
     + {abstract} right&self) -> Option<& R>
+    + is_left(&self) -> bool
+    + is_right(&self) -> bool
+    + any(&self) -> Any<& L, & R>
 }
 
 LeftOrRight <|-- Swap

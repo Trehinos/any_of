@@ -31,28 +31,6 @@ pub type Any<T, U> = Couple<Option<T>, Option<U>>;
 /// values may contain one of two possible forms, and you need utilities for
 /// type-safe and ergonomic access to their internals.
 pub trait LeftOrRight<L, R> {
-    /// Checks if the `LeftOrRight<L, R>` value is the `L` variant.
-    ///
-    /// ## Returns
-    ///
-    /// `true` if the value is `L`, otherwise `false`.
-    fn is_left(&self) -> bool;
-
-    /// Checks if the `LeftOrRight<L, R>` value is the `R` variant.
-    ///
-    /// ## Returns
-    ///
-    /// `true` if the value is `R`, otherwise `false`.
-    fn is_right(&self) -> bool;
-
-    /// Returns references to the `L` or `R` values as a tuple of `Option`.
-    ///
-    /// ## Returns
-    ///
-    /// A tuple containing an `Option` reference to the left value and an `Option`
-    /// reference to the right value.
-    fn any(&self) -> Couple<Option<&L>, Option<&R>>;
-
     /// Returns a reference to the left value if it exists.
     ///
     /// ## Returns
@@ -68,6 +46,34 @@ pub trait LeftOrRight<L, R> {
     /// An `Option` containing a reference to the right value if the variant is `R`,
     /// otherwise `None`.
     fn right(&self) -> Option<&R>;
+
+    /// Checks if the `LeftOrRight<L, R>` value is the `L` variant.
+    ///
+    /// ## Returns
+    ///
+    /// `true` if the value is `L`, otherwise `false`.
+    fn is_left(&self) -> bool {
+        self.left().is_some()
+    }
+
+    /// Checks if the `LeftOrRight<L, R>` value is the `R` variant.
+    ///
+    /// ## Returns
+    ///
+    /// `true` if the value is `R`, otherwise `false`.
+    fn is_right(&self) -> bool {
+        self.right().is_some()
+    }
+
+    /// Returns references to the `L` or `R` values as a tuple of `Option`.
+    ///
+    /// ## Returns
+    ///
+    /// A tuple containing an `Option` reference to the left value and an `Option`
+    /// reference to the right value.
+    fn any(&self) -> Couple<Option<&L>, Option<&R>> {
+        (self.left(), self.right())
+    }
 }
 
 /// The `Swap` trait extends the `LeftOrRight` trait to include the ability to swap
