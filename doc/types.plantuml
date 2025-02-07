@@ -132,7 +132,8 @@ enum AnyOf<L, R> {
     + has_left(&self) -> bool
     + has_right(&self) -> bool
     + is_any(&self) -> bool
-    + is_one(&self) -> bool
+    - is_one(&self) -> bool
+    + is_either(&self) -> bool
     + is_both(&self) -> bool
     + is_neither(&self) -> bool
     + is_neither_or_both(&self) -> bool
