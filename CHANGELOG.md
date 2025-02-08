@@ -4,9 +4,13 @@
 
 ## `v1.3` 
 
-## `v1.3.2`
+## `v1.3.3`
 
-`From` and `Into` implementations.
+- Add missing tests for `AnyOf`.
+
+## `v1.3.2` From
+
+`From` and `Into` implementations and tests.
 
 - Added the `conversions` module with type conversion implementations.
 - Exported the `conversions` module in `src/lib.rs`.

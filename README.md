@@ -101,14 +101,13 @@ manner.
 The project aims to enrich Rust's type system with expressive and flexible types
 for representing data combinations and states.
 
-* Unlike the Rust's `Result` type, the types `Either` or `LeftOrRight` has no error semantic,
-* `LeftOrRight<L, R>::any` = `(Option<L>, Option<R>)` (a product of two optional types),
+* Unlike the Rust's `Result` type, `AnyOf`, `Either` or `LeftOrRight` have not an "error" semantic, it is general purpose,
+* All `LeftOrRight<L, R>::any` can be represented by a `(Option<L>, Option<R>)`  which is a product of two optional types,
 
 ## Status
 
-The library may evolve but not actively.
-
-The project follows semantic versioning, so the API will be stable in a given major version.
+The library may evolve following **semantic versioning**,
+so the API will be stable in a given major version.
 
 [Feedback is welcome](mailto:dev-any-of@trehinos.eu)!
 
