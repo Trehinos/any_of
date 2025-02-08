@@ -11,6 +11,7 @@
 - Added the `conversions` module with type conversion implementations.
 - Exported the `conversions` module in `src/lib.rs`.
 - Updated `doc/types.plantuml` to reflect new struct member additions.
+- Add dedicated test modules for `Either`, `Both`, and `AnyOf`.
 
 ## `v1.3.1` Any
 
