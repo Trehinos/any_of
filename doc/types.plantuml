@@ -1,5 +1,4 @@
 @startuml
-
 struct Couple<T, U> {
     (T, U)
     __
@@ -8,7 +7,7 @@ struct Pair<T> {
     Couple(T, T)
     __
 }
-Couple <- Pair
+Couple <-- Pair
 
 struct Any<T, U> {
     Couple<Option< T >, Option< U >>
@@ -22,24 +21,6 @@ interface LeftOrRight<L, R> {
     + is_left(&self) -> bool
     + is_right(&self) -> bool
     + any(&self) -> Any<& L, & R>
-}
-
-LeftOrRight <|-- Swap
-interface Swap<L, R> {
-    + {abstract}{static} type Output: LeftOrRight<R, L>
-    __
-    + {abstract} swap(self) -> Self::Output
-}
-
-LeftOrRight <|-- Map
-abstract Map<L, R> {
-    + {abstract}{static} type Output<L2, R2>: LeftOrRight<L2, R2>
-    __
-    * FL: FnOnce(L) -> L2
-    * FR: FnOnce(R) -> R2
-    + {abstract} map<FL, FR, L2, R2>(self, fl: FL, fr: FR) -> Self::Output<L2, R2>
-    + map_left<FL, L2>(self, fl: FL) -> Self::Output<L2, R>
-    + map_right<FR, R2>(self, fr: FR) -> Self::Output<L, R2>
 }
 
 LeftOrRight <|-- Unwrap
@@ -57,23 +38,43 @@ abstract Unwrap<L, R> {
     + unwrap_left(self) -> L
     + unwrap_right(self) -> R
 }
+LeftOrRight <|-- Map
+abstract Map<L, R> {
+    + {abstract}{static} type Output<L2, R2>: LeftOrRight<L2, R2>
+    __
+    * FL: FnOnce(L) -> L2
+    * FR: FnOnce(R) -> R2
+    + {abstract} map<FL, FR, L2, R2>(self, fl: FL, fr: FR) -> Self::Output<L2, R2>
+    + map_left<FL, L2>(self, fl: FL) -> Self::Output<L2, R>
+    + map_right<FR, R2>(self, fr: FR) -> Self::Output<L, R2>
+}
 
-diamond "LeftOrRight+Swap+Map+Unwrap+Not"
+LeftOrRight <|-- Swap
+interface Swap<L, R> {
+    + {abstract}{static} type Output: LeftOrRight<R, L>
+    __
+    + {abstract} swap(self) -> Self::Output
+}
 
+interface From< T > {
+    {abstract} {static} from(T) -> Self
+    into(self) -> T
+}
+metaclass "Copy, Clone, Eq, PartialEq, Debug, Hash"
+interface Not {
+    !a
+}
 interface BitAnd {
     a & b
 }
 interface BitOr {
     a | b
 }
-interface From< T > {
-    {abstract} {static} from(T) -> Self
-    into(self) -> T
-}
-interface Not {
-    !a
-}
 
+diamond "LeftOrRight+Swap+Map+Unwrap+Not"
+
+
+"Copy, Clone, Eq, PartialEq, Debug, Hash" <... "LeftOrRight+Swap+Map+Unwrap+Not"
 Not <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
 From <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
 LeftOrRight <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
@@ -87,6 +88,7 @@ enum Either<L, R> {
     * Right(R)
     __
     Swap::Output = Either<R, L>
+    Not::Output = Either<R, L>
     Map::Output<L2, R2> = Either<L2, R2>
     ==
     __
@@ -99,6 +101,7 @@ struct Both<L, R> {
     + right: R
     __
     Swap::Output = Both<R, L>
+    Not::Output = Both<R, L>
     Map::Output<L2, R2> = Both<L2, R2>
     ==
     + {static} new(l: L, r: R) -> Self
@@ -118,9 +121,12 @@ enum AnyOf<L, R> {
     * Both(Both<L, R>)
     __
     Swap::Output = AnyOf<R, L>
+    Not::Output = AnyOf<R, L>
     Map::Output<L2, R2> = AnyOf<L2, R2>
+    BitAnd::Output = Self
+    BitOr::Output = Self
     ==
-    * FB: FnOnce() -> Both<L, R>
+    * FB: FnOnce() -> Self
     + {static} new(l: Option<L>, r: Option<R>) -> Self
     + {static} new_neither() -> Self
     + {static} new_left(l: L) -> Self
@@ -152,8 +158,7 @@ enum AnyOf<L, R> {
     + unwrap_both(self) -> Both<L, R>
 }
 
-AnyOf o-- AnyOf4
-class AnyOf4<LL, LR, RL, RR> {
+struct AnyOf4<LL, LR, RL, RR> {
     AnyOf<AnyOf<LL, LR>, AnyOf<RL, RR>>
     __
     + ll(&self) -> Option<& LL>
@@ -161,8 +166,8 @@ class AnyOf4<LL, LR, RL, RR> {
     + rl(&self) -> Option<& RL>
     + rr(&self) -> Option<& RR>
 }
-AnyOf o-- AnyOf8
-class AnyOf8< ... > {
+AnyOf o-- AnyOf4
+struct AnyOf8< ... > {
     AnyOf<AnyOf4, AnyOf4>
     __
     + lll(&self) -> Option<& LLL>
@@ -174,8 +179,8 @@ class AnyOf8< ... > {
     + rrl(&self) -> Option<& RRL>
     + rrr(&self) -> Option<& RRR>
 }
-AnyOf o-- AnyOf16
-class AnyOf16< ... > {
+AnyOf o-- AnyOf8
+struct AnyOf16< ... > {
     AnyOf<AnyOf8, AnyOf8>
     __
     + llll(&self) -> Option<& LLLL>
@@ -195,5 +200,6 @@ class AnyOf16< ... > {
     + rrrl(&self) -> Option<& RRRL>
     + rrrr(&self) -> Option<& RRRR>
 }
+AnyOf o-- AnyOf16
 
 @enduml
