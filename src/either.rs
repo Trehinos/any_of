@@ -1,20 +1,20 @@
-//! This module provides the `Either` enum, a utility type that represents a value
+//! This module provides the `EitherOf` enum, a utility type that represents a value
 //! that can be one of two variants: `Left` or `Right`.
 //!
 //! This is useful for scenarios where a value can have one of two possible types, often used as a lightweight
 //! alternative to `Result` or for decision trees in functional programming.
 //!
-//! The `Either` enum has the following scenarios of use:
+//! The `EitherOf` enum has the following scenarios of use:
 //! - `Left`: A variant for holding a value of type `L`.
 //! - `Right`: A variant for holding a value of type `R`.
 //!
 //! # Public API
 //! This module provides numerous utility methods for creating, inspecting, and
-//! transforming instances of `Either`.
+//! transforming instances of `EitherOf`.
 //!
 //! ## Creation
-//! - [`EitherOf::new_left`]: Creates an `Either` value in the `Left` variant.
-//! - [`EitherOf::new_right`]: Creates an `Either` value in the `Right` variant.
+//! - [`EitherOf::new_left`]: Creates an `EitherOf` value in the `Left` variant.
+//! - [`EitherOf::new_right`]: Creates an `EitherOf` value in the `Right` variant.
 //!
 //! ## Inspection
 //! - [`EitherOf::is_left`]: Returns `true` if the value is `Left`.
@@ -46,7 +46,7 @@
 //!   or `Right` value depending on the variant.
 //!
 //! ## Examples
-//! Usage of the `Either` enum looks like this:
+//! Usage of the `EitherOf` enum looks like this:
 //!
 //! ```rust
 //! use any_of::{EitherOf, LeftOrRight, Swap};
@@ -69,7 +69,7 @@ use crate::concepts::{Map, Unwrap};
 use crate::{LeftOrRight, Swap};
 use core::ops::Not;
 
-/// The `Either` enum is a utility type that can hold a value of one of two variants: `Left(L)` or `Right(R)`.
+/// The `EitherOf` enum is a utility type that can hold a value of one of two variants: `Left(L)` or `Right(R)`.
 /// 
 /// This type is exported as `any_of::EitherOf`.
 ///
@@ -83,7 +83,7 @@ pub enum EitherOf<L, R> {
 }
 
 impl<L, R> EitherOf<L, R> {
-    /// Creates a new `Either` value in the `Left` variant.
+    /// Creates a new `EitherOf` value in the `Left` variant.
     ///
     /// ## Arguments
     ///
@@ -91,12 +91,12 @@ impl<L, R> EitherOf<L, R> {
     ///
     /// ## Returns
     ///
-    /// A new instance of `Either` with the value in the `Left` variant.
+    /// A new instance of `EitherOf` with the value in the `Left` variant.
     pub fn new_left(left: L) -> Self {
         Self::Left(left)
     }
 
-    /// Creates a new `Either` value in the `Right` variant.
+    /// Creates a new `EitherOf` value in the `Right` variant.
     ///
     /// ## Arguments
     ///
@@ -104,7 +104,7 @@ impl<L, R> EitherOf<L, R> {
     ///
     /// ## Returns
     ///
-    /// A new instance of `Either` with the value in the `Right` variant.
+    /// A new instance of `EitherOf` with the value in the `Right` variant.
     pub fn new_right(right: R) -> Self {
         Self::Right(right)
     }
@@ -128,11 +128,11 @@ impl<L, R> LeftOrRight<L, R> for EitherOf<L, R> {
 
 impl<L, R> Swap<L, R> for EitherOf<L, R> {
     type Output = EitherOf<R, L>;
-    /// Swaps the variants of the `Either`, turning a `Left` into a `Right` and vice versa.
+    /// Swaps the variants of the `EitherOf`, turning a `Left` into a `Right` and vice versa.
     ///
     /// ## Returns
     ///
-    /// An `Either` with the variants swapped. The `Left` value becomes `Right`,
+    /// An `EitherOf` with the variants swapped. The `Left` value becomes `Right`,
     /// and the `Right` value becomes `Left`.
     fn swap(self) -> Self::Output {
         match self {
@@ -160,7 +160,7 @@ impl<L, R> Map<L, R> for EitherOf<L, R> {
     ///
     /// ## Returns
     ///
-    /// An `Either` where the `Left` or `Right` value has been transformed
+    /// An `EitherOf` where the `Left` or `Right` value has been transformed
     /// by the corresponding function.
     fn map<FL, FR, L2, R2>(self, fl: FL, fr: FR) -> Self::Output<L2, R2>
     where

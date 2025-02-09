@@ -1,13 +1,13 @@
-//! This module defines the `Both` struct, a utility for pairing two values together.
+//! This module defines the `BothOf` struct, a utility for pairing two values together.
 //!
-//! The `Both` struct is a generic struct that holds a pair of values, `left` and `right`, of potentially different types.
+//! The `BothOf` struct is a generic struct that holds a pair of values, `left` and `right`, of potentially different types.
 //! It provides helper methods for constructing, converting, and destructuring these pairs of data.
 //!
 //! # Struct Overview
 //!
-//! ## `Both` Struct
+//! ## `BothOf` Struct
 //!
-//! The `Both` struct is generic over two types `L` and `R`, allowing users to pair any two types together.
+//! The `BothOf` struct is generic over two types `L` and `R`, allowing users to pair any two types together.
 //! It derives a variety of useful traits such as `Copy`, `Clone`, `Eq`, `PartialEq`, `Debug`, and `Hash`.
 //!
 //! ### Fields
@@ -16,8 +16,8 @@
 //!
 //! # Methods
 //!
-//! - `new(left, right) -> Self`: Creates a new `Both` instance with the given left and right values.
-//! - `from_couple(couple) -> Self`: Constructs a `Both` instance from a `Couple`, which is a tuple `(L, R)`.
+//! - `new(left, right) -> Self`: Creates a new `BothOf` instance with the given left and right values.
+//! - `from_couple(couple) -> Self`: Constructs a `BothOf` instance from a `Couple`, which is a tuple `(L, R)`.
 //! - `into_couple() -> Couple<L, R>`: Converts this struct into a `Couple`, returning it as a tuple `(L, R)`.
 //! - `into_left() -> Either<L, R>`: Converts this struct into a `Left` variant of the `Either` enum, using the `left` value.
 //! - `into_right() -> Either<L, R>`: Converts this struct into a `Right` variant of the `Either` enum, using the `right` value.
@@ -52,11 +52,9 @@ use crate::either::EitherOf;
 use crate::{Couple, LeftOrRight, Map, Unwrap};
 use core::ops::Not;
 
-/// `Both` is a generic struct that allows pairing two values of potentially different types.
+/// `BothOf` is a generic struct that allows pairing two values of potentially different types.
 ///
-/// This type is exported as `any_of::BothOf`.
-///
-/// The `Both` struct is a utility for combining two values together,
+/// The `BothOf` struct is a utility for combining two values together,
 /// making it easier to manipulate pairs of values with helper methods for construction,
 /// transformation, and conversion.
 ///
@@ -77,14 +75,14 @@ pub struct BothOf<L, R> {
 }
 
 impl<L, R> BothOf<L, R> {
-    /// Creates a new instance of the `Both` struct.
+    /// Creates a new instance of the `BothOf` struct.
     ///
     /// # Arguments
     /// - `left` - The left-hand value of type `L`.
     /// - `right` - The right-hand value of type `R`.
     ///
     /// # Returns
-    /// A new `Both` instance containing `left` and `right`.
+    /// A new `BothOf` instance containing `left` and `right`.
     ///
     /// # Examples
     /// ```rust
@@ -98,13 +96,13 @@ impl<L, R> BothOf<L, R> {
         Self { left, right }
     }
 
-    /// Constructs a `Both` instance from a `Couple`, which is a tuple `(L, R)`.
+    /// Constructs a `BothOf` instance from a `Couple`, which is a tuple `(L, R)`.
     ///
     /// # Arguments
     /// - `couple` - A tuple containing the left and right values.
     ///
     /// # Returns
-    /// A new `Both` instance containing the values of the tuple.
+    /// A new `BothOf` instance containing the values of the tuple.
     ///
     /// # Examples
     /// ```rust
@@ -122,10 +120,10 @@ impl<L, R> BothOf<L, R> {
         }
     }
 
-    /// Converts this `Both` instance into a `Couple` (a tuple `(L, R)`).
+    /// Converts this `BothOf` instance into a `Couple` (a tuple `(L, R)`).
     ///
     /// # Returns
-    /// A tuple containing the left and right values of the `Both` instance.
+    /// A tuple containing the left and right values of the `BothOf` instance.
     ///
     /// # Examples
     /// ```rust
@@ -139,7 +137,7 @@ impl<L, R> BothOf<L, R> {
         (self.left, self.right)
     }
 
-    /// Converts this `Both` instance into a `Left` variant of the `Either` enum,
+    /// Converts this `BothOf` instance into a `Left` variant of the `Either` enum,
     /// using the `left` value of this struct.
     ///
     /// # Returns
@@ -160,7 +158,7 @@ impl<L, R> BothOf<L, R> {
         EitherOf::<L, R>::Left(self.left)
     }
 
-    /// Converts this `Both` instance into a `Right` variant of the `Either` enum,
+    /// Converts this `BothOf` instance into a `Right` variant of the `Either` enum,
     /// using the `right` value of this struct.
     ///
     /// # Returns
@@ -206,10 +204,10 @@ impl<L, R> Swap<L, R> for BothOf<L, R> {
     type Output = BothOf<R, L>;
 
 
-    /// Swaps the `left` and `right` values of this `Both` instance.
+    /// Swaps the `left` and `right` values of this `BothOf` instance.
     ///
     /// # Returns
-    /// A new `Both` instance where the `left` and `right` values are swapped.
+    /// A new `BothOf` instance where the `left` and `right` values are swapped.
     ///
     /// # Examples
     /// ```rust
@@ -233,7 +231,7 @@ impl<L, R> Swap<L, R> for BothOf<L, R> {
 impl<L, R> Map<L, R> for BothOf<L, R> {
     type Output<L2, R2> = BothOf<L2, R2>;
 
-    /// Applies the provided transformation functions to the `left` and `right` values of this `Both` instance.
+    /// Applies the provided transformation functions to the `left` and `right` values of this `BothOf` instance.
     ///
     /// # Type Parameters
     /// - `L2`: The resulting type of the transformed `left` value.
@@ -246,7 +244,7 @@ impl<L, R> Map<L, R> for BothOf<L, R> {
     /// - `fr`: A function that takes the `right` value and transforms it into a value of type `R2`.
     ///
     /// # Returns
-    /// A new `Both` instance with transformed `left` and `right` values.
+    /// A new `BothOf` instance with transformed `left` and `right` values.
     ///
     /// # Examples
     /// ```rust
