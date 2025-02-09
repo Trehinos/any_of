@@ -12,15 +12,15 @@ Public API changed : types and enum cases naming consistency.
 - Renamed the cases `BothOf` to `Both` and `EitherOf` to `Either` of the exported cases of the `AnyOf` type.
 - Removed deprecated `AnyOf::is_one()` (replaced with `AnyOf::is_either()`).
 - Change operators to `+` `combine()`, `-` `filter()`, `!` `swap()`.
-- Added `From<Couple<L, R>>` implementations for `BothOf` and `AnyOf` and vice versa.
-- Added `From<Any<L, R>>` implementations for `AnyOf`, `BothOf`, `EitherOf`, and vice versa.
 
 Other changes:
 
+- Added `From<Couple<L, R>>` implementations for `BothOf` and `AnyOf` and vice versa.
+- Added `From<Any<L, R>>` implementations for `AnyOf`, `BothOf`, `EitherOf`, and vice versa.
 - Updated test cases in `test_either.rs` to use `EitherOf` instead of `Either`.
 - Modified `README.md` to reflect the updated naming convention.
 - Refactored associated documentation, examples, and comments across the codebase.
-- Diagram update.
+- Diagram updated.
 
 # `v1` Demo phase
 
