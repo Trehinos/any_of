@@ -64,11 +64,11 @@ metaclass "Copy, Clone, Eq, PartialEq, Debug, Hash"
 interface Not {
     !a
 }
-interface BitAnd {
-    a & b
+interface Add {
+    a + b
 }
-interface BitOr {
-    a | b
+interface Sub {
+    a - b
 }
 
 diamond "LeftOrRight+Swap+Map+Unwrap+Not"
@@ -112,8 +112,8 @@ struct BothOf<L, R> {
 }
 "LeftOrRight+Swap+Map+Unwrap+Not" <|.. BothOf
 
-BitAnd <|... AnyOf
-BitOr <|... AnyOf
+Add <|... AnyOf
+Sub <|... AnyOf
 "LeftOrRight+Swap+Map+Unwrap+Not" <|.. AnyOf
 enum AnyOf<L, R> {
     * Neither
@@ -145,7 +145,6 @@ enum AnyOf<L, R> {
     + has_left(&self) -> bool
     + has_right(&self) -> bool
     + is_any(&self) -> bool
-    - is_one(&self) -> bool
     + is_either(&self) -> bool
     + is_both(&self) -> bool
     + is_neither(&self) -> bool

@@ -1,16 +1,28 @@
 # Changelog
 
-# `v1` Release phase
+# `v2`
 
-## `v1.4` EitherOf/BothOf 
+## `2.0` 
 
-Public type and case naming consistency.
+## `2.0.0`
+
+Public API changed : types and enum cases naming consistency.
+
+- Renamed the types `Both` to `BothOf` and `Either` to `EitherOf`.
+- Renamed the cases `BothOf` to `Both` and `EitherOf` to `Either` of the exported cases of the `AnyOf` type.
+- Removed deprecated `AnyOf::is_one()` (replaced with `AnyOf::is_either()`).
+- Change operators to `+` `combine()`, `-` `filter()`, `!` `swap()`.
+- Added `From<Couple<L, R>>` implementations for `BothOf` and `AnyOf` and vice versa.
+- Added `From<Any<L, R>>` implementations for `AnyOf`, `BothOf`, `EitherOf`, and vice versa.
+
+Other changes:
 
 - Updated test cases in `test_either.rs` to use `EitherOf` instead of `Either`.
-- Renamed the types `Both` to `BothOf` and `Either` to `EitherOf` in `src/lib.rs` and `src/both.rs`.
-- Renamed the cases `BothOf` to `Both` and `EitherOf` to `Either` of the exported cases of the `AnyOf` type.
 - Modified `README.md` to reflect the updated naming convention.
 - Refactored associated documentation, examples, and comments across the codebase.
+- Diagram update.
+
+# `v1` Demo phase
 
 ## `v1.3` 
 

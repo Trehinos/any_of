@@ -13,36 +13,36 @@
 //! transforming instances of `Either`.
 //!
 //! ## Creation
-//! - [`Either::new_left`]: Creates an `Either` value in the `Left` variant.
-//! - [`Either::new_right`]: Creates an `Either` value in the `Right` variant.
+//! - [`EitherOf::new_left`]: Creates an `Either` value in the `Left` variant.
+//! - [`EitherOf::new_right`]: Creates an `Either` value in the `Right` variant.
 //!
 //! ## Inspection
-//! - [`Either::is_left`]: Returns `true` if the value is `Left`.
-//! - [`Either::is_right`]: Returns `true` if the value is `Right`.
+//! - [`EitherOf::is_left`]: Returns `true` if the value is `Left`.
+//! - [`EitherOf::is_right`]: Returns `true` if the value is `Right`.
 //! - [`Left`]: Returns a reference to the left value if it exists.
 //! - [`Right`]: Returns a reference to the right value if it exists.
-//! - [`Either::any`]: Returns a tuple of `Option` references to either the left
+//! - [`EitherOf::any`]: Returns a tuple of `Option` references to either the left
 //!   or the right value, depending on the variant.
 //!
 //! ## Default Values
-//! - [`Either::left_or`]: Returns the left value or a provided default.
-//! - [`Either::right_or`]: Returns the right value or a provided default.
-//! - [`Either::left_or_else`]: Returns the left value or computes a default using
+//! - [`EitherOf::left_or`]: Returns the left value or a provided default.
+//! - [`EitherOf::right_or`]: Returns the right value or a provided default.
+//! - [`EitherOf::left_or_else`]: Returns the left value or computes a default using
 //!   a closure.
-//! - [`Either::right_or_else`]: Returns the right value or computes a default
+//! - [`EitherOf::right_or_else`]: Returns the right value or computes a default
 //!   using a closure.
 //!
 //! ## Unwrapping
-//! - [`Either::unwrap_left`]: Extracts the left value, panicking if the value is
+//! - [`EitherOf::unwrap_left`]: Extracts the left value, panicking if the value is
 //!   a `Right`.
-//! - [`Either::unwrap_right`]: Extracts the right value, panicking if the value is
+//! - [`EitherOf::unwrap_right`]: Extracts the right value, panicking if the value is
 //!   a `Left`.
 //!
 //! ## Transformation
-//! - [`Either::swap`]: Swaps the `Left` variant for `Right` and vice versa.
-//! - [`Either::map_left`]: Applies a function to transform the `Left` value.
-//! - [`Either::map_right`]: Applies a function to transform the `Right` value.
-//! - [`Either::map`]: Applies separate functions to transform either the `Left`
+//! - [`EitherOf::swap`]: Swaps the `Left` variant for `Right` and vice versa.
+//! - [`EitherOf::map_left`]: Applies a function to transform the `Left` value.
+//! - [`EitherOf::map_right`]: Applies a function to transform the `Right` value.
+//! - [`EitherOf::map`]: Applies separate functions to transform either the `Left`
 //!   or `Right` value depending on the variant.
 //!
 //! ## Examples
@@ -77,12 +77,12 @@ use core::ops::Not;
 /// on values of two possible types. Unlike `Result`, it does not imply any specific meaning
 /// to the variants.
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
-pub enum Either<L, R> {
+pub enum EitherOf<L, R> {
     Left(L),
     Right(R),
 }
 
-impl<L, R> Either <L, R> {
+impl<L, R> EitherOf<L, R> {
     /// Creates a new `Either` value in the `Left` variant.
     ///
     /// ## Arguments
@@ -110,7 +110,7 @@ impl<L, R> Either <L, R> {
     }
 }
 
-impl<L, R> LeftOrRight<L, R> for Either<L, R> {    
+impl<L, R> LeftOrRight<L, R> for EitherOf<L, R> {    
     fn left(&self) -> Option<&L> {
         match self {
             Self::Left(l) => Some(l),
@@ -126,8 +126,8 @@ impl<L, R> LeftOrRight<L, R> for Either<L, R> {
     }
 }
 
-impl<L, R> Swap<L, R> for Either<L, R> {
-    type Output = Either<R, L>;
+impl<L, R> Swap<L, R> for EitherOf<L, R> {
+    type Output = EitherOf<R, L>;
     /// Swaps the variants of the `Either`, turning a `Left` into a `Right` and vice versa.
     ///
     /// ## Returns
@@ -136,14 +136,14 @@ impl<L, R> Swap<L, R> for Either<L, R> {
     /// and the `Right` value becomes `Left`.
     fn swap(self) -> Self::Output {
         match self {
-            Self::Left(l) => Either::<R, L>::Right(l),
-            Self::Right(r) => Either::<R, L>::Left(r),
+            Self::Left(l) => EitherOf::<R, L>::Right(l),
+            Self::Right(r) => EitherOf::<R, L>::Left(r),
         }
     }
 }
 
-impl<L, R> Map<L, R> for Either<L, R> {
-    type Output<L2, R2> = Either<L2, R2>;
+impl<L, R> Map<L, R> for EitherOf<L, R> {
+    type Output<L2, R2> = EitherOf<L2, R2>;
 
     /// Transforms the `L` or `R` value using separate functions, depending
     /// on the variant.
@@ -168,13 +168,13 @@ impl<L, R> Map<L, R> for Either<L, R> {
         FR: FnOnce(R) -> R2,
     {
         match self {
-            Self::Left(l) => Either::<L2, R2>::Left(fl(l)),
-            Self::Right(r) => Either::<L2, R2>::Right(fr(r)),
+            Self::Left(l) => EitherOf::<L2, R2>::Left(fl(l)),
+            Self::Right(r) => EitherOf::<L2, R2>::Right(fr(r)),
         }
     }
 }
 
-impl<L, R> Unwrap<L, R> for Either<L, R> {
+impl<L, R> Unwrap<L, R> for EitherOf<L, R> {
     fn left_or_else(self, f: impl FnOnce() -> L) -> L {
         match self {
             Self::Left(l) => l,
@@ -190,8 +190,8 @@ impl<L, R> Unwrap<L, R> for Either<L, R> {
     }
 }
 
-impl<L, R> Not for Either<L, R> {
-    type Output = Either<R, L>;
+impl<L, R> Not for EitherOf<L, R> {
+    type Output = EitherOf<R, L>;
 
     /// See : [Self::swap].
     fn not(self) -> Self::Output {

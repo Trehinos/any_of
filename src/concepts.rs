@@ -110,7 +110,7 @@ pub trait Swap<L, R>: LeftOrRight<L, R> {
     /// # Examples
     /// ```rust
     /// use any_of::BothOf;
-    /// use any_of::concepts::Swap;
+    /// use any_of::Swap;
     ///
     /// let both = BothOf::new(42, "example");
     /// let swapped = both.swap();

@@ -45,19 +45,15 @@
 //! ## Notable methods :
 //! - [AnyOf::new]
 //! - [AnyOf::combine]
+//! - [AnyOf::filter]
+//! - [AnyOf::map]
+//! - [AnyOf::swap]
 //! - [AnyOf::unwrap_left] and [AnyOf::left]
 //! - [AnyOf::unwrap_right] and [AnyOf::right]
 //! - [AnyOf::unwrap_both] and [AnyOf::both_or_none]
 //!
-//! ## Shorthands enum cases
-//! - [Either::Left] as [Left],
-//! - [Either::Right] as [Right],
-//! - [AnyOf::Both] as [Both],
-//! - [AnyOf::Either] as [Either],
-//! - [AnyOf::Neither] as [Neither].
-//!
 //! ## Exported elements :
-//! - Shorthands cases : [Left], [Right], [Both], [Either], [Neither],
+//! - Enum cases : [Left], [Right], [Both], [Either], [Neither],
 //! - Traits : [LeftOrRight], [Unwrap], [Map], [Swap],
 //! - Types : [Couple], [Pair], [EitherOf], [BothOf], [AnyOf], [AnyOf4], [AnyOf8], [AnyOf16]
 //!
@@ -69,14 +65,14 @@ pub mod either;
 
 pub mod both;
 
-use core::ops::{BitAnd, BitOr, Not};
+use core::ops::{Add, Not, Sub};
 
 pub use crate::{
     any_of_x::{AnyOf16, AnyOf4, AnyOf8},
-    both::Both as BothOf,
+    both::BothOf,
     concepts::{Any, Couple, LeftOrRight, Map, Pair, Swap, Unwrap},
-    either::Either as EitherOf,
-    either::Either::{Left, Right},
+    either::EitherOf,
+    either::EitherOf::{Left, Right},
     AnyOf::{Both, Either, Neither},
 };
 
@@ -249,10 +245,10 @@ impl<L, R> AnyOf<L, R> {
     /// # Examples
     ///
     /// ```rust
-    /// use any_of::{AnyOf, Either, LeftOrRight};
-    /// use any_of::either::Either::{Right, Left};
+    /// use any_of::{AnyOf, EitherOf, LeftOrRight};
+    /// use any_of::either::EitherOf::{Right, Left};
     ///
-    /// let either: Either<i32, ()> = Left(42);
+    /// let either: EitherOf<i32, ()> = Left(42);
     /// let any_of: AnyOf<i32, ()> = AnyOf::from_either(either);
     /// assert!(any_of.is_left());
     /// ```
@@ -291,9 +287,9 @@ impl<L, R> AnyOf<L, R> {
     /// # Examples
     ///
     /// ```rust
-    /// use any_of::{AnyOf, Either, Left};
+    /// use any_of::{AnyOf, EitherOf, Left};
     ///
-    /// let either: Either<i32, ()> = AnyOf::new_left(42).into_either();
+    /// let either: EitherOf<i32, ()> = AnyOf::new_left(42).into_either();
     /// assert_eq!(either, Left(42));
     /// ```
     pub fn into_either(self) -> EitherOf<L, R> {
@@ -347,16 +343,6 @@ impl<L, R> AnyOf<L, R> {
     /// True if not [Neither].
     pub fn is_any(&self) -> bool {
         matches!(self, Either(Left(_)) | Either(Right(_)) | Both(_))
-    }
-
-    // todo(2.0.0) : remove
-    /// True if [Either].
-    #[deprecated(
-        since = "1.3.1",
-        note = "Use `is_either` instead. Will be removed in 2.0.0."
-    )]
-    pub fn is_one(&self) -> bool {
-        self.is_either()
     }
 
     /// True if [Either].
@@ -528,20 +514,20 @@ impl<L, R> AnyOf<L, R> {
     /// let neither: AnyOf<i32, i32> = Neither;
     ///
     /// // Filtering Both with Right results in Left
-    /// assert_eq!(both | right_only, left_only);
+    /// assert_eq!(both - right_only, left_only);
     ///
     /// // Filtering Both with Left results in Right
-    /// assert_eq!(both | left_only, right_only);
+    /// assert_eq!(both - left_only, right_only);
     ///
     /// // Filtering with Neither doesn't affect the original value
-    /// assert_eq!(both | neither, both);
-    /// assert_eq!(left_only | neither, left_only);
-    /// assert_eq!(right_only | neither, right_only);
+    /// assert_eq!(both - neither, both);
+    /// assert_eq!(left_only - neither, left_only);
+    /// assert_eq!(right_only - neither, right_only);
     ///
     /// // Filtering with Both always results in Neither
-    /// assert_eq!(both | both, neither);
-    /// assert_eq!(left_only | both, neither);
-    /// assert_eq!(right_only | both, neither);
+    /// assert_eq!(both - both, neither);
+    /// assert_eq!(left_only - both, neither);
+    /// assert_eq!(right_only - both, neither);
     /// ```
     pub fn filter(self, other: Self) -> Self {
         match other {
@@ -563,20 +549,20 @@ impl<L, R> AnyOf<L, R> {
     }
 }
 
-impl<L, R> BitAnd for AnyOf<L, R> {
+impl<L, R> Add for AnyOf<L, R> {
     type Output = Self;
 
     /// See : [Self::combine].
-    fn bitand(self, rhs: Self) -> Self::Output {
+    fn add(self, rhs: Self) -> Self::Output {
         self.combine(rhs)
     }
 }
 
-impl<L, R> BitOr for AnyOf<L, R> {
+impl<L, R> Sub for AnyOf<L, R> {
     type Output = Self;
 
     /// See : [Self::filter].
-    fn bitor(self, rhs: Self) -> Self::Output {
+    fn sub(self, rhs: Self) -> Self::Output {
         self.filter(rhs)
     }
 }

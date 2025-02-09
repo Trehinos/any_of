@@ -20,53 +20,63 @@ manner.
 1. **`AnyOf<L, R>`**
     - A flexible type that represents four possible states:
         - `Neither`: No value is present.
-        - `Left`: Only the left value is present.
-        - `Right`: Only the right value is present.
+        - `Either`:
+            - `Left`: Only the left value is present.
+            - `Right`: Only the right value is present.
         - `Both`: Both values are present.
-    - Conceptually, it combines variants in the following way:
+    - It combines variants in the following way:
       ```
       AnyOf<L, R> = Neither | Either(EitherOf<L, R>) | Both(BothOf<L, R>)
       ```
     - Its cases are:
       ```
-      AnyOf(L, R) = Neither | Left(L) | Right(R) | Both(L, R)
+      AnyOf(L, R) = Neither | Either(Left(L)) | Either(Right(R)) | Both{left: L, right: R)}
       ```
-    - It can also be viewed as a product of two optional types:
+    - This type can also be viewed as a product of two optional types:
       ```
-      AnyOf<L, R>::any = (Option<L>, Option<R>)
+      AnyOf<L, R>::any() -> (Option<L>, Option<R>)
       ```
       Cases :
-        - `Neither::any` = `(None, None)`
-        - `Left(L)::any` = `(Some(L), None)`
-        - `Right(R)::any` = `(None, Some(R))`
-        - `Both::any` = `(Some(L), Some(R))`
+        - `Neither.any()` returns `(None, None)`
+        - `Left(L).any()` returns `(Some(L), None)`
+        - `Right(R).any()` returns `(None, Some(R))`
+        - `Both(L, R).any()` returns `(Some(L), Some(R))`
 
 2. **`EitherOf<L, R>`**
-    - (or `Either<L, R>`, deprecated, can have collision with the `AnyOf::Either` case)
     - A simple sum type representing one of two values.
     - Variants:
         - `Left(L)`
         - `Right(R)`
     - Ideal for binary decision-making.
-    - Conceptually, it is the type :
+    - Implements `any()` too :
+        - `Left(L).any()` returns `(Some(L), None)`
+        - `Right(R).any()` returns `(None, Some(R))`
+    - It is the type :
       ```
-      Either<L, R> = Left(L) | Right(R)
+      EitherOf<L, R> = Left(L) | Right(R)
       ```
 
 3. **`BothOf<L, R>`**
-    - (or `Both<L, R>`, deprecated, can have collision with the `AnyOf::Both` case)
     - A product type that pairs two values, `left` and `right`, of potentially different types.
-    - Conceptually, it is the type:
+    - Implements `any()` too :
+        - `BothOf{ left: L, right: R }.any()` returns `(Some(L), Some(R))`
+    - It is the type:
       ```
-      Both<L, R> = (L, R)
+      BothOf<L, R> = {left: L, right: R}
       ```
+    - It can be transformed into a tuple with:  
+      `into_couple(self) -> Couple<L, R>`,
+    - And can be transformed from a tuple with:  
+      `from_couple(Couple<L, R>) -> Self`,
 
 4. **Enhanced Type Composition**
+    - A `Couple<T, U>` is a `(T, U)`,
+    - A `Pair<T>` is a `Couple<T, T>`,
     - Complex types like `AnyOf4`, `AnyOf8`, and `AnyOf16` are implemented for handling larger,
       structured combinations via nested `AnyOf` structures.
     - The `LeftOrRight` trait :
         - Provides the methods `is_right()`, `is_left()`, `any()`, `left()` and `right()`.
-        - Implemented by `AnyOf`, `Either` and `Both`,
+        - Implemented by `AnyOf`, `EitherOf` and `BothOf`,
         - Can be implemented by a custom type.
     - Other useful traits : `Unwrap<L, R>`, `Swap<L, R>` and `Map<L, R>`.
 
@@ -101,10 +111,22 @@ manner.
 ## Motivation
 
 The project aims to enrich Rust's type system with expressive and flexible types
-for representing data combinations and states.
+for representing data combinations and states.  
+It is inspired by the Haskel's `Either` type.
 
-* Unlike the Rust's `Result` type, the types `AnyOf`, `Either` or `LeftOrRight` have not an "error" semantic, they are general purpose,
-* Any `LeftOrRight<L, R>::any` can be represented by a `(Option<L>, Option<R>)`  which is a product of two optional types,
+* Unlike the Rust's `Result` type, the types `AnyOf`, `EitherOf` or `LeftOrRight` have not an "error" semantic, they are
+  general purpose,
+* Any `LeftOrRight<L, R>::any` can be represented by a `(Option<L>, Option<R>)`  which is a product of two optional
+  types, but the two types has not the same composition conciseness :
+  ```
+  AnyOf<AnyOf<LL, LR>, AnyOf<RL, RR>>
+  vs
+  (Option<(Option<LL>, Option<LR>)>, Option<(Option<RL>, Option<RR>)>)
+  
+  AnyOf<AnyOf<AnyOf<LLL, LLR>, AnyOf<LRL, LRR>>, AnyOf<AnyOf<RLL, RLR>, AnyOf<RRL, RRR>>>
+  vs
+  (Option<(Option<(Option<LLL>, Option<LLR>)>, Option<(Option<LRL>, Option<LRR>)>)>, Option<(Option<(Option<RLL>, Option<RLR>)>, Option<(Option<RRL>, Option<RRR>)>)>)
+  ```
 
 ## Status
 

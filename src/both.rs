@@ -48,7 +48,7 @@
 //! ```
 
 use crate::concepts::Swap;
-use crate::either::Either;
+use crate::either::EitherOf;
 use crate::{Couple, LeftOrRight, Map, Unwrap};
 use core::ops::Not;
 
@@ -71,12 +71,12 @@ use core::ops::Not;
 ///
 /// For more examples, see the documentation of the individual methods below.
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
-pub struct Both<L, R> {
+pub struct BothOf<L, R> {
     pub left: L,
     pub right: R,
 }
 
-impl<L, R> Both<L, R> {
+impl<L, R> BothOf<L, R> {
     /// Creates a new instance of the `Both` struct.
     ///
     /// # Arguments
@@ -156,8 +156,8 @@ impl<L, R> Both<L, R> {
     ///     _ => panic!("Expected Left"),
     /// }
     /// ```
-    pub fn into_left(self) -> Either<L, R> {
-        Either::<L, R>::Left(self.left)
+    pub fn into_left(self) -> EitherOf<L, R> {
+        EitherOf::<L, R>::Left(self.left)
     }
 
     /// Converts this `Both` instance into a `Right` variant of the `Either` enum,
@@ -177,12 +177,12 @@ impl<L, R> Both<L, R> {
     ///     _ => panic!("Expected Right"),
     /// }
     /// ```
-    pub fn into_right(self) -> Either<L, R> {
-        Either::<L, R>::Right(self.right)
+    pub fn into_right(self) -> EitherOf<L, R> {
+        EitherOf::<L, R>::Right(self.right)
     }
 }
 
-impl<L, R> LeftOrRight<L, R> for Both<L, R> {
+impl<L, R> LeftOrRight<L, R> for BothOf<L, R> {
     /// Returns a reference to the left value.
     ///
     /// ## Returns
@@ -202,8 +202,8 @@ impl<L, R> LeftOrRight<L, R> for Both<L, R> {
     }
 }
 
-impl<L, R> Swap<L, R> for Both<L, R> {
-    type Output = Both<R, L>;
+impl<L, R> Swap<L, R> for BothOf<L, R> {
+    type Output = BothOf<R, L>;
 
 
     /// Swaps the `left` and `right` values of this `Both` instance.
@@ -223,15 +223,15 @@ impl<L, R> Swap<L, R> for Both<L, R> {
     /// assert_eq!(swapped.right, 42);
     /// ```
     fn swap(self) -> Self::Output {
-        Both {
+        BothOf {
             left: self.right,
             right: self.left,
         }
     }
 }
 
-impl<L, R> Map<L, R> for Both<L, R> {
-    type Output<L2, R2> = Both<L2, R2>;
+impl<L, R> Map<L, R> for BothOf<L, R> {
+    type Output<L2, R2> = BothOf<L2, R2>;
 
     /// Applies the provided transformation functions to the `left` and `right` values of this `Both` instance.
     ///
@@ -263,14 +263,14 @@ impl<L, R> Map<L, R> for Both<L, R> {
         FL: FnOnce(L) -> L2,
         FR: FnOnce(R) -> R2,
     {
-        Both {
+        BothOf {
             left: fl(self.left),
             right: fr(self.right),
         }
     }
 }
 
-impl<L, R> Unwrap<L, R> for Both<L, R> {
+impl<L, R> Unwrap<L, R> for BothOf<L, R> {
     fn left_or_else(self, _: impl FnOnce() -> L) -> L {
         self.left
     }
@@ -280,8 +280,8 @@ impl<L, R> Unwrap<L, R> for Both<L, R> {
     }
 }
 
-impl<L, R> Not for Both<L, R> {
-    type Output = Both<R, L>;
+impl<L, R> Not for BothOf<L, R> {
+    type Output = BothOf<R, L>;
 
     /// See : [Self::swap].
     fn not(self) -> Self::Output {
