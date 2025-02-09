@@ -2,6 +2,16 @@
 
 # `v1` Release phase
 
+## `v1.4` EitherOf/BothOf 
+
+Public type and case naming consistency.
+
+- Updated test cases in `test_either.rs` to use `EitherOf` instead of `Either`.
+- Renamed the types `Both` to `BothOf` and `Either` to `EitherOf` in `src/lib.rs` and `src/both.rs`.
+- Renamed the cases `BothOf` to `Both` and `EitherOf` to `Either` of the exported cases of the `AnyOf` type.
+- Modified `README.md` to reflect the updated naming convention.
+- Refactored associated documentation, examples, and comments across the codebase.
+
 ## `v1.3` 
 
 ## `v1.3.4` Shorthand variants

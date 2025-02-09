@@ -2,7 +2,7 @@ use crate::*;
 
 #[test]
 fn test_new_left() {
-    let either: Either<i32, &str> = Either::new_left(42);
+    let either: EitherOf<i32, &str> = EitherOf::new_left(42);
     assert!(either.is_left());
     assert_eq!(either.left(), Some(&42));
     assert_eq!(either.right(), None);
@@ -10,7 +10,7 @@ fn test_new_left() {
 
 #[test]
 fn test_new_right() {
-    let either: Either<i32, &str> = Either::new_right("Hello");
+    let either: EitherOf<i32, &str> = EitherOf::new_right("Hello");
     assert!(either.is_right());
     assert_eq!(either.right(), Some(&"Hello"));
     assert_eq!(either.left(), None);
@@ -18,34 +18,34 @@ fn test_new_right() {
 
 #[test]
 fn test_is_left() {
-    let either: Either<i32, &str> = Either::new_left(10);
+    let either: EitherOf<i32, &str> = EitherOf::new_left(10);
     assert!(either.is_left());
     assert!(!either.is_right());
 }
 
 #[test]
 fn test_is_right() {
-    let either: Either<i32, &str> = Either::new_right("World");
+    let either: EitherOf<i32, &str> = EitherOf::new_right("World");
     assert!(either.is_right());
     assert!(!either.is_left());
 }
 
 #[test]
 fn test_any() {
-    let either: Either<i32, &str> = Either::new_left(25);
+    let either: EitherOf<i32, &str> = EitherOf::new_left(25);
     assert_eq!(either.any(), (Some(&25), None));
-    let either: Either<i32, &str> = Either::new_right("Option");
+    let either: EitherOf<i32, &str> = EitherOf::new_right("Option");
     assert_eq!(either.any(), (None, Some(&"Option")));
 }
 
 #[test]
 fn test_swap() {
-    let either: Either<i32, &str> = Either::new_left(100);
+    let either: EitherOf<i32, &str> = EitherOf::new_left(100);
     let swapped = either.swap();
     assert!(swapped.is_right());
     assert_eq!(swapped.right(), Some(&100));
 
-    let either: Either<i32, &str> = Either::new_right("Swapped");
+    let either: EitherOf<i32, &str> = EitherOf::new_right("Swapped");
     let swapped = either.swap();
     assert!(swapped.is_left());
     assert_eq!(swapped.left(), Some(&"Swapped"));
@@ -53,12 +53,12 @@ fn test_swap() {
 
 #[test]
 fn test_map() {
-    let either: Either<i32, &str> = Either::new_left(50);
+    let either: EitherOf<i32, &str> = EitherOf::new_left(50);
     let mapped = either.map(|l| l * 2, |r| r.len());
     assert!(mapped.is_left());
     assert_eq!(mapped.left(), Some(&100));
 
-    let either: Either<i32, &str> = Either::new_right("MapTest");
+    let either: EitherOf<i32, &str> = EitherOf::new_right("MapTest");
     let mapped = either.map(|l| l * 2, |r| r.len());
     assert!(mapped.is_right());
     assert_eq!(mapped.right(), Some(&7));
@@ -66,7 +66,7 @@ fn test_map() {
 
 #[test]
 fn test_map_left() {
-    let either: Either<i32, &str> = Either::new_left(30);
+    let either: EitherOf<i32, &str> = EitherOf::new_left(30);
     let mapped = either.map_left(|l| l + 10);
     assert!(mapped.is_left());
     assert_eq!(mapped.left(), Some(&40));
@@ -74,7 +74,7 @@ fn test_map_left() {
 
 #[test]
 fn test_map_right() {
-    let either: Either<i32, &str> = Either::new_right("Mapping");
+    let either: EitherOf<i32, &str> = EitherOf::new_right("Mapping");
     let mapped = either.map_right(|r| r.len());
     assert!(mapped.is_right());
     assert_eq!(mapped.right(), Some(&7));
@@ -82,35 +82,35 @@ fn test_map_right() {
 
 #[test]
 fn test_left_or_else() {
-    let either: Either<i32, &str> = Either::new_right("Fallback");
+    let either: EitherOf<i32, &str> = EitherOf::new_right("Fallback");
     let value = either.left_or_else(|| 99);
     assert_eq!(value, 99);
 }
 
 #[test]
 fn test_right_or_else() {
-    let either: Either<i32, &str> = Either::new_left(123);
+    let either: EitherOf<i32, &str> = EitherOf::new_left(123);
     let value = either.right_or_else(|| "Default");
     assert_eq!(value, "Default");
 }
 
 #[test]
 fn test_left_or_default() {
-    let either: Either<i32, &str> = Either::new_right("Default");
+    let either: EitherOf<i32, &str> = EitherOf::new_right("Default");
     let value = either.left_or_default();
     assert_eq!(value, 0);
 }
 
 #[test]
 fn test_right_or_default() {
-    let either: Either<i32, &str> = Either::new_left(123);
+    let either: EitherOf<i32, &str> = EitherOf::new_left(123);
     let value = either.right_or_default();
     assert_eq!(value, "");
 }
 
 #[test]
 fn test_expect_left() {
-    let either: Either<i32, &str> = Either::new_left(42);
+    let either: EitherOf<i32, &str> = EitherOf::new_left(42);
     let value = either.expect_left("Expected left value");
     assert_eq!(value, 42);
 }
@@ -118,13 +118,13 @@ fn test_expect_left() {
 #[test]
 #[should_panic(expected = "Expected right value")]
 fn test_expect_right_panics() {
-    let either: Either<i32, &str> = Either::new_left(42);
+    let either: EitherOf<i32, &str> = EitherOf::new_left(42);
     either.expect_right("Expected right value");
 }
 
 #[test]
 fn test_unwrap_left() {
-    let either: Either<i32, &str> = Either::new_left(36);
+    let either: EitherOf<i32, &str> = EitherOf::new_left(36);
     let value = either.unwrap_left();
     assert_eq!(value, 36);
 }
@@ -132,13 +132,13 @@ fn test_unwrap_left() {
 #[test]
 #[should_panic(expected = "called `unwrap_left` on `LeftOrRight` value that is `Right`")]
 fn test_unwrap_left_panics() {
-    let either: Either<i32, &str> = Either::new_right("Failure");
+    let either: EitherOf<i32, &str> = EitherOf::new_right("Failure");
     either.unwrap_left();
 }
 
 #[test]
 fn test_unwrap_right() {
-    let either: Either<i32, &str> = Either::new_right("Success");
+    let either: EitherOf<i32, &str> = EitherOf::new_right("Success");
     let value = either.unwrap_right();
     assert_eq!(value, "Success");
 }
@@ -146,6 +146,6 @@ fn test_unwrap_right() {
 #[test]
 #[should_panic(expected = "called `unwrap_right` on `LeftOrRight` value that is `Left`")]
 fn test_unwrap_right_panics() {
-    let either: Either<i32, &str> = Either::new_left(101);
+    let either: EitherOf<i32, &str> = EitherOf::new_left(101);
     either.unwrap_right();
 }

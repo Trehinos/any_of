@@ -10,7 +10,7 @@ which enables clear and safe data representations in functional and type-driven 
 ## Overview
 
 At the core of the project is the `AnyOf` enum, a general-purpose algebraic type,
-alongside additional types as `Either` and `Both`.
+alongside additional types as `EitherOf` and `BothOf`.
 
 These abstractions allow to express dynamic states, optional values, and branching logic in a natural and explicit
 manner.
@@ -25,7 +25,7 @@ manner.
         - `Both`: Both values are present.
     - Conceptually, it combines variants in the following way:
       ```
-      AnyOf<L, R> = Neither | Either<L, R> | Both<L, R>
+      AnyOf<L, R> = Neither | Either(EitherOf<L, R>) | Both(BothOf<L, R>)
       ```
     - Its cases are:
       ```
@@ -41,7 +41,8 @@ manner.
         - `Right(R)::any` = `(None, Some(R))`
         - `Both::any` = `(Some(L), Some(R))`
 
-2. **`Either<L, R>`**
+2. **`EitherOf<L, R>`**
+    - (or `Either<L, R>`, deprecated, can have collision with the `AnyOf::Either` case)
     - A simple sum type representing one of two values.
     - Variants:
         - `Left(L)`
@@ -52,7 +53,8 @@ manner.
       Either<L, R> = Left(L) | Right(R)
       ```
 
-3. **`Both<L, R>`**
+3. **`BothOf<L, R>`**
+    - (or `Both<L, R>`, deprecated, can have collision with the `AnyOf::Both` case)
     - A product type that pairs two values, `left` and `right`, of potentially different types.
     - Conceptually, it is the type:
       ```
@@ -80,7 +82,7 @@ manner.
     - Operators :
         - `&` to combine `AnyOf` values, or,
         - `|` to filter `AnyOf` values, or,
-        - `!` to swap  `AnyOf`, `Either` and `Both` values.
+        - `!` to swap  `AnyOf`, `EitherOf` and `BothOf` values.
     - Default value handling and state manipulation methods.
 
 ![Type diagram PNG](doc/any_of-type-diagram.png)

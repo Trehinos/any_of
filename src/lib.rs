@@ -16,16 +16,16 @@
 //! ## Example Usage
 //!
 //! ```rust
-//! use any_of::{AnyOf, Both , BothOf, EitherOf , Left, LeftOrRight, Map, Neither};
+//! use any_of::{AnyOf, Both , BothOf, Either , Left, LeftOrRight, Map, Neither};
 //!
 //! let neither: AnyOf<i32, &str> = AnyOf::new(None, None);
 //! let neither: AnyOf<i32, &str> = Neither;
 //!
 //! let left: AnyOf<i32, &str> = AnyOf::new(Some(42), None);
-//! let left: AnyOf<i32, &str> = EitherOf(Left(42));
+//! let left: AnyOf<i32, &str> = Either(Left(42));
 //!
 //! let both: AnyOf<i32, &str> = AnyOf::new(Some(42), Some("Hello"));
-//! let both: AnyOf<i32, &str> = BothOf(Both { left: 42, right: "Hello" });
+//! let both: AnyOf<i32, &str> = Both(BothOf { left: 42, right: "Hello" });
 //!
 //! assert!(neither.is_neither());
 //! assert!(left.is_left());
@@ -52,14 +52,14 @@
 //! ## Shorthands enum cases
 //! - [Either::Left] as [Left],
 //! - [Either::Right] as [Right],
-//! - [AnyOf::Both] as [BothOf],
-//! - [AnyOf::Either] as [EitherOf],
+//! - [AnyOf::Both] as [Both],
+//! - [AnyOf::Either] as [Either],
 //! - [AnyOf::Neither] as [Neither].
 //!
 //! ## Exported elements :
-//! - Shorthands cases : [Left], [Right], [BothOf], [EitherOf], [Neither],
+//! - Shorthands cases : [Left], [Right], [Both], [Either], [Neither],
 //! - Traits : [LeftOrRight], [Unwrap], [Map], [Swap],
-//! - Types : [Couple], [Pair], [Either], [Both], [AnyOf], [AnyOf4], [AnyOf8], [AnyOf16]
+//! - Types : [Couple], [Pair], [EitherOf], [BothOf], [AnyOf], [AnyOf4], [AnyOf8], [AnyOf16]
 //!
 #![no_std]
 
@@ -73,13 +73,12 @@ use core::ops::{BitAnd, BitOr, Not};
 
 pub use crate::{
     any_of_x::{AnyOf16, AnyOf4, AnyOf8},
-    both::Both,
+    both::Both as BothOf,
     concepts::{Any, Couple, LeftOrRight, Map, Pair, Swap, Unwrap},
-    either::Either,
+    either::Either as EitherOf,
     either::Either::{Left, Right},
+    AnyOf::{Both, Either, Neither},
 };
-
-pub use AnyOf::{Both as BothOf, Either as EitherOf, Neither};
 
 /// Represents a type that can hold one of several variants: `Neither`, `Either` (with `Left` or `Right`),
 /// or `Both` (containing both `Left` and `Right` values).
@@ -100,13 +99,13 @@ pub use AnyOf::{Both as BothOf, Either as EitherOf, Neither};
 /// # Examples
 ///
 /// ```rust
-/// use any_of::{AnyOf, Either, Both, LeftOrRight, Map, Right, Left, Neither, EitherOf, BothOf};
+/// use any_of::{AnyOf, EitherOf, BothOf, LeftOrRight, Map, Right, Left, Neither, Either, Both};
 ///
 /// let neither: AnyOf<i32, &str> = Neither;
 /// let neither: AnyOf<i32, &str> = AnyOf::new(None, None);
-/// let left: AnyOf<i32, &str> = EitherOf(Left(42));
+/// let left: AnyOf<i32, &str> = Either(Left(42));
 /// let left: AnyOf<i32, &str> = AnyOf::new(Some(42), None);
-/// let both: AnyOf<i32, &str> = BothOf(Both { left: 42, right: "Hello" });
+/// let both: AnyOf<i32, &str> = Both(BothOf { left: 42, right: "Hello" });
 /// let both: AnyOf<i32, &str> = AnyOf::new(Some(42), Some("Hello"));
 ///
 /// assert!(neither.is_neither());
@@ -122,8 +121,8 @@ pub use AnyOf::{Both as BothOf, Either as EitherOf, Neither};
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
 pub enum AnyOf<L, R = L> {
     Neither,
-    Either(Either<L, R>),
-    Both(Both<L, R>),
+    Either(EitherOf<L, R>),
+    Both(BothOf<L, R>),
 }
 
 impl<L, R> AnyOf<L, R> {
@@ -137,9 +136,9 @@ impl<L, R> AnyOf<L, R> {
     /// # Returns
     ///
     /// - Returns `Neither` if both `left` and `right` are `None`.
-    /// - Returns `EitherOf(Left)` if `left` has a value and `right` is `None`.
-    /// - Returns `EitherOf(Right)` if `right` has a value and `left` is `None`.
-    /// - Returns `BothOf` if both `left` and `right` have values.
+    /// - Returns `Either(Left)` if `left` has a value and `right` is `None`.
+    /// - Returns `Either(Right)` if `right` has a value and `left` is `None`.
+    /// - Returns `Both` if both `left` and `right` have values.
     ///
     /// # Examples
     ///
@@ -161,9 +160,9 @@ impl<L, R> AnyOf<L, R> {
     pub fn new(left: Option<L>, right: Option<R>) -> Self {
         match (left, right) {
             (None, None) => Neither,
-            (Some(l), None) => EitherOf(Left(l)),
-            (None, Some(r)) => EitherOf(Right(r)),
-            (Some(l), Some(r)) => BothOf(Both { left: l, right: r }),
+            (Some(l), None) => Either(Left(l)),
+            (None, Some(r)) => Either(Right(r)),
+            (Some(l), Some(r)) => Both(BothOf { left: l, right: r }),
         }
     }
 
@@ -181,7 +180,7 @@ impl<L, R> AnyOf<L, R> {
         Self::new(None, None)
     }
 
-    /// Creates an `EitherOf` variant containing a `Left` value.
+    /// Creates an `Either` variant containing a `Left` value.
     ///
     /// # Examples
     ///
@@ -195,7 +194,7 @@ impl<L, R> AnyOf<L, R> {
         Self::new(Some(left), None)
     }
 
-    /// Creates an `EitherOf` variant containing a `Right` value.
+    /// Creates an `Either` variant containing a `Right` value.
     ///
     /// # Examples
     ///
@@ -209,7 +208,7 @@ impl<L, R> AnyOf<L, R> {
         Self::new(None, Some(right))
     }
 
-    /// Creates an `BothOf` variant containing both a `Left` and `Right` value.
+    /// Creates an `Both` variant containing both a `Left` and `Right` value.
     ///
     /// # Examples
     ///
@@ -223,18 +222,18 @@ impl<L, R> AnyOf<L, R> {
         Self::new(Some(l), Some(r))
     }
 
-    /// Creates an `BothOf` variant from a `Both` struct.
+    /// Creates an `Both` variant from a `Both` struct.
     ///
     /// # Examples
     ///
     /// ```rust
-    /// use any_of::{AnyOf, Both};
+    /// use any_of::{AnyOf, BothOf};
     ///
-    /// let both_struct = Both { left: 42, right: "Hello" };
+    /// let both_struct = BothOf { left: 42, right: "Hello" };
     /// let both = AnyOf::from_both(both_struct);
     /// assert!(both.is_both());
     /// ```
-    pub fn from_both(both: Both<L, R>) -> Self {
+    pub fn from_both(both: BothOf<L, R>) -> Self {
         Self::new(Some(both.left), Some(both.right))
     }
 
@@ -257,15 +256,15 @@ impl<L, R> AnyOf<L, R> {
     /// let any_of: AnyOf<i32, ()> = AnyOf::from_either(either);
     /// assert!(any_of.is_left());
     /// ```
-    pub fn from_either(either: Either<L, R>) -> Self {
-        EitherOf(either)
+    pub fn from_either(either: EitherOf<L, R>) -> Self {
+        Either(either)
     }
 
     /// Converts the `AnyOf` variant to a `Both` struct.
     ///
     /// # Panics
     ///
-    /// This function will panic if `self` is not an `BothOf` variant.
+    /// This function will panic if `self` is not an `Both` variant.
     ///
     /// # Examples
     ///
@@ -276,9 +275,9 @@ impl<L, R> AnyOf<L, R> {
     /// assert_eq!(both.left, 42);
     /// assert_eq!(both.right, "Hello");
     /// ```
-    pub fn into_both(self) -> Both<L, R> {
+    pub fn into_both(self) -> BothOf<L, R> {
         match self {
-            BothOf(b) => b,
+            Both(b) => b,
             _ => panic!("Can only convert Either::Both to Both"),
         }
     }
@@ -287,19 +286,18 @@ impl<L, R> AnyOf<L, R> {
     ///
     /// # Panics
     ///
-    /// This function will panic if `self` is not an `EitherOf` variant.
+    /// This function will panic if `self` is not an `Either` variant.
     ///
     /// # Examples
     ///
     /// ```rust
-    /// use any_of::{AnyOf, Either};
-    /// use any_of::either::Either::{Right, Left};
+    /// use any_of::{AnyOf, Either, Left};
     ///
     /// let either: Either<i32, ()> = AnyOf::new_left(42).into_either();
     /// assert_eq!(either, Left(42));
     /// ```
-    pub fn into_either(self) -> Either<L, R> {
-        if let EitherOf(e) = self {
+    pub fn into_either(self) -> EitherOf<L, R> {
+        if let Either(e) = self {
             e
         } else {
             panic!("Can only convert Either::Either to Either");
@@ -310,23 +308,22 @@ impl<L, R> AnyOf<L, R> {
     ///
     /// # Returns
     ///
-    /// - `(Some(Left), None)` for `EitherOf(Left)`.
-    /// - `(None, Some(Right))` for `EitherOf(Right)`.
-    /// - `(Some(Left), Some(Right))` for `BothOf`.
+    /// - `(Some(Left), None)` for `Either(Left)`.
+    /// - `(None, Some(Right))` for `Either(Right)`.
+    /// - `(Some(Left), Some(Right))` for `Both`.
     /// - `(None, None)` for `Neither`.
     ///
     /// # Examples
     ///
     /// ```rust
-    /// use any_of::{AnyOf, Either};
-    /// use any_of::either::Either::{Right, Left};
+    /// use any_of::{AnyOf, Either, Right, Left};
     ///
     /// let any_of = AnyOf::new_both(42, "Hello");
     /// let (left, right) = any_of.to_either_pair();
     /// assert_eq!(left, Some(Left(42)));
     /// assert_eq!(right, Some(Right("Hello")));
     /// ```
-    pub fn to_either_pair(&self) -> Pair<Option<Either<L, R>>>
+    pub fn to_either_pair(&self) -> Pair<Option<EitherOf<L, R>>>
     where
         L: Clone,
         R: Clone,
@@ -337,23 +334,23 @@ impl<L, R> AnyOf<L, R> {
         (left, right)
     }
 
-    /// True if [Left] or [BothOf].
+    /// True if [Left] or [Both].
     pub fn has_left(&self) -> bool {
-        matches!(self, EitherOf(Left(_)) | BothOf(_))
+        matches!(self, Either(Left(_)) | Both(_))
     }
 
-    /// True if [Right] or [BothOf].0
+    /// True if [Right] or [Both].0
     pub fn has_right(&self) -> bool {
-        matches!(self, EitherOf(Right(_)) | BothOf(_))
+        matches!(self, Either(Right(_)) | Both(_))
     }
 
     /// True if not [Neither].
     pub fn is_any(&self) -> bool {
-        matches!(self, EitherOf(Left(_)) | EitherOf(Right(_)) | BothOf(_))
+        matches!(self, Either(Left(_)) | Either(Right(_)) | Both(_))
     }
 
     // todo(2.0.0) : remove
-    /// True if [EitherOf].
+    /// True if [Either].
     #[deprecated(
         since = "1.3.1",
         note = "Use `is_either` instead. Will be removed in 2.0.0."
@@ -362,14 +359,14 @@ impl<L, R> AnyOf<L, R> {
         self.is_either()
     }
 
-    /// True if [EitherOf].
+    /// True if [Either].
     pub fn is_either(&self) -> bool {
-        matches!(self, EitherOf(_))
+        matches!(self, Either(_))
     }
 
-    /// True if [BothOf]
+    /// True if [Both]
     pub fn is_both(&self) -> bool {
-        matches!(self, BothOf(_))
+        matches!(self, Both(_))
     }
 
     /// True if [Neither]
@@ -377,9 +374,9 @@ impl<L, R> AnyOf<L, R> {
         matches!(self, Neither)
     }
 
-    /// True if not [EitherOf]
+    /// True if not [Either]
     pub fn is_neither_or_both(&self) -> bool {
-        matches!(self, Neither | BothOf(_))
+        matches!(self, Neither | Both(_))
     }
 
     /// Returns `Some((&L, &R))` if `self.is_both()` is true, or `None`.
@@ -388,22 +385,22 @@ impl<L, R> AnyOf<L, R> {
     }
 
     /// Returns both values if present, or computes them with the provided function.
-    pub fn both_or_else(self, f: impl FnOnce() -> Both<L, R>) -> Both<L, R> {
+    pub fn both_or_else(self, f: impl FnOnce() -> BothOf<L, R>) -> BothOf<L, R> {
         match self {
             Neither => f(),
-            EitherOf(Left(l)) => Both::new(l, f().right),
-            EitherOf(Right(r)) => Both::new(f().left, r),
-            BothOf(b) => b,
+            Either(Left(l)) => BothOf::new(l, f().right),
+            Either(Right(r)) => BothOf::new(f().left, r),
+            Both(b) => b,
         }
     }
 
     /// Returns both values if present, or the provided default values.
-    pub fn both_or(self, other: Both<L, R>) -> Both<L, R> {
+    pub fn both_or(self, other: BothOf<L, R>) -> BothOf<L, R> {
         self.both_or_else(|| other)
     }
 
     /// Unwraps and returns both values, panicking if not available.
-    pub fn unwrap_both(self) -> Both<L, R> {
+    pub fn unwrap_both(self) -> BothOf<L, R> {
         self.both_or_else(|| panic!("Can only unwrap both of Either::Both"))
     }
 
@@ -411,9 +408,9 @@ impl<L, R> AnyOf<L, R> {
     pub fn filter_left(self) -> Self {
         match self {
             Neither => Neither,
-            EitherOf(Left(l)) => EitherOf(Left(l)),
-            EitherOf(Right(_)) => Neither,
-            BothOf(Both { left: l, .. }) => EitherOf(Left(l)),
+            Either(Left(l)) => Either(Left(l)),
+            Either(Right(_)) => Neither,
+            Both(BothOf { left: l, .. }) => Either(Left(l)),
         }
     }
 
@@ -421,29 +418,29 @@ impl<L, R> AnyOf<L, R> {
     pub fn filter_right(self) -> Self {
         match self {
             Neither => Neither,
-            EitherOf(Left(_)) => Neither,
-            EitherOf(Right(r)) => EitherOf(Right(r)),
-            BothOf(Both { right: r, .. }) => EitherOf(Right(r)),
+            Either(Left(_)) => Neither,
+            Either(Right(r)) => Either(Right(r)),
+            Both(BothOf { right: r, .. }) => Either(Right(r)),
         }
     }
 
     /// Adds or replaces the right value, keeping or constructing the instance accordingly.
     pub fn with_right(self, right: R) -> Self {
         match self {
-            Neither => EitherOf(Right(right)),
-            EitherOf(Left(l)) => BothOf(Both { left: l, right }),
-            EitherOf(Right(_)) => EitherOf(Right(right)),
-            BothOf(Both { left: l, .. }) => BothOf(Both { left: l, right }),
+            Neither => Either(Right(right)),
+            Either(Left(l)) => Both(BothOf { left: l, right }),
+            Either(Right(_)) => Either(Right(right)),
+            Both(BothOf { left: l, .. }) => Both(BothOf { left: l, right }),
         }
     }
 
     /// Adds or replaces the left value, keeping or constructing the instance accordingly.
     pub fn with_left(self, left: L) -> Self {
         match self {
-            Neither => EitherOf(Left(left)),
-            EitherOf(Left(_)) => EitherOf(Left(left)),
-            EitherOf(Right(r)) => BothOf(Both { left, right: r }),
-            BothOf(Both { right: r, .. }) => BothOf(Both { left, right: r }),
+            Neither => Either(Left(left)),
+            Either(Left(_)) => Either(Left(left)),
+            Either(Right(r)) => Both(BothOf { left, right: r }),
+            Both(BothOf { right: r, .. }) => Both(BothOf { left, right: r }),
         }
     }
 
@@ -479,19 +476,19 @@ impl<L, R> AnyOf<L, R> {
     pub fn combine(self, other: Self) -> Self {
         match self {
             Neither => other,
-            EitherOf(Left(l)) => match other {
-                Neither => EitherOf(Left(l)),
-                EitherOf(Left(_)) => EitherOf(Left(l)),
-                EitherOf(Right(r)) => BothOf(Both { left: l, right: r }),
-                BothOf(Both { right: r, .. }) => BothOf(Both { left: l, right: r }),
+            Either(Left(l)) => match other {
+                Neither => Either(Left(l)),
+                Either(Left(_)) => Either(Left(l)),
+                Either(Right(r)) => Both(BothOf { left: l, right: r }),
+                Both(BothOf { right: r, .. }) => Both(BothOf { left: l, right: r }),
             },
-            EitherOf(Right(r)) => match other {
-                Neither => EitherOf(Right(r)),
-                EitherOf(Left(l)) => BothOf(Both { left: l, right: r }),
-                EitherOf(Right(r2)) => EitherOf(Right(r2)),
-                BothOf(Both { left: l, .. }) => BothOf(Both { left: l, right: r }),
+            Either(Right(r)) => match other {
+                Neither => Either(Right(r)),
+                Either(Left(l)) => Both(BothOf { left: l, right: r }),
+                Either(Right(r2)) => Either(Right(r2)),
+                Both(BothOf { left: l, .. }) => Both(BothOf { left: l, right: r }),
             },
-            BothOf(b) => BothOf(b),
+            Both(b) => Both(b),
         }
     }
 
@@ -523,11 +520,11 @@ impl<L, R> AnyOf<L, R> {
     /// # Examples
     ///
     /// ```rust
-    /// use any_of::{AnyOf, Both, Either,Right, Left, Neither, EitherOf, BothOf};
+    /// use any_of::{AnyOf, Both ,BothOf, Either, Left, Neither, Right};
     ///
-    /// let both = BothOf(Both { left: 5, right: 10 });
-    /// let left_only = EitherOf(Left(5));
-    /// let right_only = EitherOf(Right(10));
+    /// let both = Both(BothOf { left: 5, right: 10 });
+    /// let left_only = Either(Left(5));
+    /// let right_only = Either(Right(10));
     /// let neither: AnyOf<i32, i32> = Neither;
     ///
     /// // Filtering Both with Right results in Left
@@ -549,19 +546,19 @@ impl<L, R> AnyOf<L, R> {
     pub fn filter(self, other: Self) -> Self {
         match other {
             Neither => self,
-            EitherOf(Left(_)) => match self {
-                EitherOf(Left(_)) => Neither,
-                EitherOf(Right(r)) => EitherOf(Right(r)),
-                BothOf(Both { right: r, .. }) => EitherOf(Right(r)),
+            Either(Left(_)) => match self {
+                Either(Left(_)) => Neither,
+                Either(Right(r)) => Either(Right(r)),
+                Both(BothOf { right: r, .. }) => Either(Right(r)),
                 _ => self,
             },
-            EitherOf(Right(_)) => match self {
-                EitherOf(Left(l)) => EitherOf(Left(l)),
-                EitherOf(Right(_)) => Neither,
-                BothOf(Both { left: l, .. }) => EitherOf(Left(l)),
+            Either(Right(_)) => match self {
+                Either(Left(l)) => Either(Left(l)),
+                Either(Right(_)) => Neither,
+                Both(BothOf { left: l, .. }) => Either(Left(l)),
                 _ => self,
             },
-            BothOf(_) => Neither,
+            Both(_) => Neither,
         }
     }
 }
@@ -598,8 +595,8 @@ impl<L, R> LeftOrRight<L, R> for AnyOf<L, R> {
     fn left(&self) -> Option<&L> {
         match self {
             Neither => None,
-            EitherOf(e) => e.left(),
-            BothOf(b) => b.left(),
+            Either(e) => e.left(),
+            Both(b) => b.left(),
         }
     }
 
@@ -607,8 +604,8 @@ impl<L, R> LeftOrRight<L, R> for AnyOf<L, R> {
     fn right(&self) -> Option<&R> {
         match self {
             Neither => None,
-            EitherOf(e) => e.right(),
-            BothOf(b) => b.right(),
+            Either(e) => e.right(),
+            Both(b) => b.right(),
         }
     }
 }
@@ -629,8 +626,8 @@ impl<L, R> Swap<L, R> for AnyOf<L, R> {
     fn swap(self) -> Self::Output {
         match self {
             Neither => AnyOf::<R, L>::Neither,
-            EitherOf(e) => AnyOf::<R, L>::Either(e.swap()),
-            BothOf(b) => AnyOf::<R, L>::Both(b.swap()),
+            Either(e) => AnyOf::<R, L>::Either(e.swap()),
+            Both(b) => AnyOf::<R, L>::Both(b.swap()),
         }
     }
 }
@@ -657,8 +654,8 @@ impl<L, R> Map<L, R> for AnyOf<L, R> {
     {
         match self {
             Neither => AnyOf::<L2, R2>::Neither,
-            EitherOf(e) => AnyOf::<L2, R2>::Either(e.map(fl, fr)),
-            BothOf(b) => AnyOf::<L2, R2>::Both(b.map(fl, fr)),
+            Either(e) => AnyOf::<L2, R2>::Either(e.map(fl, fr)),
+            Both(b) => AnyOf::<L2, R2>::Both(b.map(fl, fr)),
         }
     }
 }
@@ -668,9 +665,9 @@ impl<L, R> Unwrap<L, R> for AnyOf<L, R> {
     fn left_or_else(self, f: impl FnOnce() -> L) -> L {
         match self {
             Neither => f(),
-            EitherOf(Left(l)) => l,
-            EitherOf(Right(_)) => f(),
-            BothOf(Both { left: l, .. }) => l,
+            Either(Left(l)) => l,
+            Either(Right(_)) => f(),
+            Both(BothOf { left: l, .. }) => l,
         }
     }
 
@@ -678,9 +675,9 @@ impl<L, R> Unwrap<L, R> for AnyOf<L, R> {
     fn right_or_else(self, f: impl FnOnce() -> R) -> R {
         match self {
             Neither => f(),
-            EitherOf(Left(_)) => f(),
-            EitherOf(Right(r)) => r,
-            BothOf(Both { right: r, .. }) => r,
+            Either(Left(_)) => f(),
+            Either(Right(r)) => r,
+            Both(BothOf { right: r, .. }) => r,
         }
     }
 }

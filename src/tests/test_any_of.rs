@@ -85,13 +85,13 @@ fn test_combine() {
 
 #[test]
 fn test_swap_and_not() {
-    let both = Both::new(42, "text");
+    let both = BothOf::new(42, "text");
     let swapped = both.swap();
 
     assert_eq!(swapped.left, "text");
     assert_eq!(swapped.right, 42);
 
-    let not_both: Both<&str, i32> = !both;
+    let not_both: BothOf<&str, i32> = !both;
 
     assert_eq!(not_both.left, "text");
     assert_eq!(not_both.right, 42);
@@ -99,31 +99,34 @@ fn test_swap_and_not() {
 
 #[test]
 fn test_either() {
-    let either_left: Either<i32, &str> = Either::new_left(42);
-    let either_right: Either<i32, &str> = Either::new_right("Hello");
+    let either_left: EitherOf<i32, &str> = EitherOf::new_left(42);
+    let either_right: EitherOf<i32, &str> = EitherOf::new_right("Hello");
 
     assert!(either_left.is_left());
     assert!(!either_left.is_right());
     assert!(either_right.is_right());
     assert!(!either_right.is_left());
 
-    let swapped_left: Either<&str, i32> = either_left.swap();
-    let swapped_right: Either<&str, i32> = either_right.swap();
+    let swapped_left: EitherOf<&str, i32> = either_left.swap();
+    let swapped_right: EitherOf<&str, i32> = either_right.swap();
 
-    assert_eq!(swapped_left, Either::new_right(42));
-    assert_eq!(swapped_right, Either::new_left("Hello"));
+    assert_eq!(swapped_left, EitherOf::new_right(42));
+    assert_eq!(swapped_right, EitherOf::new_left("Hello"));
 }
 
 #[test]
 fn test_unwrap() {
-    let both = Both::new(1, "text");
+    let both = BothOf::new(1, "text");
     assert_eq!(both.left_or_else(|| 0), 1);
     assert_eq!(both.right_or_else(|| "default"), "text");
 }
 
 #[test]
 fn test_from_both() {
-    let both = Both { left: 42, right: "Hello" };
+    let both = BothOf {
+        left: 42,
+        right: "Hello",
+    };
     let any_of = AnyOf::from_both(both);
     assert!(any_of.is_both());
 }
@@ -131,13 +134,13 @@ fn test_from_both() {
 #[test]
 fn test_from_any() {
     let any = (Some(42), None);
-    let any_of:AnyOf<i32, &str> = AnyOf::from_any(any);
+    let any_of: AnyOf<i32, &str> = AnyOf::from_any(any);
     assert!(any_of.is_left());
 }
 
 #[test]
 fn test_from_either() {
-    let either:Either<i32, &str> = Left(42);
+    let either: EitherOf<i32, &str> = Left(42);
     let any_of = AnyOf::from_either(either);
     assert!(any_of.is_left());
 }
@@ -152,7 +155,7 @@ fn test_into_both() {
 
 #[test]
 fn test_into_either() {
-    let any_of:AnyOf<i32, &str> = AnyOf::new_left(42);
+    let any_of: AnyOf<i32, &str> = AnyOf::new_left(42);
     let either = any_of.into_either();
     assert_eq!(either, Left(42));
 }
@@ -168,9 +171,9 @@ fn test_to_either_pair() {
 #[test]
 fn test_is_either_and_is_neither_or_both() {
     let neither: AnyOf<i32, &str> = AnyOf::new_neither();
-    let left:AnyOf<i32, &str> = AnyOf::new_left(42);
-    let right:AnyOf<i32, &str> = AnyOf::new_right("World");
-    let both:AnyOf<i32, &str> = AnyOf::new_both(42, "World");
+    let left: AnyOf<i32, &str> = AnyOf::new_left(42);
+    let right: AnyOf<i32, &str> = AnyOf::new_right("World");
+    let both: AnyOf<i32, &str> = AnyOf::new_both(42, "World");
 
     assert!(!neither.is_either());
     assert!(left.is_either());
@@ -189,20 +192,20 @@ fn test_both_methods() {
 
     assert_eq!(both.both_or_none(), Some((&42, &"Hello")));
     assert_eq!(
-        both.both_or_else(|| Both::new(0, "Default")),
-        Both::new(42, "Hello")
+        both.both_or_else(|| BothOf::new(0, "Default")),
+        BothOf::new(42, "Hello")
     );
 
     let neither: AnyOf<i32, &str> = AnyOf::new_neither();
     assert_eq!(
-        neither.both_or_else(|| Both::new(0, "Default")),
-        Both::new(0, "Default")
+        neither.both_or_else(|| BothOf::new(0, "Default")),
+        BothOf::new(0, "Default")
     );
 
     let left = AnyOf::new_left(42);
     assert_eq!(
-        left.both_or(Both::new(0, "Default")),
-        Both::new(42, "Default")
+        left.both_or(BothOf::new(0, "Default")),
+        BothOf::new(42, "Default")
     );
 }
 
@@ -233,6 +236,6 @@ fn test_with_left_and_with_right() {
 
     let both = with_left.with_right("Hello");
     assert!(both.is_both());
-    let both_values = both.both_or_else(|| Both::new(0, "Default"));
-    assert_eq!(both_values, Both::new(42, "Hello"));
+    let both_values = both.both_or_else(|| BothOf::new(0, "Default"));
+    assert_eq!(both_values, BothOf::new(42, "Hello"));
 }

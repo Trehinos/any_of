@@ -82,27 +82,27 @@ Swap <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
 Map <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
 Unwrap <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
 
-"LeftOrRight+Swap+Map+Unwrap+Not" <|.. Either
-enum Either<L, R> {
+"LeftOrRight+Swap+Map+Unwrap+Not" <|.. EitherOf
+enum EitherOf<L, R> {
     * Left(L)
     * Right(R)
     __
-    Swap::Output = Either<R, L>
-    Not::Output = Either<R, L>
-    Map::Output<L2, R2> = Either<L2, R2>
+    Swap::Output = EitherOf<R, L>
+    Not::Output = EitherOf<R, L>
+    Map::Output<L2, R2> = EitherOf<L2, R2>
     ==
     __
     + {static} new_left(l: L) -> Self
     + {static} new_right(r: R) -> Self
 }
 
-struct Both<L, R> {
+struct BothOf<L, R> {
     + left: L
     + right: R
     __
-    Swap::Output = Both<R, L>
-    Not::Output = Both<R, L>
-    Map::Output<L2, R2> = Both<L2, R2>
+    Swap::Output = BothOf<R, L>
+    Not::Output = BothOf<R, L>
+    Map::Output<L2, R2> = BothOf<L2, R2>
     ==
     + {static} new(l: L, r: R) -> Self
     + {static} from_couple(couple: Couple<L, R>) -> Self
@@ -110,15 +110,15 @@ struct Both<L, R> {
     + into_left(self) -> L
     + into_right(self) -> R
 }
-"LeftOrRight+Swap+Map+Unwrap+Not" <|.. Both
+"LeftOrRight+Swap+Map+Unwrap+Not" <|.. BothOf
 
 BitAnd <|... AnyOf
 BitOr <|... AnyOf
 "LeftOrRight+Swap+Map+Unwrap+Not" <|.. AnyOf
 enum AnyOf<L, R> {
     * Neither
-    * Either(Either<L, R>)
-    * Both(Both<L, R>)
+    * Either(EitherOf<L, R>)
+    * Both(BothOf<L, R>)
     __
     Swap::Output = AnyOf<R, L>
     Not::Output = AnyOf<R, L>
@@ -132,8 +132,8 @@ enum AnyOf<L, R> {
     + {static} new_left(l: L) -> Self
     + {static} new_right(r: R) -> Self
     + {static} new_both(l: L, r: R) -> Self
-    + {static} from_both(both: Both<L, R>) -> Self
-    + {static} from_either(either: Either<L, R>) -> Self
+    + {static} from_both(both: BothOf<L, R>) -> Self
+    + {static} from_either(either: EitherOf<L, R>) -> Self
     + {static} from_any(any: Any<L, R>) -> Self
     + filter_left(self) -> Self
     + filter_right(self) -> Self
@@ -141,7 +141,7 @@ enum AnyOf<L, R> {
     + with_right(self, r: R) -> Self
     + combine(self, other: Self) -> Self
     + filter(self, other: Self) -> Self
-    + to_either_pair(&self) -> Pair<Option<Either<L, R>>
+    + to_either_pair(&self) -> Pair<Option<EitherOf<L, R>>
     + has_left(&self) -> bool
     + has_right(&self) -> bool
     + is_any(&self) -> bool
@@ -150,12 +150,12 @@ enum AnyOf<L, R> {
     + is_both(&self) -> bool
     + is_neither(&self) -> bool
     + is_neither_or_both(&self) -> bool
-    + into_both(self) -> Both<L, R>
-    + into_either(self) -> Either<L, R>
+    + into_both(self) -> BothOf<L, R>
+    + into_either(self) -> EitherOf<L, R>
     + both_or_none(self) -> Option<Couple<&L, &R>>
-    + both_or_else(self, f: FB) -> Both<L, R>
-    + both_or(self, default: Both<L, R>) -> Both<L, R>
-    + unwrap_both(self) -> Both<L, R>
+    + both_or_else(self, f: FB) -> BothOf<L, R>
+    + both_or(self, default: BothOf<L, R>) -> BothOf<L, R>
+    + unwrap_both(self) -> BothOf<L, R>
 }
 
 struct AnyOf4<LL, LR, RL, RR> {

@@ -25,9 +25,9 @@
 //! # Usage Examples
 //!
 //! ```rust
-//! use any_of::{Both, Couple, Either, Left, Right};
+//! use any_of::{BothOf, Couple, Either, Left, Right};
 //!
-//! let both = Both::new(10, "right");
+//! let both = BothOf::new(10, "right");
 //! assert_eq!(both.left, 10);
 //! assert_eq!(both.right, "right");
 //!
@@ -54,15 +54,17 @@ use core::ops::Not;
 
 /// `Both` is a generic struct that allows pairing two values of potentially different types.
 ///
+/// This type is exported as `any_of::BothOf`.
+///
 /// The `Both` struct is a utility for combining two values together,
 /// making it easier to manipulate pairs of values with helper methods for construction,
 /// transformation, and conversion.
 ///
 /// # Examples
 /// ```rust
-/// use any_of::Both;
+/// use any_of::BothOf;
 ///
-/// let both = Both::new(1, "example");
+/// let both = BothOf::new(1, "example");
 /// assert_eq!(both.left, 1);
 /// assert_eq!(both.right, "example");
 /// ```
@@ -86,9 +88,9 @@ impl<L, R> Both<L, R> {
     ///
     /// # Examples
     /// ```rust
-    /// use any_of::Both;
+    /// use any_of::BothOf;
     ///
-    /// let both = Both::new(10, "right");
+    /// let both = BothOf::new(10, "right");
     /// assert_eq!(both.left, 10);
     /// assert_eq!(both.right, "right");
     /// ```
@@ -106,10 +108,10 @@ impl<L, R> Both<L, R> {
     ///
     /// # Examples
     /// ```rust
-    /// use any_of::{Both, Couple};
+    /// use any_of::{BothOf, Couple};
     ///
     /// let couple: Couple<i32, &str> = (42, "answer");
-    /// let both = Both::from_couple(couple);
+    /// let both = BothOf::from_couple(couple);
     /// assert_eq!(both.left, 42);
     /// assert_eq!(both.right, "answer");
     /// ```
@@ -127,9 +129,9 @@ impl<L, R> Both<L, R> {
     ///
     /// # Examples
     /// ```rust
-    /// use any_of::{Both, Couple};
+    /// use any_of::{BothOf, Couple};
     ///
-    /// let both = Both::new(50, "hello");
+    /// let both = BothOf::new(50, "hello");
     /// let couple: Couple<i32, &str> = both.into_couple();
     /// assert_eq!(couple, (50, "hello"));
     /// ```
@@ -145,9 +147,9 @@ impl<L, R> Both<L, R> {
     ///
     /// # Examples
     /// ```rust
-    /// use any_of::{Both, Either, Left};
+    /// use any_of::{BothOf, Either, Left};
     ///
-    /// let both = Both::new(100, "unused");
+    /// let both = BothOf::new(100, "unused");
     /// let left = both.into_left();
     /// match left {
     ///     Left(value) => assert_eq!(value, 100),
@@ -166,9 +168,9 @@ impl<L, R> Both<L, R> {
     ///
     /// # Examples
     /// ```rust
-    /// use any_of::{Both, Either, Right};
+    /// use any_of::{BothOf, Either, Right};
     ///
-    /// let both = Both::new("unused", 2023);
+    /// let both = BothOf::new("unused", 2023);
     /// let right = both.into_right();
     /// match right {
     ///     Right(value) => assert_eq!(value, 2023),
@@ -211,10 +213,10 @@ impl<L, R> Swap<L, R> for Both<L, R> {
     ///
     /// # Examples
     /// ```rust
-    /// use any_of::Both;
+    /// use any_of::BothOf;
     /// use any_of::Swap;
     ///
-    /// let both = Both::new(42, "example");
+    /// let both = BothOf::new(42, "example");
     /// let swapped = both.swap();
     ///
     /// assert_eq!(swapped.left, "example");
@@ -248,9 +250,9 @@ impl<L, R> Map<L, R> for Both<L, R> {
     ///
     /// # Examples
     /// ```rust
-    /// use any_of::{Both, Map};
+    /// use any_of::{BothOf, Map};
     ///
-    /// let both = Both::new(2, "example");
+    /// let both = BothOf::new(2, "example");
     /// let transformed = both.map(|left| left * 2, |right| format!("{}!", right));
     ///
     /// assert_eq!(transformed.left, 4);

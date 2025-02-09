@@ -12,44 +12,44 @@
 //! # Examples
 //!
 //! ```rust
-//! use any_of::{AnyOf, Both, Either, Left};
+//! use any_of::{AnyOf, Both, BothOf, Either, EitherOf, Left};
 //!
 //! let either: Either<i32, String> = Left(42);
 //! let any_of: AnyOf<i32, String> = AnyOf::from(either);
 //!
 //! let either: Either<i32, String> = Left(42);
 //! let any_of_again: AnyOf<i32, String> = AnyOf::from(either);
-//! let back_to_either: Either<i32, String> = Either::from(any_of_again);
+//! let back_to_either: Either<i32, String> = EitherOf::from(any_of_again);
 //!
-//! let both: Both<i32, String> = Both { left: 42, right: "hello".to_string() };
+//! let both: Both<i32, String> = BothOf { left: 42, right: "hello".to_string() };
 //! let any_of_again: AnyOf<i32, String> = AnyOf::from(both);
-//! let back_to_both: Both<i32, String> = Both::from(any_of_again);
+//! let back_to_both: Both<i32, String> = BothOf::from(any_of_again);
 //! ```
 
-use crate::{AnyOf, Both, Either};
+use crate::{AnyOf, BothOf, EitherOf};
 
-impl<L, R> From<Either<L, R>> for AnyOf<L, R> {
+impl<L, R> From<EitherOf<L, R>> for AnyOf<L, R> {
     /// See [Self::from_either].
-    fn from(value: Either<L, R>) -> Self {
+    fn from(value: EitherOf<L, R>) -> Self {
         Self::from_either(value)
     }
 }
 
-impl<L, R> From<AnyOf<L, R>> for Either<L, R> {
+impl<L, R> From<AnyOf<L, R>> for EitherOf<L, R> {
     /// See [AnyOf::into_either].
     fn from(value: AnyOf<L, R>) -> Self {
         value.into_either()
     }
 }
 
-impl<L, R> From<Both<L, R>> for AnyOf<L, R> {
+impl<L, R> From<BothOf<L, R>> for AnyOf<L, R> {
     /// See [Self::from_both].
-    fn from(value: Both<L, R>) -> Self {
+    fn from(value: BothOf<L, R>) -> Self {
         Self::from_both(value)
     }
 }
 
-impl<L, R> From<AnyOf<L, R>> for Both<L, R> {
+impl<L, R> From<AnyOf<L, R>> for BothOf<L, R> {
     /// See [AnyOf::into_both].
     fn from(value: AnyOf<L, R>) -> Self {
         value.into_both()

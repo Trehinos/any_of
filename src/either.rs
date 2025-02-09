@@ -49,13 +49,13 @@
 //! Usage of the `Either` enum looks like this:
 //!
 //! ```rust
-//! use any_of::{Either, LeftOrRight, Swap};
+//! use any_of::{EitherOf, LeftOrRight, Swap};
 //!
-//! let left_value: Either<i32, &str> = Either::new_left(10);
+//! let left_value: EitherOf<i32, &str> = EitherOf::new_left(10);
 //! assert!(left_value.is_left());
 //! assert_eq!(left_value.left(), Some(&10));
 //!
-//! let right_value: Either<i32, &str> = Either::new_right("Hello");
+//! let right_value: EitherOf<i32, &str> = EitherOf::new_right("Hello");
 //! assert!(right_value.is_right());
 //! assert_eq!(right_value.right(), Some(&"Hello"));
 //!
@@ -70,6 +70,8 @@ use crate::{LeftOrRight, Swap};
 use core::ops::Not;
 
 /// The `Either` enum is a utility type that can hold a value of one of two variants: `Left(L)` or `Right(R)`.
+/// 
+/// This type is exported as `any_of::EitherOf`.
 ///
 /// It serves as a straightforward alternative to `Result`, providing a way to perform operations
 /// on values of two possible types. Unlike `Result`, it does not imply any specific meaning
@@ -80,7 +82,7 @@ pub enum Either<L, R> {
     Right(R),
 }
 
-impl<L, R> Either<L, R> {
+impl<L, R> Either <L, R> {
     /// Creates a new `Either` value in the `Left` variant.
     ///
     /// ## Arguments
