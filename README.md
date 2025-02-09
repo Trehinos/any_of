@@ -30,10 +30,9 @@ manner.
       ```
     - Its cases are:
       ```
-      AnyOf(L, R) = Neither | Left(L) | Right(R) | Both({left: L, right: R})
+      AnyOf(L, R) = Neither | Left(L) | Right(R) | BothOf{left: L, right: R}
       ```
     - This type can also be viewed as a product of two optional types:
-    - 
       ```
       AnyOf<L, R>::any() -> (Option<L>, Option<R>)
       ```
@@ -73,6 +72,7 @@ manner.
 4. **Enhanced Type Composition**
     - A `Couple<T, U>` is a `(T, U)`,
     - A `Pair<T>` is a `Couple<T, T>`,
+    - An `Any<T, U>` is a `Couple<Option<T>, Option<U>>`,
     - Complex types like `AnyOf4`, `AnyOf8`, and `AnyOf16` are implemented for handling larger,
       structured combinations via nested `AnyOf` structures.
     - The `LeftOrRight` trait :
@@ -117,7 +117,7 @@ It is inspired by the Haskel's `Either` type.
 
 * Unlike the Rust's `Result` type, the types `AnyOf`, `EitherOf` or `LeftOrRight` have not an "error" semantic, they are
   general purpose,
-* Any `LeftOrRight<L, R>::any` can be represented by a `(Option<L>, Option<R>)`  which is a product of two optional
+* `LeftOrRight<L, R>::any()` can be represented by a `(Option<L>, Option<R>)`  which is a product of two optional
   types, but the two types has not the same composition conciseness :
   ```
   AnyOf<AnyOf<LL, LR>, AnyOf<RL, RR>>
