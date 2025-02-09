@@ -26,13 +26,14 @@ manner.
         - `Both`: Both values are present.
     - It combines variants in the following way:
       ```
-      AnyOf<L, R> = Neither | Either(EitherOf<L, R>) | Both(BothOf<L, R>)
+      AnyOf<L, R> = Neither | EitherOf<L, R> | BothOf<L, R>
       ```
     - Its cases are:
       ```
-      AnyOf(L, R) = Neither | Either(Left(L)) | Either(Right(R)) | Both{left: L, right: R)}
+      AnyOf(L, R) = Neither | Left(L) | Right(R) | Both({left: L, right: R})
       ```
     - This type can also be viewed as a product of two optional types:
+    - 
       ```
       AnyOf<L, R>::any() -> (Option<L>, Option<R>)
       ```
