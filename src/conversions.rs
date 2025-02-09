@@ -21,9 +21,9 @@
 //! let any_of_again: AnyOf<i32, String> = AnyOf::from(either);
 //! let back_to_either: EitherOf<i32, String> = EitherOf::from(any_of_again);
 //!
-//! let both: Both<i32, String> = BothOf { left: 42, right: "hello".to_string() };
+//! let both: BothOf<i32, String> = BothOf { left: 42, right: "hello".to_string() };
 //! let any_of_again: AnyOf<i32, String> = AnyOf::from(both);
-//! let back_to_both: Both<i32, String> = BothOf::from(any_of_again);
+//! let back_to_both: BothOf<i32, String> = BothOf::from(any_of_again);
 //! ```
 
 use crate::{Any, AnyOf, BothOf, Couple, EitherOf, LeftOrRight};
