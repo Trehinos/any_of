@@ -206,10 +206,10 @@ pub trait Map<L, R>: LeftOrRight<L, R> {
 /// ## Examples
 ///
 /// ```rust
-/// use any_of::{Either, Unwrap};
+/// use any_of::{Either, Unwrap, Left, Right};
 ///
-/// let left: Either<i32, &str> = Either::Left(42);
-/// let right: Either<i32, &str> = Either::Right("example");
+/// let left: Either<i32, &str> = Left(42);
+/// let right: Either<i32, &str> = Right("example");
 ///
 /// // Retrieve the left value, or default to 0
 /// assert_eq!(left.left_or_default(), 42);
@@ -300,10 +300,10 @@ pub trait Unwrap<L, R>: LeftOrRight<L, R> {
     /// ## Examples
     ///
     /// ```rust
-    /// use any_of::{Either, Unwrap};
+    /// use any_of::{Either, Unwrap, Left, Right};
     ///
-    /// let left: Either<i32, &str> = Either::Left(42);
-    /// let right: Either<i32, &str> = Either::Right("example");
+    /// let left: Either<i32, &str> = Left(42);
+    /// let right: Either<i32, &str> = Right("example");
     ///
     /// // Returns the left value as it exists.
     /// assert_eq!(left.left_or_default(), 42);
@@ -335,10 +335,10 @@ pub trait Unwrap<L, R>: LeftOrRight<L, R> {
     /// ## Examples
     ///
     /// ```rust
-    /// use any_of::{Either, Unwrap};
+    /// use any_of::{Either, Unwrap, Left, Right};
     ///
-    /// let left: Either<i32, &str> = Either::Left(42);
-    /// let right: Either<i32, &str> = Either::Right("example");
+    /// let left: Either<i32, &str> = Left(42);
+    /// let right: Either<i32, &str> = Right("example");
     ///
     /// // Returns the default value for &str ("") because the variant is `Left`.
     /// assert_eq!(left.right_or_default(), "");
@@ -371,10 +371,10 @@ pub trait Unwrap<L, R>: LeftOrRight<L, R> {
     /// ## Examples
     ///
     /// ```rust
-    /// use any_of::{Either, Unwrap};
+    /// use any_of::{Either, Unwrap, Left, Right};
     ///
-    /// let left: Either<i32, &str> = Either::Left(42);
-    /// let right: Either<i32, &str> = Either::Right("example");
+    /// let left: Either<i32, &str> = Left(42);
+    /// let right: Either<i32, &str> = Right("example");
     ///
     /// // Successfully extracts the left value.
     /// assert_eq!(left.expect_left("Expected left value"), 42);
@@ -406,10 +406,10 @@ pub trait Unwrap<L, R>: LeftOrRight<L, R> {
     /// ## Examples
     ///
     /// ```rust
-    /// use any_of::{Either, Unwrap};
+    /// use any_of::{Either, Unwrap, Left, Right};
     ///
-    /// let left: Either<i32, &str> = Either::Left(42);
-    /// let right: Either<i32, &str> = Either::Right("example");
+    /// let left: Either<i32, &str> = Left(42);
+    /// let right: Either<i32, &str> = Right("example");
     ///
     /// // Successfully extracts the right value.
     /// assert_eq!(right.expect_right("Expected right value"), "example");

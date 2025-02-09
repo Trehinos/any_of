@@ -1,4 +1,4 @@
-use crate::{AnyOf, Both, Either, LeftOrRight, Map, Swap, Unwrap};
+use crate::*;
 
 #[test]
 fn test_new() {
@@ -137,7 +137,7 @@ fn test_from_any() {
 
 #[test]
 fn test_from_either() {
-    let either:Either<i32, &str> = Either::Left(42);
+    let either:Either<i32, &str> = Left(42);
     let any_of = AnyOf::from_either(either);
     assert!(any_of.is_left());
 }
@@ -154,15 +154,15 @@ fn test_into_both() {
 fn test_into_either() {
     let any_of:AnyOf<i32, &str> = AnyOf::new_left(42);
     let either = any_of.into_either();
-    assert_eq!(either, Either::Left(42));
+    assert_eq!(either, Left(42));
 }
 
 #[test]
 fn test_to_either_pair() {
     let any_of = AnyOf::new_both(42, "Hello");
     let (left, right) = any_of.to_either_pair();
-    assert_eq!(left, Some(Either::Left(42)));
-    assert_eq!(right, Some(Either::Right("Hello")));
+    assert_eq!(left, Some(Left(42)));
+    assert_eq!(right, Some(Right("Hello")));
 }
 
 #[test]
@@ -212,11 +212,11 @@ fn test_filter_left_and_filter_right() {
 
     let left_only = any_of.filter_left();
     assert!(left_only.is_left());
-    assert_eq!(left_only.into_either(), Either::Left(42));
+    assert_eq!(left_only.into_either(), Left(42));
 
     let right_only = any_of.filter_right();
     assert!(right_only.is_right());
-    assert_eq!(right_only.into_either(), Either::Right("Hello"));
+    assert_eq!(right_only.into_either(), Right("Hello"));
 }
 
 #[test]
@@ -225,11 +225,11 @@ fn test_with_left_and_with_right() {
 
     let with_left = neither.with_left(42);
     assert!(with_left.is_left());
-    assert_eq!(with_left.into_either(), Either::Left(42));
+    assert_eq!(with_left.into_either(), Left(42));
 
     let with_right = neither.with_right("World");
     assert!(with_right.is_right());
-    assert_eq!(with_right.into_either(), Either::Right("World"));
+    assert_eq!(with_right.into_either(), Right("World"));
 
     let both = with_left.with_right("Hello");
     assert!(both.is_both());

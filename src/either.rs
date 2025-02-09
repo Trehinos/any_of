@@ -19,8 +19,8 @@
 //! ## Inspection
 //! - [`Either::is_left`]: Returns `true` if the value is `Left`.
 //! - [`Either::is_right`]: Returns `true` if the value is `Right`.
-//! - [`Either::left`]: Returns a reference to the left value if it exists.
-//! - [`Either::right`]: Returns a reference to the right value if it exists.
+//! - [`Left`]: Returns a reference to the left value if it exists.
+//! - [`Right`]: Returns a reference to the right value if it exists.
 //! - [`Either::any`]: Returns a tuple of `Option` references to either the left
 //!   or the right value, depending on the variant.
 //!

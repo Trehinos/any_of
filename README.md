@@ -20,8 +20,8 @@ manner.
 1. **`AnyOf<L, R>`**
     - A flexible type that represents four possible states:
         - `Neither`: No value is present.
-        - `Either::Left`: Only the left value is present.
-        - `Either::Right`: Only the right value is present.
+        - `Left`: Only the left value is present.
+        - `Right`: Only the right value is present.
         - `Both`: Both values are present.
     - Conceptually, it combines variants in the following way:
       ```
@@ -29,7 +29,7 @@ manner.
       ```
     - Its cases are:
       ```
-      AnyOf(L, R) = Neither | Either::Left(L) | Either::Right(R) | Both(L, R)
+      AnyOf(L, R) = Neither | Left(L) | Right(R) | Both(L, R)
       ```
     - It can also be viewed as a product of two optional types:
       ```
@@ -37,8 +37,8 @@ manner.
       ```
       Cases :
         - `Neither::any` = `(None, None)`
-        - `Either::Left(L)::any` = `(Some(L), None)`
-        - `Either::Right(R)::any` = `(None, Some(R))`
+        - `Left(L)::any` = `(Some(L), None)`
+        - `Right(R)::any` = `(None, Some(R))`
         - `Both::any` = `(Some(L), Some(R))`
 
 2. **`Either<L, R>`**
@@ -101,8 +101,8 @@ manner.
 The project aims to enrich Rust's type system with expressive and flexible types
 for representing data combinations and states.
 
-* Unlike the Rust's `Result` type, `AnyOf`, `Either` or `LeftOrRight` have not an "error" semantic, it is general purpose,
-* All `LeftOrRight<L, R>::any` can be represented by a `(Option<L>, Option<R>)`  which is a product of two optional types,
+* Unlike the Rust's `Result` type, the types `AnyOf`, `Either` or `LeftOrRight` have not an "error" semantic, they are general purpose,
+* Any `LeftOrRight<L, R>::any` can be represented by a `(Option<L>, Option<R>)`  which is a product of two optional types,
 
 ## Status
 

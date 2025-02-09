@@ -1,4 +1,4 @@
-use crate::{Either, LeftOrRight, Map, Swap, Unwrap};
+use crate::*;
 
 #[test]
 fn test_new_left() {

@@ -1,4 +1,4 @@
-use crate::{Both, Map, Swap};
+use crate::*;
 
 #[test]
 fn test_both_new() {
@@ -26,14 +26,14 @@ fn test_into_couple() {
 fn test_into_left() {
     let both = Both::new(1, "left");
     let left = both.into_left();
-    assert!(matches!(left, crate::either::Either::Left(1)));
+    assert!(matches!(left, Left(1)));
 }
 
 #[test]
 fn test_into_right() {
     let both = Both::new("right", 2023);
     let right = both.into_right();
-    assert!(matches!(right, crate::either::Either::Right(2023)));
+    assert!(matches!(right, Right(2023)));
 }
 
 #[test]

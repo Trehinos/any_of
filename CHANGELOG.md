@@ -4,7 +4,11 @@
 
 ## `v1.3` 
 
-## `v1.3.3`
+## `v1.3.4` Shorthand variants
+
+- Incorporated new shorthand variants, `Left`, `Right`, `Neither`, `EitherOf`, and `BothOf`, and where applicable for cleaner syntax.
+
+## `v1.3.3` Tests
 
 - Add missing tests for `AnyOf`.
 

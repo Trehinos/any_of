@@ -12,12 +12,12 @@
 //! # Examples
 //!
 //! ```rust
-//! use any_of::{AnyOf, Both, Either};
+//! use any_of::{AnyOf, Both, Either, Left};
 //!
-//! let either: Either<i32, String> = Either::Left(42);
+//! let either: Either<i32, String> = Left(42);
 //! let any_of: AnyOf<i32, String> = AnyOf::from(either);
 //!
-//! let either: Either<i32, String> = Either::Left(42);
+//! let either: Either<i32, String> = Left(42);
 //! let any_of_again: AnyOf<i32, String> = AnyOf::from(either);
 //! let back_to_either: Either<i32, String> = Either::from(any_of_again);
 //!

@@ -25,7 +25,7 @@
 //! # Usage Examples
 //!
 //! ```rust
-//! use any_of::{Both, Couple, Either};
+//! use any_of::{Both, Couple, Either, Left, Right};
 //!
 //! let both = Both::new(10, "right");
 //! assert_eq!(both.left, 10);
@@ -36,13 +36,13 @@
 //!
 //! let left = both.into_left();
 //! match left {
-//!     Either::Left(value) => assert_eq!(value, 10),
+//!     Left(value) => assert_eq!(value, 10),
 //!     _ => panic!("Expected Left"),
 //! }
 //!
 //! let right = both.into_right();
 //! match right {
-//!     Either::Right(value) => assert_eq!(value, "right"),
+//!     Right(value) => assert_eq!(value, "right"),
 //!     _ => panic!("Expected Right"),
 //! }
 //! ```
@@ -141,16 +141,16 @@ impl<L, R> Both<L, R> {
     /// using the `left` value of this struct.
     ///
     /// # Returns
-    /// An `Either::Left` variant containing the left value.
+    /// An `Left` variant containing the left value.
     ///
     /// # Examples
     /// ```rust
-    /// use any_of::{Both, Either};
+    /// use any_of::{Both, Either, Left};
     ///
     /// let both = Both::new(100, "unused");
     /// let left = both.into_left();
     /// match left {
-    ///     Either::Left(value) => assert_eq!(value, 100),
+    ///     Left(value) => assert_eq!(value, 100),
     ///     _ => panic!("Expected Left"),
     /// }
     /// ```
@@ -162,16 +162,16 @@ impl<L, R> Both<L, R> {
     /// using the `right` value of this struct.
     ///
     /// # Returns
-    /// An `Either::Right` variant containing the right value.
+    /// An `Right` variant containing the right value.
     ///
     /// # Examples
     /// ```rust
-    /// use any_of::{Both, Either};
+    /// use any_of::{Both, Either, Right};
     ///
     /// let both = Both::new("unused", 2023);
     /// let right = both.into_right();
     /// match right {
-    ///     Either::Right(value) => assert_eq!(value, 2023),
+    ///     Right(value) => assert_eq!(value, 2023),
     ///     _ => panic!("Expected Right"),
     /// }
     /// ```
