@@ -90,8 +90,8 @@ manner.
 
 - Flexible combinations:
     - Operators :
-        - `&` to combine `AnyOf` values, or,
-        - `|` to filter `AnyOf` values, or,
+        - `+` to combine `AnyOf` values, or,
+        - `-` to filter `AnyOf` values, or,
         - `!` to swap  `AnyOf`, `EitherOf` and `BothOf` values.
     - Default value handling and state manipulation methods.
 
