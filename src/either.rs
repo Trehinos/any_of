@@ -126,21 +126,24 @@ impl<L, R> LeftOrRight<L, R> for EitherOf<L, R> {
     }
 }
 
-impl<L, R> Swap<L, R> for EitherOf<L, R> {
+
+impl<L, R> Not for EitherOf<L, R> {
     type Output = EitherOf<R, L>;
+
     /// Swaps the variants of the `EitherOf`, turning a `Left` into a `Right` and vice versa.
     ///
     /// ## Returns
     ///
     /// An `EitherOf` with the variants swapped. The `Left` value becomes `Right`,
     /// and the `Right` value becomes `Left`.
-    fn swap(self) -> Self::Output {
+    fn not(self) -> Self::Output {
         match self {
             Self::Left(l) => EitherOf::<R, L>::Right(l),
             Self::Right(r) => EitherOf::<R, L>::Left(r),
         }
     }
 }
+impl<L, R> Swap<L, R> for EitherOf<L, R> { type Output = <Self as Not>::Output; }
 
 impl<L, R> Map<L, R> for EitherOf<L, R> {
     type Output<L2, R2> = EitherOf<L2, R2>;
@@ -187,14 +190,5 @@ impl<L, R> Unwrap<L, R> for EitherOf<L, R> {
             Self::Left(_) => f(),
             Self::Right(r) => r,
         }
-    }
-}
-
-impl<L, R> Not for EitherOf<L, R> {
-    type Output = EitherOf<R, L>;
-
-    /// See : [Self::swap].
-    fn not(self) -> Self::Output {
-        self.swap()
     }
 }

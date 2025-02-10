@@ -4,6 +4,10 @@
 
 ## `2.0` 
 
+## `2.0.1`
+
+- Switched the implementation of the `Swap` trait across various types to use the `Not` (`!`) operator.
+
 ## `2.0.0`
 
 Public API changed : types and enum cases naming consistency.

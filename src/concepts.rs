@@ -4,6 +4,8 @@
 //! It includes definitions for `Couple`, `Pair`, and the `LeftOrRight` trait,
 //! providing type-safe methods for ergonomic and efficient access to such data.
 
+use core::ops::Not;
+
 /// The `(T, U)` tuple.
 pub type Couple<T, U> = (T, U);
 
@@ -99,7 +101,7 @@ pub trait LeftOrRight<L, R> {
 /// assert_eq!(swapped.left, "example");
 /// assert_eq!(swapped.right, 42);
 /// ```
-pub trait Swap<L, R>: LeftOrRight<L, R> {
+pub trait Swap<L, R>: LeftOrRight<L, R> + Not<Output = <Self as Swap<L, R>>::Output> {
     type Output: LeftOrRight<R, L>;
 
     /// Swaps the `left` and `right` values of this `dyn LeftOrRight` instance.
@@ -118,7 +120,12 @@ pub trait Swap<L, R>: LeftOrRight<L, R> {
     /// assert_eq!(swapped.left, "example");
     /// assert_eq!(swapped.right, 42);
     /// ```
-    fn swap(self) -> Self::Output;
+    fn swap(self) -> <Self as Swap<L, R>>::Output
+    where
+        Self: Sized,
+    {
+        self.not()
+    }
 }
 
 /// The `Map` trait provides utilities for transforming the `left` or `right` variants
@@ -191,10 +198,10 @@ pub trait Map<L, R>: LeftOrRight<L, R> {
         FR: FnOnce(R) -> R2;
 }
 
-/// The `Unwrap` trait provides utilities for safely extracting values from 
+/// The `Unwrap` trait provides utilities for safely extracting values from
 /// a dual-variant type (`LeftOrRight`).
-/// 
-/// It allows ergonomic operations that retrieve either the left or right value, 
+///
+/// It allows ergonomic operations that retrieve either the left or right value,
 /// with fallbacks when the expected variant is not present.
 ///
 /// ## Usage

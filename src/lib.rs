@@ -430,7 +430,7 @@ impl<L, R> AnyOf<L, R> {
         }
     }
 
-    /// Combines (`&` operator) two `Either` values into a single one.
+    /// Combines (`+` operator) two `Either` values into a single one.
     ///
     /// ## General rules
     ///
@@ -478,7 +478,7 @@ impl<L, R> AnyOf<L, R> {
         }
     }
 
-    /// Filters (`|` operator) the current `AnyOf` instance using another `AnyOf` instance.
+    /// Filters (`-` operator) the current `AnyOf` instance using another `AnyOf` instance.
     ///
     /// ## General rules
     ///
@@ -570,11 +570,25 @@ impl<L, R> Sub for AnyOf<L, R> {
 impl<L, R> Not for AnyOf<L, R> {
     type Output = AnyOf<R, L>;
 
-    /// See : [Self::swap].
+    /// Swaps (`!` operator) the left and right components, creating a new `AnyOf` with reversed types.
+    ///
+    /// # Returns
+    ///
+    /// A new `AnyOf<R, L>` instance where the left and right components have been swapped.
+    ///
+    /// - If `self` is `Neither`, the result will also be `Neither`.
+    /// - If `self` is an `Left`, the result will contain the value as an `Right`.
+    /// - If `self` is an `Right`, the result will contain the value as an `Left`.
+    /// - If `self` is a `Both`, the left and right values are swapped in the result.
     fn not(self) -> Self::Output {
-        self.swap()
+        match self {
+            Neither => AnyOf::<R, L>::Neither,
+            Either(e) => AnyOf::<R, L>::Either(e.swap()),
+            Both(b) => AnyOf::<R, L>::Both(b.swap()),
+        }
     }
 }
+impl<L, R> Swap<L, R> for AnyOf<L, R> { type Output = <Self as Not>::Output; }
 
 impl<L, R> LeftOrRight<L, R> for AnyOf<L, R> {
     /// Returns `Some(&L)` if `self.has_left()` is true, or `None`.
@@ -592,28 +606,6 @@ impl<L, R> LeftOrRight<L, R> for AnyOf<L, R> {
             Neither => None,
             Either(e) => e.right(),
             Both(b) => b.right(),
-        }
-    }
-}
-
-impl<L, R> Swap<L, R> for AnyOf<L, R> {
-    type Output = AnyOf<R, L>;
-
-    /// Swaps (! operator) the left and right components, creating a new `AnyOf` with reversed types.
-    ///
-    /// # Returns
-    ///
-    /// A new `AnyOf<R, L>` instance where the left and right components have been swapped.
-    ///
-    /// - If `self` is `Neither`, the result will also be `Neither`.
-    /// - If `self` is an `Left`, the result will contain the value as an `Right`.
-    /// - If `self` is an `Right`, the result will contain the value as an `Left`.
-    /// - If `self` is a `Both`, the left and right values are swapped in the result.
-    fn swap(self) -> Self::Output {
-        match self {
-            Neither => AnyOf::<R, L>::Neither,
-            Either(e) => AnyOf::<R, L>::Either(e.swap()),
-            Both(b) => AnyOf::<R, L>::Both(b.swap()),
         }
     }
 }

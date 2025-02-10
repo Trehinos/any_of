@@ -141,7 +141,7 @@ impl<L, R> BothOf<L, R> {
     /// using the `left` value of this struct.
     ///
     /// # Returns
-    /// An `Left` variant containing the left value.
+    /// A `Left` variant containing the left value.
     ///
     /// # Examples
     /// ```rust
@@ -162,7 +162,7 @@ impl<L, R> BothOf<L, R> {
     /// using the `right` value of this struct.
     ///
     /// # Returns
-    /// An `Right` variant containing the right value.
+    /// A `Right` variant containing the right value.
     ///
     /// # Examples
     /// ```rust
@@ -200,9 +200,8 @@ impl<L, R> LeftOrRight<L, R> for BothOf<L, R> {
     }
 }
 
-impl<L, R> Swap<L, R> for BothOf<L, R> {
+impl<L, R> Not for BothOf<L, R> {
     type Output = BothOf<R, L>;
-
 
     /// Swaps the `left` and `right` values of this `BothOf` instance.
     ///
@@ -215,18 +214,20 @@ impl<L, R> Swap<L, R> for BothOf<L, R> {
     /// use any_of::Swap;
     ///
     /// let both = BothOf::new(42, "example");
+    /// let swapped = !both;
     /// let swapped = both.swap();
     ///
     /// assert_eq!(swapped.left, "example");
     /// assert_eq!(swapped.right, 42);
     /// ```
-    fn swap(self) -> Self::Output {
+    fn not(self) -> Self::Output {
         BothOf {
             left: self.right,
             right: self.left,
         }
     }
 }
+impl<L, R> Swap<L, R> for BothOf<L, R> { type Output = <Self as Not>::Output; }
 
 impl<L, R> Map<L, R> for BothOf<L, R> {
     type Output<L2, R2> = BothOf<L2, R2>;
@@ -275,14 +276,5 @@ impl<L, R> Unwrap<L, R> for BothOf<L, R> {
 
     fn right_or_else(self, _: impl FnOnce() -> R) -> R {
         self.right
-    }
-}
-
-impl<L, R> Not for BothOf<L, R> {
-    type Output = BothOf<R, L>;
-
-    /// See : [Self::swap].
-    fn not(self) -> Self::Output {
-        self.swap()
     }
 }
