@@ -65,7 +65,7 @@ pub mod either;
 
 pub mod both;
 
-use core::ops::{Add, Not, Sub};
+use core::ops::{Add, Not, Shr, Sub};
 
 pub use crate::{
     any_of_x::{AnyOf16, AnyOf4, AnyOf8},
@@ -588,7 +588,9 @@ impl<L, R> Not for AnyOf<L, R> {
         }
     }
 }
-impl<L, R> Swap<L, R> for AnyOf<L, R> { type Output = <Self as Not>::Output; }
+impl<L, R> Swap<L, R> for AnyOf<L, R> {
+    type Output = <Self as Not>::Output;
+}
 
 impl<L, R> LeftOrRight<L, R> for AnyOf<L, R> {
     /// Returns `Some(&L)` if `self.has_left()` is true, or `None`.
@@ -613,28 +615,12 @@ impl<L, R> LeftOrRight<L, R> for AnyOf<L, R> {
 impl<L, R> Map<L, R> for AnyOf<L, R> {
     type Output<L2, R2> = AnyOf<L2, R2>;
 
-    /// Transforms the `Left` and `Right` value using separate functions, depending
-    /// on the variant.
-    ///
-    /// ## Arguments
-    ///
-    /// * `fl` - A function to transform the left value.
-    /// * `fr` - A function to transform the right value.
-    ///
-    /// ## Returns
-    ///
-    /// An `AnyOf` where the `Left` and `Right` value has been transformed
-    /// by the corresponding function. If self is `Neither`, this function returns `Neither`.
     fn map<FL, FR, L2, R2>(self, fl: FL, fr: FR) -> Self::Output<L2, R2>
     where
         FL: FnOnce(L) -> L2,
-        FR: FnOnce(R) -> R2,
+        FR: FnOnce(R) -> R2
     {
-        match self {
-            Neither => AnyOf::<L2, R2>::Neither,
-            Either(e) => AnyOf::<L2, R2>::Either(e.map(fl, fr)),
-            Both(b) => AnyOf::<L2, R2>::Both(b.map(fl, fr)),
-        }
+        self >> (fl, fr).into()
     }
 }
 
@@ -656,6 +642,36 @@ impl<L, R> Unwrap<L, R> for AnyOf<L, R> {
             Either(Left(_)) => f(),
             Either(Right(r)) => r,
             Both(BothOf { right: r, .. }) => r,
+        }
+    }
+}
+
+impl<L, R, FL, FR, L2, R2> Shr<BothOf<FL, FR>> for AnyOf<L, R>
+where
+    FL: FnOnce(L) -> L2,
+    FR: FnOnce(R) -> R2,
+{
+    type Output = AnyOf<L2, R2>;
+
+    /// Maps two functions with the parts of this `AnyOf`
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use any_of::{AnyOf, BothOf    };
+    ///
+    /// let both = AnyOf::Both(BothOf { left: 5, right: 10 });
+    /// let left_fn = |x: i32| x * 2;
+    /// let right_fn = |y: i32| y + 3;
+    ///
+    /// let result = both >> (left_fn, right_fn).into();
+    /// assert_eq!(result, AnyOf::Both(BothOf { left: 10, right: 13 }));
+    /// ```
+    fn shr(self, rhs: BothOf<FL, FR>) -> Self::Output {
+        match self {
+            Neither => AnyOf::<L2, R2>::Neither,
+            Either(e) => AnyOf::<L2, R2>::Either(e >> rhs),
+            Both(b) => AnyOf::<L2, R2>::Both(b >> rhs),
         }
     }
 }

@@ -2,13 +2,19 @@
 
 # `v2`
 
-## `2.0` 
+## `2.1` 
 
-## `2.0.1`
+### `2.1.0`
 
+`>>` operator and `Not` as a super-trait.
+
+- Added a new operator `>>` for map operations : `bothOf >> (fl, fr).into()`.
 - Switched the implementation of the `Swap` trait across various types to use the `Not` (`!`) operator.
+- Renamed `Both` to `BothOf` in `src/both.rs` and `Either` to `EitherOf` in `src/either.rs` in comment references
 
-## `2.0.0`
+## `2.0`
+
+### `2.0.0`
 
 Public API changed : types and enum cases naming consistency.
 

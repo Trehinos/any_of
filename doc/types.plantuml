@@ -23,6 +23,17 @@ interface LeftOrRight<L, R> {
     + any(&self) -> Any<& L, & R>
 }
 
+LeftOrRight <|-- Map
+abstract Map<L, R> {
+    + {abstract}{static} type Output<L2, R2>: LeftOrRight<L2, R2>
+    __
+    * FL: FnOnce(L) -> L2
+    * FR: FnOnce(R) -> R2
+    + {abstract} map<FL, FR, L2, R2>(self, fl: FL, fr: FR) -> Self::Output<L2, R2>
+    + map_left<FL, L2>(self, fl: FL) -> Self::Output<L2, R>
+    + map_right<FR, R2>(self, fr: FR) -> Self::Output<L, R2>
+}
+
 LeftOrRight <|-- Unwrap
 abstract Unwrap<L, R> {
     * FL: FnOnce(L) -> L
@@ -38,22 +49,16 @@ abstract Unwrap<L, R> {
     + unwrap_left(self) -> L
     + unwrap_right(self) -> R
 }
-LeftOrRight <|-- Map
-abstract Map<L, R> {
-    + {abstract}{static} type Output<L2, R2>: LeftOrRight<L2, R2>
-    __
-    * FL: FnOnce(L) -> L2
-    * FR: FnOnce(R) -> R2
-    + {abstract} map<FL, FR, L2, R2>(self, fl: FL, fr: FR) -> Self::Output<L2, R2>
-    + map_left<FL, L2>(self, fl: FL) -> Self::Output<L2, R>
-    + map_right<FR, R2>(self, fr: FR) -> Self::Output<L, R2>
-}
 
+interface Not {
+    !a
+}
+Not <-- Swap
 LeftOrRight <|-- Swap
 interface Swap<L, R> {
     + {abstract}{static} type Output: LeftOrRight<R, L>
     __
-    + {abstract} swap(self) -> Self::Output
+    + swap(self) -> Self::Output = !self
 }
 
 interface From< T > {
@@ -61,24 +66,30 @@ interface From< T > {
     into(self) -> T
 }
 metaclass "Copy, Clone, Eq, PartialEq, Debug, Hash"
-interface Not {
-    !a
-}
 interface Add {
     a + b
+    __
+    self.combine()
 }
 interface Sub {
     a - b
+    __
+    self.filter()
+}
+interface Shr<L, R, FL, FR, L2, R2> {
+    a >> b:BothOf<FL, FR>(fl, fr)
+    __
+    self.map(fl, fr)
 }
 
 diamond "LeftOrRight+Swap+Map+Unwrap+Not"
 
 
 "Copy, Clone, Eq, PartialEq, Debug, Hash" <... "LeftOrRight+Swap+Map+Unwrap+Not"
-Not <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
 From <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
 LeftOrRight <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
 Swap <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
+Shr <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
 Map <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
 Unwrap <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
 

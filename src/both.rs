@@ -50,7 +50,7 @@
 use crate::concepts::Swap;
 use crate::either::EitherOf;
 use crate::{Couple, LeftOrRight, Map, Unwrap};
-use core::ops::Not;
+use core::ops::{Not, Shr};
 
 /// `BothOf` is a generic struct that allows pairing two values of potentially different types.
 ///
@@ -227,7 +227,9 @@ impl<L, R> Not for BothOf<L, R> {
         }
     }
 }
-impl<L, R> Swap<L, R> for BothOf<L, R> { type Output = <Self as Not>::Output; }
+impl<L, R> Swap<L, R> for BothOf<L, R> {
+    type Output = <Self as Not>::Output;
+}
 
 impl<L, R> Map<L, R> for BothOf<L, R> {
     type Output<L2, R2> = BothOf<L2, R2>;
@@ -262,10 +264,7 @@ impl<L, R> Map<L, R> for BothOf<L, R> {
         FL: FnOnce(L) -> L2,
         FR: FnOnce(R) -> R2,
     {
-        BothOf {
-            left: fl(self.left),
-            right: fr(self.right),
-        }
+        self >> (fl, fr).into()
     }
 }
 
@@ -276,5 +275,20 @@ impl<L, R> Unwrap<L, R> for BothOf<L, R> {
 
     fn right_or_else(self, _: impl FnOnce() -> R) -> R {
         self.right
+    }
+}
+
+impl<L, R, FL, FR, L2, R2> Shr<BothOf<FL, FR>> for BothOf<L, R>
+where
+    FL: FnOnce(L) -> L2,
+    FR: FnOnce(R) -> R2,
+{
+    type Output = BothOf<L2, R2>;
+
+    fn shr(self, rhs: BothOf<FL, FR>) -> Self::Output {
+        BothOf {
+            left: (rhs.left)(self.left),
+            right: (rhs.right)(self.right),
+        }
     }
 }

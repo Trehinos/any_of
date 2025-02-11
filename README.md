@@ -93,7 +93,8 @@ manner.
     - Operators :
         - `+` to combine `AnyOf` values, or,
         - `-` to filter `AnyOf` values, or,
-        - `!` to swap  `AnyOf`, `EitherOf` and `BothOf` values.
+        - `!` to swap  `AnyOf`, `EitherOf` and `BothOf` values,
+        - `>>` to map  `AnyOf`, `EitherOf` and `BothOf` values,
     - Default value handling and state manipulation methods.
 
 ![Type diagram PNG](doc/any_of-type-diagram.png)

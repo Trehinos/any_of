@@ -19,8 +19,8 @@
 //! ## Inspection
 //! - [`EitherOf::is_left`]: Returns `true` if the value is `Left`.
 //! - [`EitherOf::is_right`]: Returns `true` if the value is `Right`.
-//! - [`Left`]: Returns a reference to the left value if it exists.
-//! - [`Right`]: Returns a reference to the right value if it exists.
+//! - [`EitherOf::Left`]: Returns a reference to the left value if it exists.
+//! - [`EitherOf::Right`]: Returns a reference to the right value if it exists.
 //! - [`EitherOf::any`]: Returns a tuple of `Option` references to either the left
 //!   or the right value, depending on the variant.
 //!
@@ -66,11 +66,11 @@
 //!
 
 use crate::concepts::{Map, Unwrap};
-use crate::{LeftOrRight, Swap};
-use core::ops::Not;
+use crate::{BothOf, LeftOrRight, Swap};
+use core::ops::{Not, Shr};
 
 /// The `EitherOf` enum is a utility type that can hold a value of one of two variants: `Left(L)` or `Right(R)`.
-/// 
+///
 /// This type is exported as `any_of::EitherOf`.
 ///
 /// It serves as a straightforward alternative to `Result`, providing a way to perform operations
@@ -110,14 +110,14 @@ impl<L, R> EitherOf<L, R> {
     }
 }
 
-impl<L, R> LeftOrRight<L, R> for EitherOf<L, R> {    
+impl<L, R> LeftOrRight<L, R> for EitherOf<L, R> {
     fn left(&self) -> Option<&L> {
         match self {
             Self::Left(l) => Some(l),
             Self::Right(_) => None,
         }
     }
-    
+
     fn right(&self) -> Option<&R> {
         match self {
             Self::Left(_) => None,
@@ -125,7 +125,6 @@ impl<L, R> LeftOrRight<L, R> for EitherOf<L, R> {
         }
     }
 }
-
 
 impl<L, R> Not for EitherOf<L, R> {
     type Output = EitherOf<R, L>;
@@ -143,14 +142,16 @@ impl<L, R> Not for EitherOf<L, R> {
         }
     }
 }
-impl<L, R> Swap<L, R> for EitherOf<L, R> { type Output = <Self as Not>::Output; }
+impl<L, R> Swap<L, R> for EitherOf<L, R> {
+    type Output = <Self as Not>::Output;
+}
 
 impl<L, R> Map<L, R> for EitherOf<L, R> {
     type Output<L2, R2> = EitherOf<L2, R2>;
 
     /// Transforms the `L` or `R` value using separate functions, depending
     /// on the variant.
-    /// 
+    ///
     /// # Type Parameters
     /// - `L2`: The resulting type of the transformed `left` value.
     /// - `R2`: The resulting type of the transformed `right` value.
@@ -170,9 +171,21 @@ impl<L, R> Map<L, R> for EitherOf<L, R> {
         FL: FnOnce(L) -> L2,
         FR: FnOnce(R) -> R2,
     {
+        self >> (fl, fr).into()
+    }
+}
+
+impl<L, R, FL, FR, L2, R2> Shr<BothOf<FL, FR>> for EitherOf<L, R>
+where
+    FL: FnOnce(L) -> L2,
+    FR: FnOnce(R) -> R2,
+{
+    type Output = EitherOf<L2, R2>;
+
+    fn shr(self, rhs: BothOf<FL, FR>) -> Self::Output {
         match self {
-            Self::Left(l) => EitherOf::<L2, R2>::Left(fl(l)),
-            Self::Right(r) => EitherOf::<L2, R2>::Right(fr(r)),
+            Self::Left(l) => EitherOf::<L2, R2>::Left((rhs.left)(l)),
+            Self::Right(r) => EitherOf::<L2, R2>::Right((rhs.right)(r)),
         }
     }
 }
