@@ -4,6 +4,15 @@
 
 ## `2.1` 
 
+### `2.1.1`
+
+- Added default type parameter `R = L` for `BothOf` and `EitherOf`.
+- Updated README with adjusted type examples and operator clarifications.
+- Improved code samples and operator descriptions in `src/lib.rs`.
+- Adjusted test example output to align with changes.
+- Fixed and cleaned up the shr method's example.
+- Modified doc comments for consistency.
+
 ### `2.1.0`
 
 `>>` operator and `Not` as a super-trait.

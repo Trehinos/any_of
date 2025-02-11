@@ -447,18 +447,18 @@ impl<L, R> AnyOf<L, R> {
     /// ## All cases
     ///
     /// * Neither cases :
-    ///     * Neither & Neither = Neither
-    ///     * Neither & **other** = other
-    ///     * **self** & Neither = self
+    ///     * Neither + Neither = Neither
+    ///     * Neither + **other** = other
+    ///     * **self** + Neither = self
     /// * Trivial cases :
-    ///     * **Left(x)** & Left(y) = Left(x)
-    ///     * Right(x) & **Right(y)** = Right(y)
-    ///     * **Both(x, y)** & other = Both(x, y)
+    ///     * **Left(x)** + Left(y) = Left(x)
+    ///     * Right(x) + **Right(y)** = Right(y)
+    ///     * **Both(x, y)** + other = Both(x, y)
     /// * Combined cases :
-    ///     * Left(x) & Right(y) = Both(x, y)
-    ///     * Right(x) & Left(y) = Both(y, x)
-    ///     * Left(x) & Both(_, y) = Both(x, y)
-    ///     * Right(x) & Both(y, _) = Both(y, x)
+    ///     * Left(x) + Right(y) = Both(x, y)
+    ///     * Right(x) + Left(y) = Both(y, x)
+    ///     * Left(x) + Both(_, y) = Both(x, y)
+    ///     * Right(x) + Both(y, _) = Both(y, x)
     pub fn combine(self, other: Self) -> Self {
         match self {
             Neither => other,
@@ -491,17 +491,17 @@ impl<L, R> AnyOf<L, R> {
     /// ## All cases
     ///
     /// - **Neither cases**:
-    ///     * `Neither | other = Neither`
-    ///     * `Left(x) | Left(y) = Neither`
-    ///     * `Right(x) | Right(y) = Neither`
-    ///     * `other | Both(x, y) = Neither`
+    ///     * `Neither - other = Neither`
+    ///     * `Left(x) - Left(y) = Neither`
+    ///     * `Right(x) - Right(y) = Neither`
+    ///     * `other - Both(x, y) = Neither`
     /// - **Trivial case**:
-    ///     * `other | Neither = other`
+    ///     * `other - Neither = other`
     /// - **Filtered cases**:
-    ///     * `Left(x) | Right(y) = Left(x)`
-    ///     * `Right(x) | Left(y) = Right(x)`
-    ///     * `Both(x, y) | Right(y) = Left(x)`
-    ///     * `Both(x, y) | Left(y) = Right(y)`
+    ///     * `Left(x) - Right(y) = Left(x)`
+    ///     * `Right(x) - Left(y) = Right(x)`
+    ///     * `Both(x, y) - Right(z) = Left(x)`
+    ///     * `Both(x, y) - Left(z) = Right(y)`
     ///
     /// # Examples
     ///
@@ -658,14 +658,19 @@ where
     /// # Examples
     ///
     /// ```
-    /// use any_of::{AnyOf, BothOf    };
+    /// use any_of::{AnyOf, Left, Unwrap};
     ///
-    /// let both = AnyOf::Both(BothOf { left: 5, right: 10 });
     /// let left_fn = |x: i32| x * 2;
-    /// let right_fn = |y: i32| y + 3;
+    /// let right_fn  = |y: i32| y + 3;
+    /// let both_fn = (left_fn, right_fn).into();
     ///
-    /// let result = both >> (left_fn, right_fn).into();
-    /// assert_eq!(result, AnyOf::Both(BothOf { left: 10, right: 13 }));
+    /// let both:AnyOf<i32, i32> = (5, 10).into();
+    /// let result = both >> both_fn;
+    /// assert_eq!(result, (10, 13).into());
+    ///
+    /// let left = AnyOf::Either(Left(25));
+    /// let left_result = left >> both_fn;
+    /// assert_eq!(left_result.unwrap_left(), 50);
     /// ```
     fn shr(self, rhs: BothOf<FL, FR>) -> Self::Output {
         match self {

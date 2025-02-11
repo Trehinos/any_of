@@ -77,7 +77,7 @@ use core::ops::{Not, Shr};
 /// on values of two possible types. Unlike `Result`, it does not imply any specific meaning
 /// to the variants.
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
-pub enum EitherOf<L, R> {
+pub enum EitherOf<L, R = L> {
     Left(L),
     Right(R),
 }

@@ -26,11 +26,16 @@ manner.
         - `Both`: Both values are present.
     - It combines variants in the following way:
       ```
-      AnyOf<L, R> = Neither | EitherOf<L, R> | BothOf<L, R>
+      AnyOf<L, R> = Neither
+                  | Either(EitherOf<L, R>)
+                  | Both(BothOf<L, R>)
       ```
     - Its cases are:
       ```
-      AnyOf(L, R) = Neither | Left(L) | Right(R) | BothOf{left: L, right: R}
+      AnyOf(l: L, r: R) = Neither 
+                        | Either(Left(l))
+                        | Either(Right(r)) 
+                        | Both(BothOf{left = l, right = r})
       ```
     - This type can also be viewed as a product of two optional types:
       ```
@@ -91,10 +96,10 @@ manner.
 
 - Flexible combinations:
     - Operators :
-        - `+` to combine `AnyOf` values, or,
-        - `-` to filter `AnyOf` values, or,
-        - `!` to swap  `AnyOf`, `EitherOf` and `BothOf` values,
-        - `>>` to map  `AnyOf`, `EitherOf` and `BothOf` values,
+        - `+` to **combine** `AnyOf` values, or,
+        - `-` to **filter** `AnyOf` values, or,
+        - `!` to **swap**  `AnyOf`, `EitherOf` and `BothOf` values,
+        - `>>` to **map**  `AnyOf`, `EitherOf` and `BothOf` values,
     - Default value handling and state manipulation methods.
 
 ![Type diagram PNG](doc/any_of-type-diagram.png)

@@ -69,7 +69,7 @@ use core::ops::{Not, Shr};
 ///
 /// For more examples, see the documentation of the individual methods below.
 #[derive(Copy, Clone, Eq, PartialEq, Debug, Hash)]
-pub struct BothOf<L, R> {
+pub struct BothOf<L, R = L> {
     pub left: L,
     pub right: R,
 }
