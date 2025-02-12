@@ -4,6 +4,8 @@
 //! It includes definitions for `Couple`, `Pair`, and the `LeftOrRight` trait,
 //! providing type-safe methods for ergonomic and efficient access to such data.
 
+use core::ops::Not;
+
 /// The `(T, U)` tuple.
 pub type Couple<T, U> = (T, U);
 
@@ -90,16 +92,16 @@ pub trait LeftOrRight<L, R> {
 ///
 /// # Examples
 /// ```rust
-/// use any_of::Both;
+/// use any_of::BothOf;
 /// use any_of::Swap;
 ///
-/// let both = Both::new(42, "example");
+/// let both = BothOf::new(42, "example");
 /// let swapped = both.swap();
 ///
 /// assert_eq!(swapped.left, "example");
 /// assert_eq!(swapped.right, 42);
 /// ```
-pub trait Swap<L, R>: LeftOrRight<L, R> {
+pub trait Swap<L, R>: LeftOrRight<L, R> + Not<Output = <Self as Swap<L, R>>::Output> {
     type Output: LeftOrRight<R, L>;
 
     /// Swaps the `left` and `right` values of this `dyn LeftOrRight` instance.
@@ -109,21 +111,27 @@ pub trait Swap<L, R>: LeftOrRight<L, R> {
     ///
     /// # Examples
     /// ```rust
-    /// use any_of::Both;
-    /// use any_of::concepts::Swap;
+    /// use any_of::BothOf;
+    /// use any_of::Swap;
     ///
-    /// let both = Both::new(42, "example");
+    /// let both = BothOf::new(42, "example");
     /// let swapped = both.swap();
     ///
     /// assert_eq!(swapped.left, "example");
     /// assert_eq!(swapped.right, 42);
     /// ```
-    fn swap(self) -> Self::Output;
+    fn swap(self) -> <Self as Swap<L, R>>::Output
+    where
+        Self: Sized,
+    {
+        self.not()
+    }
 }
 
 /// The `Map` trait provides utilities for transforming the `left` or `right` variants
-/// of a dual-variant type (`LeftOrRight`). This allows for ergonomic and type-safe
-/// transformations of either side of the data structure.
+/// of a dual-variant type (`LeftOrRight`).
+///
+/// This allows for ergonomic and type-safe transformations of either side of the data structure.
 ///
 /// ## Provided Methods
 ///
@@ -190,6 +198,42 @@ pub trait Map<L, R>: LeftOrRight<L, R> {
         FR: FnOnce(R) -> R2;
 }
 
+/// The `Unwrap` trait provides utilities for safely extracting values from
+/// a dual-variant type (`LeftOrRight`).
+///
+/// It allows ergonomic operations that retrieve either the left or right value,
+/// with fallbacks when the expected variant is not present.
+///
+/// ## Usage
+///
+/// The `Unwrap` trait simplifies the handling of `LeftOrRight` types by providing
+/// convenient methods to extract values transparently or substitute a value when
+/// the expected variant does not exist.
+///
+/// ## Examples
+///
+/// ```rust
+/// use any_of::{EitherOf, Unwrap, Left, Right};
+///
+/// let left: EitherOf<i32, &str> = Left(42);
+/// let right: EitherOf<i32, &str> = Right("example");
+///
+/// // Retrieve the left value, or default to 0
+/// assert_eq!(left.left_or_default(), 42);
+/// assert_eq!(right.left_or_default(), 0);
+///
+/// // Use closures to provide alternate values
+/// assert_eq!(right.left_or_else(|| 100), 100);
+/// assert_eq!(left.right_or_else(|| "default"), "default");
+///
+/// // Use custom default values
+/// assert_eq!(left.left_or(99), 42);
+/// assert_eq!(right.right_or("new default"), "example");
+/// ```
+///
+/// This trait is especially useful in scenarios where fallbacks or default
+/// values need to be derived dynamically or when working with optional or
+/// fallible data structures.
 pub trait Unwrap<L, R>: LeftOrRight<L, R> {
     /// Returns the left value or computes a default using the provided closure.
     ///
@@ -263,10 +307,10 @@ pub trait Unwrap<L, R>: LeftOrRight<L, R> {
     /// ## Examples
     ///
     /// ```rust
-    /// use any_of::{Either, Unwrap};
+    /// use any_of::{EitherOf, Unwrap, Left, Right};
     ///
-    /// let left: Either<i32, &str> = Either::Left(42);
-    /// let right: Either<i32, &str> = Either::Right("example");
+    /// let left: EitherOf<i32, &str> = Left(42);
+    /// let right: EitherOf<i32, &str> = Right("example");
     ///
     /// // Returns the left value as it exists.
     /// assert_eq!(left.left_or_default(), 42);
@@ -298,10 +342,10 @@ pub trait Unwrap<L, R>: LeftOrRight<L, R> {
     /// ## Examples
     ///
     /// ```rust
-    /// use any_of::{Either, Unwrap};
+    /// use any_of::{EitherOf, Unwrap, Left, Right};
     ///
-    /// let left: Either<i32, &str> = Either::Left(42);
-    /// let right: Either<i32, &str> = Either::Right("example");
+    /// let left: EitherOf<i32, &str> = Left(42);
+    /// let right: EitherOf<i32, &str> = Right("example");
     ///
     /// // Returns the default value for &str ("") because the variant is `Left`.
     /// assert_eq!(left.right_or_default(), "");
@@ -334,10 +378,10 @@ pub trait Unwrap<L, R>: LeftOrRight<L, R> {
     /// ## Examples
     ///
     /// ```rust
-    /// use any_of::{Either, Unwrap};
+    /// use any_of::{EitherOf, Unwrap, Left, Right};
     ///
-    /// let left: Either<i32, &str> = Either::Left(42);
-    /// let right: Either<i32, &str> = Either::Right("example");
+    /// let left: EitherOf<i32, &str> = Left(42);
+    /// let right: EitherOf<i32, &str> = Right("example");
     ///
     /// // Successfully extracts the left value.
     /// assert_eq!(left.expect_left("Expected left value"), 42);
@@ -369,10 +413,10 @@ pub trait Unwrap<L, R>: LeftOrRight<L, R> {
     /// ## Examples
     ///
     /// ```rust
-    /// use any_of::{Either, Unwrap};
+    /// use any_of::{EitherOf, Unwrap, Left, Right};
     ///
-    /// let left: Either<i32, &str> = Either::Left(42);
-    /// let right: Either<i32, &str> = Either::Right("example");
+    /// let left: EitherOf<i32, &str> = Left(42);
+    /// let right: EitherOf<i32, &str> = Right("example");
     ///
     /// // Successfully extracts the right value.
     /// assert_eq!(right.expect_right("Expected right value"), "example");
