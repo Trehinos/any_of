@@ -1,13 +1,27 @@
-//! This module provides type conversion implementations between the `Either`, `Both`,
-//! and `AnyOf` types. These conversions allow seamless interchangeability through the use of the `From` trait,
+//! This module provides type conversion implementations between the `EitherOf`, `BothOf`, `AnyOf`, and `Couple` types.
+//! These conversions allow seamless interchangeability through the use of the `From` trait,
 //! enabling ergonomic and straightforward transformations.
 //!
 //! # Implementations
 //!
-//! - `From<Either<L, R>> for AnyOf<L, R>`: Converts an `Either` type into an `AnyOf` type.
-//! - `From<AnyOf<L, R>> for Either<L, R>`: Converts an `AnyOf` type back into an `Either` type.
-//! - `From<Both<L, R>> for AnyOf<L, R>`: Converts a `Both` type into an `AnyOf` type.
-//! - `From<AnyOf<L, R>> for Both<L, R>`: Converts an `AnyOf` type back into a `Both` type.
+//! - Library types conversions :
+//!     - `From<EitherOf<L, R>> for AnyOf<L, R>`: Converts an [EitherOf] type into an [AnyOf] type by internally delegating to [AnyOf::from_either].
+//!     - `From<AnyOf<L, R>> for EitherOf<L, R>`: Converts [AnyOf] back into an [EitherOf] type using [AnyOf::into_either], ensuring proper conversion paths.
+//!     - `From<BothOf<L, R>> for AnyOf<L, R>`: Turns a [BothOf] type into an [AnyOf] with the help of [AnyOf::from_both] for consistency.
+//!     - `From<AnyOf<L, R>> for BothOf<L, R>`: Allows conversion of [AnyOf] back into [BothOf] using [AnyOf::into_both]. Useful when strong pair semantics are required.
+//! - `Couple` (tuple) conversions :
+//!     - `From<Couple<L, R>> for BothOf<L, R>`: Converts a [Couple] into a [BothOf], delegating to [BothOf::from_couple]. Handy for handling paired structures.
+//!     - `From<Couple<L, R>> for AnyOf<L, R>`: Provides indirect conversion of a [Couple] into an [AnyOf], leveraging the `From<BothOf<L, R>>` for additional flexibility.
+//!     - `From<BothOf<L, R>> for Couple<L, R>`: Turns [BothOf] back into [Couple] using [BothOf::into_couple]. This is useful for extracting paired values without additional logic.
+//!     - `From<AnyOf<L, R>> for Couple<L, R>`: Turns [AnyOf] back into [Couple], using [AnyOf::into_both] and `BothOf::into()`.
+//! - `Any` (tuple of options) conversions :
+//!     - `From<Any<L, R>> for AnyOf<L, R>`: Maps higher-level [Any] structures into [AnyOf] using [AnyOf::from_any].
+//!     - `From<Any<L, R>> for BothOf<L, R>`: Attempts to create a [BothOf] from an [Any], ensuring both values are present, or panics otherwise. Good for stricter assumptions.
+//!     - `From<Any<L, R>> for EitherOf<L, R>`: Converts [Any] into [EitherOf], raising errors when invalid configurations like both missing or both present are encountered.
+//!     - `From<AnyOf<L, R>> for Any<L, R>`: Takes an [AnyOf]<L, R> and returns an [Any] pair with cloned optional values.
+//!     - `From<BothOf<L, R>> for Any<L, R>`: Converts [BothOf]<L, R> into [Any] with cloned left and right values.
+//!     - `From<EitherOf<L, R>> for Any<L, R>`: Converts [EitherOf]<L, R> into [Any] by cloning applicable values.
+//! 
 //!
 //! # Examples
 //!
@@ -26,67 +40,87 @@
 //! let back_to_both: BothOf<i32, String> = BothOf::from(any_of_again);
 //! ```
 
+
+
 use crate::{Any, AnyOf, BothOf, Couple, EitherOf, LeftOrRight};
 
 impl<L, R> From<EitherOf<L, R>> for AnyOf<L, R> {
-    /// See [Self::from_either].
+    /// Converts an [EitherOf] type into an [AnyOf] type by internally delegating to [AnyOf::from_either].
     fn from(value: EitherOf<L, R>) -> Self {
         Self::from_either(value)
     }
 }
 
 impl<L, R> From<AnyOf<L, R>> for EitherOf<L, R> {
-    /// See [AnyOf::into_either].
+    /// Converts [AnyOf] back into an [EitherOf] type using [AnyOf::into_either], ensuring proper conversion paths.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `value` is not an `Either` variant.
     fn from(value: AnyOf<L, R>) -> Self {
         value.into_either()
     }
 }
 
 impl<L, R> From<BothOf<L, R>> for AnyOf<L, R> {
-    /// See [Self::from_both].
+    /// Turns a [BothOf] type into an [AnyOf] with the help of [AnyOf::from_both] for consistency.
     fn from(value: BothOf<L, R>) -> Self {
         Self::from_both(value)
     }
 }
 
 impl<L, R> From<AnyOf<L, R>> for BothOf<L, R> {
-    /// See [AnyOf::into_both].
+    /// Allows conversion of [AnyOf] back into [BothOf] using [AnyOf::into_both]. Useful when strong pair semantics are required.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `value` is not a `Both` variant.
     fn from(value: AnyOf<L, R>) -> Self {
         value.into_both()
     }
 }
 
 impl<L, R> From<Couple<L, R>> for BothOf<L, R> {
+    /// Converts a [Couple] into a [BothOf], delegating to [AnyOf::from_couple]. Handy for handling paired structures.
     fn from(value: Couple<L, R>) -> Self {
         Self::from_couple(value)
     }
 }
 
 impl<L, R> From<Couple<L, R>> for AnyOf<L, R> {
+    /// Provides indirect conversion of a [Couple] into an [AnyOf], leveraging the `From<BothOf<L, R>>` for additional flexibility.
     fn from(value: Couple<L, R>) -> Self {
         Self::from(BothOf::from(value))
     }
 }
 
 impl<L, R> From<BothOf<L, R>> for Couple<L, R> {
+    /// Turns [BothOf] back into [Couple] using [BothOf::into_couple]. This is useful for extracting paired values without additional logic.
     fn from(value: BothOf<L, R>) -> Self {
         value.into_couple()
     }
 }
 
 impl<L, R> From<AnyOf<L, R>> for Couple<L, R> {
+    /// Turns [AnyOf] back into [Couple], using [AnyOf::into_both] and [BothOf::into()].
     fn from(value: AnyOf<L, R>) -> Self {
         value.into_both().into()
     }
 }
 
 impl<L, R> From<Any<L, R>> for AnyOf<L, R> {
+    /// Maps higher-level [Any] structures into [AnyOf] using [AnyOf::from_any].
     fn from(value: Any<L, R>) -> Self {
         Self::from_any(value)
     }
 }
 
 impl<L, R> From<Any<L, R>> for BothOf<L, R> {
+    /// Attempts to create a [BothOf] from an [Any], ensuring both values are present, or panics otherwise. Good for stricter assumptions.
+    ///
+    /// # Panics
+    ///
+    /// If `value` is not `(Some(L), Some(R))`.
     fn from(value: Any<L, R>) -> Self {
         let (left, right) = value;
         Self::new(
@@ -97,6 +131,11 @@ impl<L, R> From<Any<L, R>> for BothOf<L, R> {
 }
 
 impl<L, R> From<Any<L, R>> for EitherOf<L, R> {
+    /// Converts [Any] into [EitherOf], raising errors when invalid configurations like both missing or both present are encountered.
+    ///
+    /// # Panics
+    ///
+    /// If `value` is `(Some(L), Some(R))` or if it is `(None, None)`.
     fn from(value: Any<L, R>) -> Self {
         let (left, right) = value;
         if let Some(left_value) = left {
@@ -113,18 +152,21 @@ impl<L, R> From<Any<L, R>> for EitherOf<L, R> {
 }
 
 impl<L: Clone, R: Clone> From<AnyOf<L, R>> for Any<L, R> {
+    /// Takes an [AnyOf]<L, R> and returns an [Any] pair with cloned optional values.
     fn from(value: AnyOf<L, R>) -> Self {
         (value.left().cloned(), value.right().cloned())
     }
 }
 
 impl<L: Clone, R: Clone> From<BothOf<L, R>> for Any<L, R> {
+    /// Converts [BothOf]<L, R> into [Any] with cloned left and right values.
     fn from(value: BothOf<L, R>) -> Self {
         (value.left().cloned(), value.right().cloned())
     }
 }
 
 impl<L: Clone, R: Clone> From<EitherOf<L, R>> for Any<L, R> {
+    /// Converts [EitherOf]<L, R> into [Any] by cloning applicable values.
     fn from(value: EitherOf<L, R>) -> Self {
         (value.left().cloned(), value.right().cloned())
     }

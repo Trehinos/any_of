@@ -1,15 +1,16 @@
 @startuml
 struct Couple<T, U> {
+    ..
     (T, U)
-    __
 }
 struct Pair<T> {
+    ..
     Couple(T, T)
-    __
 }
 Couple <-- Pair
 
 struct Any<T, U> {
+    ..
     Couple<Option< T >, Option< U >>
 }
 Couple <-- Any
@@ -52,6 +53,7 @@ abstract Unwrap<L, R> {
 
 interface Not {
     !a
+    ..
 }
 Not <-- Swap
 LeftOrRight <|-- Swap
@@ -68,17 +70,20 @@ interface From< T > {
 metaclass "Copy, Clone, Eq, PartialEq, Debug, Hash"
 interface Add {
     a + b
-    __
+    ..
     self.combine()
 }
 interface Sub {
     a - b
-    __
+    ..
     self.filter()
 }
 interface Shr<L, R, FL, FR, L2, R2> {
     a >> b:BothOf<FL, FR>(fl, fr)
     __
+    * FL: FnOnce(L) -> L2
+    * FR: FnOnce(R) -> R2
+    ..
     self.map(fl, fr)
 }
 
@@ -102,7 +107,6 @@ enum EitherOf<L, R> {
     Not::Output = EitherOf<R, L>
     Map::Output<L2, R2> = EitherOf<L2, R2>
     ==
-    __
     + {static} new_left(l: L) -> Self
     + {static} new_right(r: R) -> Self
 }

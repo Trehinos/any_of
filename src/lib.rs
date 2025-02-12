@@ -260,7 +260,7 @@ impl<L, R> AnyOf<L, R> {
     ///
     /// # Panics
     ///
-    /// This function will panic if `self` is not an `Both` variant.
+    /// This function will panic if `self` is not a `Both` variant.
     ///
     /// # Examples
     ///
@@ -618,7 +618,7 @@ impl<L, R> Map<L, R> for AnyOf<L, R> {
     fn map<FL, FR, L2, R2>(self, fl: FL, fr: FR) -> Self::Output<L2, R2>
     where
         FL: FnOnce(L) -> L2,
-        FR: FnOnce(R) -> R2
+        FR: FnOnce(R) -> R2,
     {
         self >> (fl, fr).into()
     }
@@ -651,7 +651,7 @@ where
     FL: FnOnce(L) -> L2,
     FR: FnOnce(R) -> R2,
 {
-    type Output = AnyOf<L2, R2>;
+    type Output = <Self as Map<L, R>>::Output<L2, R2>;
 
     /// Maps two functions with the parts of this `AnyOf`
     ///
