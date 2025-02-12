@@ -35,8 +35,7 @@
 //! These `AnyOfX` types are highly compositional but increase in complexity as the `X` grows.
 //! Use `AnyOf16` or higher with caution.
 
-use crate::AnyOf;
-use crate::LeftOrRight;
+use crate::{AnyOf, LeftOrRight};
 
 /// A type representing a combination of four possible types.
 pub type AnyOf4<LL, LR = LL, RL = LR, RR = RL> = AnyOf<AnyOf<LL, LR>, AnyOf<RL, RR>>;
