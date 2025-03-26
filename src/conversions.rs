@@ -40,8 +40,6 @@
 //! let back_to_both: BothOf<i32, String> = BothOf::from(any_of_again);
 //! ```
 
-
-
 use crate::{Any, AnyOf, BothOf, Couple, EitherOf, LeftOrRight};
 
 impl<L, R> From<EitherOf<L, R>> for AnyOf<L, R> {

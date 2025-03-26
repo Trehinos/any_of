@@ -22,7 +22,7 @@
 //!
 //! Example usage:
 //! ```rust
-//! use any_of::any_of_x::AnyOf4;
+//! use any_of::AnyOf4;
 //! use any_of::AnyOf;
 //!
 //! let value: AnyOf4<i32, &str, f64, char> = AnyOf4::new_left(AnyOf::new_left(42));
