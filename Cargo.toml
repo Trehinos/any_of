@@ -1,6 +1,6 @@
 [package]
 name = "any_of"
-version = "2.1.1"
+version = "2.1.2"
 edition = "2021"
 description = "A general optional sum of product type which can be Neither, Left, Right or Both."
 license = "MIT"
