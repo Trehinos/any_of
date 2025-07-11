@@ -4,7 +4,7 @@
 
 This project implements a flexible [Algebraic Data Type](https://en.wikipedia.org/wiki/Algebraic_data_type) : `AnyOf`.
 
-`AnyOf` is an optional **sum of product of two types**,  
+`AnyOf` is an optional **sum product of two types**,  
 which enables clear and safe data representations in functional and type-driven programming.
 
 ## Overview
@@ -39,13 +39,13 @@ manner.
       ```
     - This type can also be viewed as a product of two optional types:
       ```
-      AnyOf<L, R>::any() -> (Option<L>, Option<R>)
+      AnyOf<L, R>::opt2() -> (Option<L>, Option<R>)
       ```
       Cases :
-        - `Neither.any()` returns `(None, None)`
-        - `Left(L).any()` returns `(Some(L), None)`
-        - `Right(R).any()` returns `(None, Some(R))`
-        - `Both(L, R).any()` returns `(Some(L), Some(R))`
+        - `Neither.opt2()` returns `(None, None)`
+        - `Left(L).opt2()` returns `(Some(L), None)`
+        - `Right(R).opt2()` returns `(None, Some(R))`
+        - `Both(L, R).opt2()` returns `(Some(L), Some(R))`
 
 2. **`EitherOf<L, R>`**
     - A simple sum type representing one of two values.
@@ -53,9 +53,9 @@ manner.
         - `Left(L)`
         - `Right(R)`
     - Ideal for binary decision-making.
-    - Implements `any()` too :
-        - `Left(L).any()` returns `(Some(L), None)`
-        - `Right(R).any()` returns `(None, Some(R))`
+    - Implements `opt2()` too :
+        - `Left(L).opt2()` returns `(Some(L), None)`
+        - `Right(R).opt2()` returns `(None, Some(R))`
     - It is the type :
       ```
       EitherOf<L, R> = Left(L) | Right(R)
@@ -63,8 +63,8 @@ manner.
 
 3. **`BothOf<L, R>`**
     - A product type that pairs two values, `left` and `right`, of potentially different types.
-    - Implements `any()` too :
-        - `BothOf{ left: L, right: R }.any()` returns `(Some(L), Some(R))`
+    - Implements `opt2()` too :
+        - `BothOf{ left: L, right: R }.opt2()` returns `(Some(L), Some(R))`
     - It is the type:
       ```
       BothOf<L, R> = {left: L, right: R}
@@ -77,11 +77,11 @@ manner.
 4. **Enhanced Type Composition**
     - A `Couple<T, U>` is a `(T, U)`,
     - A `Pair<T>` is a `Couple<T, T>`,
-    - An `Any<T, U>` is a `Couple<Option<T>, Option<U>>`,
+    - An `Opt2<T, U>` is a `Couple<Option<T>, Option<U>>`,
     - Complex types like `AnyOf4`, `AnyOf8`, and `AnyOf16` are implemented for handling larger,
       structured combinations via nested `AnyOf` structures.
     - The `LeftOrRight` trait :
-        - Provides the methods `is_right()`, `is_left()`, `any()`, `left()` and `right()`.
+        - Provides the methods `is_right()`, `is_left()`, `opt2()`, `left()` and `right()`.
         - Implemented by `AnyOf`, `EitherOf` and `BothOf`,
         - Can be implemented by a custom type.
     - Other useful traits : `Unwrap<L, R>`, `Swap<L, R>` and `Map<L, R>`.
@@ -123,8 +123,8 @@ It is inspired by the Haskel's `Either` type.
 
 * Unlike the Rust's `Result` type, the types `AnyOf`, `EitherOf` or `LeftOrRight` have not an "error" semantic, they are
   general purpose,
-* `LeftOrRight<L, R>::any()` can be represented by a `(Option<L>, Option<R>)`  which is a product of two optional
-  types, but the two types has not the same composition conciseness :
+* `LeftOrRight<L, R>::opt2()` returns a `(Option<L>, Option<R>)`  which is a product of two optional
+  types, but the two types have different composition conciseness :
   ```
   AnyOf<AnyOf<LL, LR>, AnyOf<RL, RR>>
   vs

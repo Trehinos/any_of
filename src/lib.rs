@@ -274,7 +274,7 @@ impl<L, R> AnyOf<L, R> {
     pub fn into_both(self) -> BothOf<L, R> {
         match self {
             Both(b) => b,
-            _ => panic!("Can only convert Either::Both to Both"),
+            _ => panic!("Can only convert AnyOf::Both to Both"),
         }
     }
 
@@ -296,7 +296,7 @@ impl<L, R> AnyOf<L, R> {
         if let Either(e) = self {
             e
         } else {
-            panic!("Can only convert Either::Either to Either");
+            panic!("Can only convert AnyOf::Either to Either");
         }
     }
 
