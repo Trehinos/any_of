@@ -42,6 +42,54 @@ use crate::{AnyOf, LeftOrRight};
 pub type AnyOf4<LL, LR = LL, RL = LR, RR = RL> = AnyOf<AnyOf<LL, LR>, AnyOf<RL, RR>>;
 
 impl<LL, LR, RL, RR> AnyOf4<LL, LR, RL, RR> {
+    /// Creates a new `AnyOf4` instance from four optional values.
+    ///
+    /// The parameters correspond to the `ll`, `lr`, `rl`, and `rr` positions in
+    /// the nested [`AnyOf`] structure. This mirrors [`AnyOf::new`].
+    ///
+    /// # Examples
+    /// ```rust
+    /// use any_of::{AnyOf4, AnyOf};
+    ///
+    /// let value = AnyOf4::new4(Some(1), None::<i32>, None::<i32>, None::<i32>);
+    /// assert_eq!(value.ll(), Some(&1));
+    /// ```
+    pub fn new4(
+        ll: Option<LL>,
+        lr: Option<LR>,
+        rl: Option<RL>,
+        rr: Option<RR>,
+    ) -> Self {
+        Self::from_opt4((ll, lr, rl, rr))
+    }
+
+    /// Builds an `AnyOf4` from an [`Opt4`] tuple.
+    ///
+    /// `Opt4` is a convenient representation of four optional values.
+    ///
+    /// # Examples
+    /// ```rust
+    /// use any_of::{AnyOf4, Opt4};
+    ///
+    /// let tuple: Opt4<i32, i32, i32, i32> = (Some(1), None, None, None);
+    /// let value = AnyOf4::from_opt4(tuple);
+    /// assert!(value.ll().is_some());
+    /// ```
+    pub fn from_opt4(opt: Opt4<LL, LR, RL, RR>) -> Self {
+        let (ll, lr, rl, rr) = opt;
+        let left = if ll.is_none() && lr.is_none() {
+            None
+        } else {
+            Some(AnyOf::new(ll, lr))
+        };
+        let right = if rl.is_none() && rr.is_none() {
+            None
+        } else {
+            Some(AnyOf::new(rl, rr))
+        };
+        AnyOf::new(left, right)
+    }
+
     /// Returns the left-left value if it exists.
     pub fn ll(&self) -> Option<&LL> {
         self.left()?.left()
@@ -62,6 +110,18 @@ impl<LL, LR, RL, RR> AnyOf4<LL, LR, RL, RR> {
         self.right()?.right()
     }
 
+    /// Returns a tuple containing the four optional values represented by this `AnyOf4`.
+    ///
+    /// This is useful when you need a simple `(Option<LL>, Option<LR>, Option<RL>, Option<RR>)`
+    /// representation instead of nested enums.
+    ///
+    /// # Examples
+    /// ```rust
+    /// use any_of::{AnyOf4, AnyOf, Opt4};
+    ///
+    /// let any: AnyOf4<i32, i32, i32, i32> = AnyOf4::new_left(AnyOf::new_left(1));
+    /// assert_eq!(any.opt4(), (Some(&1), None, None, None));
+    /// ```
     pub fn opt4(&self) -> Opt4<&LL, &LR, &RL, &RR> {
         (self.ll(), self.lr(), self.rl(), self.rr())
     }
@@ -72,6 +132,58 @@ pub type AnyOf8<LLL, LLR = LLL, LRL = LLR, LRR = LRL, RLL = LLL, RLR = LLR, RRL 
     AnyOf<AnyOf4<LLL, LLR, LRL, LRR>, AnyOf4<RLL, RLR, RRL, RRR>>;
 
 impl<LLL, LLR, LRL, LRR, RLL, RLR, RRL, RRR> AnyOf8<LLL, LLR, LRL, LRR, RLL, RLR, RRL, RRR> {
+    /// Creates a new `AnyOf8` from eight optional values.
+    ///
+    /// # Examples
+    /// ```rust
+    /// use any_of::AnyOf8;
+    ///
+    /// let value = AnyOf8::new8(
+    ///     Some(1),
+    ///     None::<i32>, None::<i32>, None::<i32>,
+    ///     None::<i32>, None::<i32>, None::<i32>, None::<i32>,
+    /// );
+    /// assert!(value.lll().is_some());
+    /// ```
+    pub fn new8(
+        lll: Option<LLL>,
+        llr: Option<LLR>,
+        lrl: Option<LRL>,
+        lrr: Option<LRR>,
+        rll: Option<RLL>,
+        rlr: Option<RLR>,
+        rrl: Option<RRL>,
+        rrr: Option<RRR>,
+    ) -> Self {
+        Self::from_opt8((lll, llr, lrl, lrr, rll, rlr, rrl, rrr))
+    }
+
+    /// Builds an `AnyOf8` from an [`Opt8`] tuple.
+    ///
+    /// # Examples
+    /// ```rust
+    /// use any_of::{AnyOf8, Opt8};
+    ///
+    /// let tuple: Opt8<i32, i32, i32, i32, i32, i32, i32, i32> =
+    ///     (Some(1), None, None, None, None, None, None, None);
+    /// let value = AnyOf8::from_opt8(tuple);
+    /// assert_eq!(value.lll(), Some(&1));
+    /// ```
+    pub fn from_opt8(opt: Opt8<LLL, LLR, LRL, LRR, RLL, RLR, RRL, RRR>) -> Self {
+        let (lll, llr, lrl, lrr, rll, rlr, rrl, rrr) = opt;
+        let left = if [lll.is_none(), llr.is_none(), lrl.is_none(), lrr.is_none()].iter().all(|&x| x) {
+            None
+        } else {
+            Some(AnyOf4::new4(lll, llr, lrl, lrr))
+        };
+        let right = if [rll.is_none(), rlr.is_none(), rrl.is_none(), rrr.is_none()].iter().all(|&x| x) {
+            None
+        } else {
+            Some(AnyOf4::new4(rll, rlr, rrl, rrr))
+        };
+        AnyOf::new(left, right)
+    }
+
     /// Returns the left-left-left value if it exists.
     pub fn lll(&self) -> Option<&LLL> {
         self.left()?.ll()
@@ -112,6 +224,20 @@ impl<LLL, LLR, LRL, LRR, RLL, RLR, RRL, RRR> AnyOf8<LLL, LLR, LRL, LRR, RLL, RLR
         self.right()?.rr()
     }
 
+    /// Returns the eight optional values represented by this `AnyOf8` as a tuple.
+    ///
+    /// The returned [`Opt8`] allows easier pattern matching and conversion into
+    /// other structures.
+    ///
+    /// # Examples
+    /// ```rust
+    /// use any_of::{AnyOf, AnyOf4, AnyOf8, Opt8};
+    ///
+    /// let any: AnyOf8<i32, i32, i32, i32, i32, i32, i32, i32> =
+    ///     AnyOf8::new_left(AnyOf4::new_left(AnyOf::new_left(1)));
+    /// let tuple = any.opt8();
+    /// assert_eq!(tuple.0, Some(&1));
+    /// ```
     pub fn opt8(&self) -> Opt8<&LLL, &LLR, &LRL, &LRR, &RLL, &RLR, &RRL, &RRR> {
         (
             self.lll(),
@@ -188,6 +314,124 @@ impl<
         RRRR,
     >
 {
+    /// Creates a new `AnyOf16` from sixteen optional values.
+    ///
+    /// # Examples
+    /// ```rust
+    /// use any_of::AnyOf16;
+    ///
+    /// let value = AnyOf16::new16(
+    ///     Some(1), None::<i32>, None::<i32>, None::<i32>,
+    ///     None::<i32>, None::<i32>, None::<i32>, None::<i32>,
+    ///     None::<i32>, None::<i32>, None::<i32>, None::<i32>,
+    ///     None::<i32>, None::<i32>, None::<i32>, None::<i32>,
+    /// );
+    /// assert!(value.llll().is_some());
+    /// ```
+    #[allow(clippy::too_many_arguments)]
+    pub fn new16(
+        llll: Option<LLLL>,
+        lllr: Option<LLLR>,
+        llrl: Option<LLRL>,
+        llrr: Option<LLRR>,
+        lrll: Option<LRLL>,
+        lrlr: Option<LRLR>,
+        lrrl: Option<LRRL>,
+        lrrr: Option<LRRR>,
+        rlll: Option<RLLL>,
+        rllr: Option<RLLR>,
+        rlrl: Option<RLRL>,
+        rlrr: Option<RLRR>,
+        rrll: Option<RRLL>,
+        rrlr: Option<RRLR>,
+        rrrl: Option<RRRL>,
+        rrrr: Option<RRRR>,
+    ) -> Self {
+        Self::from_opt16((
+            llll, lllr, llrl, llrr, lrll, lrlr, lrrl, lrrr,
+            rlll, rllr, rlrl, rlrr, rrll, rrlr, rrrl, rrrr,
+        ))
+    }
+
+    /// Builds an `AnyOf16` from an [`Opt16`] tuple.
+    ///
+    /// # Examples
+    /// ```rust
+    /// use any_of::{AnyOf16, Opt16};
+    ///
+    /// let tuple: Opt16<i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32,
+    ///     i32, i32, i32, i32, i32> =
+    ///     (Some(1), None, None, None, None, None, None, None,
+    ///      None, None, None, None, None, None, None, None);
+    /// let value = AnyOf16::from_opt16(tuple);
+    /// assert_eq!(value.llll(), Some(&1));
+    /// ```
+    #[allow(clippy::too_many_arguments)]
+    pub fn from_opt16(
+        opt: Opt16<
+            LLLL,
+            LLLR,
+            LLRL,
+            LLRR,
+            LRLL,
+            LRLR,
+            LRRL,
+            LRRR,
+            RLLL,
+            RLLR,
+            RLRL,
+            RLRR,
+            RRLL,
+            RRLR,
+            RRRL,
+            RRRR,
+        >,
+    ) -> Self {
+        let (
+            llll, lllr, llrl, llrr, lrll, lrlr, lrrl, lrrr,
+            rlll, rllr, rlrl, rlrr, rrll, rrlr, rrrl, rrrr,
+        ) = opt;
+        let left_empty = [
+            llll.is_none(),
+            lllr.is_none(),
+            llrl.is_none(),
+            llrr.is_none(),
+            lrll.is_none(),
+            lrlr.is_none(),
+            lrrl.is_none(),
+            lrrr.is_none(),
+        ]
+        .iter()
+        .all(|&x| x);
+        let left = if left_empty {
+            None
+        } else {
+            Some(AnyOf8::new8(
+                llll, lllr, llrl, llrr, lrll, lrlr, lrrl, lrrr,
+            ))
+        };
+        let right_empty = [
+            rlll.is_none(),
+            rllr.is_none(),
+            rlrl.is_none(),
+            rlrr.is_none(),
+            rrll.is_none(),
+            rrlr.is_none(),
+            rrrl.is_none(),
+            rrrr.is_none(),
+        ]
+        .iter()
+        .all(|&x| x);
+        let right = if right_empty {
+            None
+        } else {
+            Some(AnyOf8::new8(
+                rlll, rllr, rlrl, rlrr, rrll, rrlr, rrrl, rrrr,
+            ))
+        };
+        AnyOf::new(left, right)
+    }
+
     /// Returns the left-left-left-left value if it exists.
     pub fn llll(&self) -> Option<&LLLL> {
         self.left()?.lll()
@@ -269,6 +513,20 @@ impl<
     }
 
     #[allow(clippy::type_complexity)]
+    /// Returns all sixteen optional values represented by this `AnyOf16`.
+    ///
+    /// This method provides a direct mapping to the [`Opt16`] type for easier
+    /// inspection or conversion.
+    ///
+    /// # Examples
+    /// ```rust
+    /// use any_of::{AnyOf, AnyOf4, AnyOf8, AnyOf16, Opt16};
+    ///
+    /// let any: AnyOf16<i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32> =
+    ///     AnyOf16::new_left(AnyOf8::new_left(AnyOf4::new_left(AnyOf::new_left(1))));
+    /// let tuple = any.opt16();
+    /// assert_eq!(tuple.0, Some(&1));
+    /// ```
     pub fn opt16(
         &self,
     ) -> Opt16<

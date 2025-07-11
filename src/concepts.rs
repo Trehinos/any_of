@@ -16,7 +16,34 @@ pub type Pair<T> = Couple<T, T>;
 ///
 /// It is a valid representation of a [crate::AnyOf].
 pub type Opt2<T, U> = Couple<Option<T>, Option<U>>;
+
+/// A shortcut for `(Option<T>, Option<U>, Option<V>, Option<W>)`.
+///
+/// It can be used to represent an [`AnyOf4`] value without constructing the
+/// nested `AnyOf` type directly.
+///
+/// # Examples
+/// ```rust
+/// use any_of::{AnyOf4, Opt4};
+///
+/// let values: Opt4<i32, i32, i32, i32> = (Some(1), None, Some(3), None);
+/// assert_eq!(values.0, Some(1));
+/// ```
 pub type Opt4<T, U, V, W> = (Option<T>, Option<U>, Option<V>, Option<W>);
+
+/// A shortcut for `(Option<T>, Option<U>, Option<V>, Option<W>, Option<X>, Option<Y>, Option<Z>, Option<A>)`.
+///
+/// Useful when working with [`AnyOf8`] without creating nested `AnyOf4` structures manually.
+///
+/// # Examples
+/// ```rust
+/// use any_of::{AnyOf8, Opt8};
+///
+/// let values: Opt8<i32, i32, i32, i32, i32, i32, i32, i32> =
+///     (Some(1), None, None, None, None, None, None, Some(8));
+/// assert_eq!(values.0, Some(1));
+/// assert_eq!(values.7, Some(8));
+/// ```
 pub type Opt8<T, U, V, W, X, Y, Z, A> = (
     Option<T>,
     Option<U>,
@@ -27,6 +54,11 @@ pub type Opt8<T, U, V, W, X, Y, Z, A> = (
     Option<Z>,
     Option<A>,
 );
+
+/// A shortcut for a 16-element tuple of `Option`s.
+///
+/// This mirrors the layout of [`AnyOf16`] and allows conversions between them.
+/// Due to its length, it is recommended only for advanced use cases.
 pub type Opt16<T, U, V, W, X, Y, Z, A, B, C, D, E, F, G, H, I> = (
     Option<T>,
     Option<U>,
