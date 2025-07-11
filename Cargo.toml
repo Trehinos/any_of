@@ -1,7 +1,7 @@
 [package]
 name = "any_of"
-version = "2.1.2"
-edition = "2021"
+version = "2.2.0"
+edition = "2024"
 description = "A general optional sum of product type which can be Neither, Left, Right or Both."
 license = "MIT"
 repository = "https://github.com/Trehinos/any_of"
