@@ -1,18 +1,18 @@
 //! This module provides type definitions representing combinations
-//! of multiple possible types and their associated utility implementations. 
+//! of multiple possible types and their associated utility implementations.
 //!
 //! # Overview
 //!
-//! The `AnyOf` types are designed to express collections of various 
-//! possible types within a single type while preserving type safety 
-//! and making it easier to work with nested combinations of types. 
-//! Each `AnyOfX` type represents a combination containing up to 
+//! The `AnyOf` types are designed to express collections of various
+//! possible types within a single type while preserving type safety
+//! and making it easier to work with nested combinations of types.
+//! Each `AnyOfX` type represents a combination containing up to
 //! `X` potential variants.
 //!
 //! # Utility Implementations
 //!
-//! Each `AnyOfX` type provides utility methods to extract specific variants 
-//! if they exist. These methods are named based on their position in 
+//! Each `AnyOfX` type provides utility methods to extract specific variants
+//! if they exist. These methods are named based on their position in
 //! the hierarchy and return an `Option` of the specified type.
 //!
 //! Example for `AnyOf8`:
@@ -35,6 +35,7 @@
 //! These `AnyOfX` types are highly compositional but increase in complexity as the `X` grows.
 //! Use `AnyOf16` or higher with caution.
 
+use crate::concepts::{Opt16, Opt4, Opt8};
 use crate::{AnyOf, LeftOrRight};
 
 /// A type representing a combination of four possible types.
@@ -60,11 +61,15 @@ impl<LL, LR, RL, RR> AnyOf4<LL, LR, RL, RR> {
     pub fn rr(&self) -> Option<&RR> {
         self.right()?.right()
     }
+
+    pub fn opt4(&self) -> Opt4<&LL, &LR, &RL, &RR> {
+        (self.ll(), self.lr(), self.rl(), self.rr())
+    }
 }
 
 /// A type representing a combination of eight possible types.
 pub type AnyOf8<LLL, LLR = LLL, LRL = LLR, LRR = LRL, RLL = LLL, RLR = LLR, RRL = LRL, RRR = LRR> =
-AnyOf<AnyOf4<LLL, LLR, LRL, LRR>, AnyOf4<RLL, RLR, RRL, RRR>>;
+    AnyOf<AnyOf4<LLL, LLR, LRL, LRR>, AnyOf4<RLL, RLR, RRL, RRR>>;
 
 impl<LLL, LLR, LRL, LRR, RLL, RLR, RRL, RRR> AnyOf8<LLL, LLR, LRL, LRR, RLL, RLR, RRL, RRR> {
     /// Returns the left-left-left value if it exists.
@@ -106,10 +111,23 @@ impl<LLL, LLR, LRL, LRR, RLL, RLR, RRL, RRR> AnyOf8<LLL, LLR, LRL, LRR, RLL, RLR
     pub fn rrr(&self) -> Option<&RRR> {
         self.right()?.rr()
     }
+
+    pub fn opt8(&self) -> Opt8<&LLL, &LLR, &LRL, &LRR, &RLL, &RLR, &RRL, &RRR> {
+        (
+            self.lll(),
+            self.llr(),
+            self.lrl(),
+            self.lrr(),
+            self.rll(),
+            self.rlr(),
+            self.rrl(),
+            self.rrr(),
+        )
+    }
 }
 
 /// A type representing a combination of sixteen possible types.
-/// 
+///
 /// This type is highly complex—use cautiously.
 pub type AnyOf16<
     LLLL,
@@ -134,40 +152,42 @@ pub type AnyOf16<
 >;
 
 impl<
-    LLLL,
-    LLLR,
-    LLRL,
-    LLRR,
-    LRLL,
-    LRLR,
-    LRRL,
-    LRRR,
-    RLLL,
-    RLLR,
-    RLRL,
-    RLRR,
-    RRLL,
-    RRLR,
-    RRRL,
-    RRRR,
-> AnyOf16<
-    LLLL,
-    LLLR,
-    LLRL,
-    LLRR,
-    LRLL,
-    LRLR,
-    LRRL,
-    LRRR,
-    RLLL,
-    RLLR,
-    RLRL,
-    RLRR,
-    RRLL,
-    RRLR,
-    RRRL,
-    RRRR,
-> {
+        LLLL,
+        LLLR,
+        LLRL,
+        LLRR,
+        LRLL,
+        LRLR,
+        LRRL,
+        LRRR,
+        RLLL,
+        RLLR,
+        RLRL,
+        RLRR,
+        RRLL,
+        RRLR,
+        RRRL,
+        RRRR,
+    >
+    AnyOf16<
+        LLLL,
+        LLLR,
+        LLRL,
+        LLRR,
+        LRLL,
+        LRLR,
+        LRRL,
+        LRRR,
+        RLLL,
+        RLLR,
+        RLRL,
+        RLRR,
+        RRLL,
+        RRLR,
+        RRRL,
+        RRRR,
+    >
+{
     /// Returns the left-left-left-left value if it exists.
     pub fn llll(&self) -> Option<&LLLL> {
         self.left()?.lll()
@@ -246,5 +266,46 @@ impl<
     /// Returns the right-right-right-right value if it exists.
     pub fn rrrr(&self) -> Option<&RRRR> {
         self.right()?.rrr()
+    }
+
+    #[allow(clippy::type_complexity)]
+    pub fn opt16(
+        &self,
+    ) -> Opt16<
+        &LLLL,
+        &LLLR,
+        &LLRL,
+        &LLRR,
+        &LRLL,
+        &LRLR,
+        &LRRL,
+        &LRRR,
+        &RLLL,
+        &RLLR,
+        &RLRL,
+        &RLRR,
+        &RRLL,
+        &RRLR,
+        &RRRL,
+        &RRRR,
+    > {
+        (
+            self.llll(),
+            self.lllr(),
+            self.llrl(),
+            self.llrr(),
+            self.lrll(),
+            self.lrlr(),
+            self.lrrl(),
+            self.lrrr(),
+            self.rlll(),
+            self.rllr(),
+            self.rlrl(),
+            self.rlrr(),
+            self.rrll(),
+            self.rrlr(),
+            self.rrrl(),
+            self.rrrr(),
+        )
     }
 }

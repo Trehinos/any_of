@@ -15,12 +15,12 @@
 //!     - `From<BothOf<L, R>> for Couple<L, R>`: Turns [BothOf] back into [Couple] using [BothOf::into_couple]. This is useful for extracting paired values without additional logic.
 //!     - `From<AnyOf<L, R>> for Couple<L, R>`: Turns [AnyOf] back into [Couple], using [AnyOf::into_both] and `BothOf::into()`.
 //! - `Any` (tuple of options) conversions :
-//!     - `From<Any<L, R>> for AnyOf<L, R>`: Maps higher-level [Any] structures into [AnyOf] using [AnyOf::from_any].
-//!     - `From<Any<L, R>> for BothOf<L, R>`: Attempts to create a [BothOf] from an [Any], ensuring both values are present, or panics otherwise. Good for stricter assumptions.
-//!     - `From<Any<L, R>> for EitherOf<L, R>`: Converts [Any] into [EitherOf], raising errors when invalid configurations like both missing or both present are encountered.
-//!     - `From<AnyOf<L, R>> for Any<L, R>`: Takes an [AnyOf]<L, R> and returns an [Any] pair with cloned optional values.
-//!     - `From<BothOf<L, R>> for Any<L, R>`: Converts [BothOf]<L, R> into [Any] with cloned left and right values.
-//!     - `From<EitherOf<L, R>> for Any<L, R>`: Converts [EitherOf]<L, R> into [Any] by cloning applicable values.
+//!     - `From<Any<L, R>> for AnyOf<L, R>`: Maps higher-level [Opt2] structures into [AnyOf] using [AnyOf::from_opt2].
+//!     - `From<Any<L, R>> for BothOf<L, R>`: Attempts to create a [BothOf] from an [Opt2], ensuring both values are present, or panics otherwise. Good for stricter assumptions.
+//!     - `From<Any<L, R>> for EitherOf<L, R>`: Converts [Opt2] into [EitherOf], raising errors when invalid configurations like both missing or both present are encountered.
+//!     - `From<AnyOf<L, R>> for Any<L, R>`: Takes an [AnyOf]<L, R> and returns an [Opt2] pair with cloned optional values.
+//!     - `From<BothOf<L, R>> for Any<L, R>`: Converts [BothOf]<L, R> into [Opt2] with cloned left and right values.
+//!     - `From<EitherOf<L, R>> for Any<L, R>`: Converts [EitherOf]<L, R> into [Opt2] by cloning applicable values.
 //! 
 //!
 //! # Examples
@@ -40,7 +40,7 @@
 //! let back_to_both: BothOf<i32, String> = BothOf::from(any_of_again);
 //! ```
 
-use crate::{Any, AnyOf, BothOf, Couple, EitherOf, LeftOrRight};
+use crate::{Opt2, AnyOf, BothOf, Couple, EitherOf, LeftOrRight};
 
 impl<L, R> From<EitherOf<L, R>> for AnyOf<L, R> {
     /// Converts an [EitherOf] type into an [AnyOf] type by internally delegating to [AnyOf::from_either].
@@ -106,20 +106,20 @@ impl<L, R> From<AnyOf<L, R>> for Couple<L, R> {
     }
 }
 
-impl<L, R> From<Any<L, R>> for AnyOf<L, R> {
-    /// Maps higher-level [Any] structures into [AnyOf] using [AnyOf::from_any].
-    fn from(value: Any<L, R>) -> Self {
-        Self::from_any(value)
+impl<L, R> From<Opt2<L, R>> for AnyOf<L, R> {
+    /// Maps higher-level [Opt2] structures into [AnyOf] using [AnyOf::from_opt2].
+    fn from(value: Opt2<L, R>) -> Self {
+        Self::from_opt2(value)
     }
 }
 
-impl<L, R> From<Any<L, R>> for BothOf<L, R> {
-    /// Attempts to create a [BothOf] from an [Any], ensuring both values are present, or panics otherwise. Good for stricter assumptions.
+impl<L, R> From<Opt2<L, R>> for BothOf<L, R> {
+    /// Attempts to create a [BothOf] from an [Opt2], ensuring both values are present, or panics otherwise. Good for stricter assumptions.
     ///
     /// # Panics
     ///
     /// If `value` is not `(Some(L), Some(R))`.
-    fn from(value: Any<L, R>) -> Self {
+    fn from(value: Opt2<L, R>) -> Self {
         let (left, right) = value;
         Self::new(
             left.expect("Missing left value"),
@@ -128,13 +128,13 @@ impl<L, R> From<Any<L, R>> for BothOf<L, R> {
     }
 }
 
-impl<L, R> From<Any<L, R>> for EitherOf<L, R> {
-    /// Converts [Any] into [EitherOf], raising errors when invalid configurations like both missing or both present are encountered.
+impl<L, R> From<Opt2<L, R>> for EitherOf<L, R> {
+    /// Converts [Opt2] into [EitherOf], raising errors when invalid configurations like both missing or both present are encountered.
     ///
     /// # Panics
     ///
     /// If `value` is `(Some(L), Some(R))` or if it is `(None, None)`.
-    fn from(value: Any<L, R>) -> Self {
+    fn from(value: Opt2<L, R>) -> Self {
         let (left, right) = value;
         if let Some(left_value) = left {
             if right.is_some() {
@@ -149,22 +149,22 @@ impl<L, R> From<Any<L, R>> for EitherOf<L, R> {
     }
 }
 
-impl<L: Clone, R: Clone> From<AnyOf<L, R>> for Any<L, R> {
-    /// Takes an [AnyOf]<L, R> and returns an [Any] pair with cloned optional values.
+impl<L: Clone, R: Clone> From<AnyOf<L, R>> for Opt2<L, R> {
+    /// Takes an [AnyOf]<L, R> and returns an [Opt2] pair with cloned optional values.
     fn from(value: AnyOf<L, R>) -> Self {
         (value.left().cloned(), value.right().cloned())
     }
 }
 
-impl<L: Clone, R: Clone> From<BothOf<L, R>> for Any<L, R> {
-    /// Converts [BothOf]<L, R> into [Any] with cloned left and right values.
+impl<L: Clone, R: Clone> From<BothOf<L, R>> for Opt2<L, R> {
+    /// Converts [BothOf]<L, R> into [Opt2] with cloned left and right values.
     fn from(value: BothOf<L, R>) -> Self {
         (value.left().cloned(), value.right().cloned())
     }
 }
 
-impl<L: Clone, R: Clone> From<EitherOf<L, R>> for Any<L, R> {
-    /// Converts [EitherOf]<L, R> into [Any] by cloning applicable values.
+impl<L: Clone, R: Clone> From<EitherOf<L, R>> for Opt2<L, R> {
+    /// Converts [EitherOf]<L, R> into [Opt2] by cloning applicable values.
     fn from(value: EitherOf<L, R>) -> Self {
         (value.left().cloned(), value.right().cloned())
     }

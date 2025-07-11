@@ -2,6 +2,11 @@
 
 # `v2`
 
+## `2.2.0`
+
+- Alias `Any<T, U>` of `(Option<T>, Option<U>)` renamed to `Opt2<T, U>` for clarity.
+- Added `Opt4`, `Opt8`, `Opt16` and functions to convert to these types in `AnyOf*` impl.
+
 ## `2.1`
 
 ### `2.1.2`
@@ -68,14 +73,14 @@ Other changes:
 
 ## `v1.3.1` Any
 
-`Any`, `from_any` and `from_either`.
+`Any`, `from_opt2` and `from_either`.
 
 - Set CI badge to reference the 'ci' branch.
 - Rename `AnyOf` to `LeftOrRight` in README.
 - Added `types.plantuml` and `any_of-type-diagram.png`.
 - Updated `README.md` with references to the diagram.
 - Added `Any<T, U>` type alias in `concepts.rs`.
-- Introduced `from_any` and `from_either` methods to `AnyOf`.
+- Introduced `from_opt2` and `from_either` methods to `AnyOf`.
 - Updated `Cargo.toml` and `Cargo.lock` to version `1.4.0-dev`.
 - Added `is_either` method in `src/lib.rs`.
 - Deprecated `is_one` method with a deprecation notice.

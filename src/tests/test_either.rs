@@ -33,9 +33,9 @@ fn test_is_right() {
 #[test]
 fn test_any() {
     let either: EitherOf<i32, &str> = EitherOf::new_left(25);
-    assert_eq!(either.any(), (Some(&25), None));
+    assert_eq!(either.opt2(), (Some(&25), None));
     let either: EitherOf<i32, &str> = EitherOf::new_right("Option");
-    assert_eq!(either.any(), (None, Some(&"Option")));
+    assert_eq!(either.opt2(), (None, Some(&"Option")));
 }
 
 #[test]

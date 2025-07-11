@@ -70,7 +70,7 @@ use core::ops::{Add, Not, Shr, Sub};
 pub use crate::{
     any_of_x::{AnyOf16, AnyOf4, AnyOf8},
     both::BothOf,
-    concepts::{Any, Couple, LeftOrRight, Map, Pair, Swap, Unwrap},
+    concepts::{Opt2, Couple, LeftOrRight, Map, Pair, Swap, Unwrap},
     either::EitherOf,
     either::EitherOf::{Left, Right},
     AnyOf::{Both, Either, Neither},
@@ -236,7 +236,7 @@ impl<L, R> AnyOf<L, R> {
     /// Creates a new `AnyOf` instance based on the presence of `left` and `right` values.
     ///
     /// See [Self::new].
-    pub fn from_any(any: Any<L, R>) -> Self {
+    pub fn from_opt2(any: Opt2<L, R>) -> Self {
         Self::new(any.0, any.1)
     }
 
@@ -324,7 +324,7 @@ impl<L, R> AnyOf<L, R> {
         L: Clone,
         R: Clone,
     {
-        let both = self.any();
+        let both = self.opt2();
         let left = both.0.map(|l| Left(l.clone()));
         let right = both.1.map(|r| Right(r.clone()));
         (left, right)
@@ -335,14 +335,14 @@ impl<L, R> AnyOf<L, R> {
         matches!(self, Either(Left(_)) | Both(_))
     }
 
-    /// True if [Right] or [Both].0
+    /// True if [Right] or [Both].
     pub fn has_right(&self) -> bool {
         matches!(self, Either(Right(_)) | Both(_))
     }
 
     /// True if not [Neither].
     pub fn is_any(&self) -> bool {
-        matches!(self, Either(Left(_)) | Either(Right(_)) | Both(_))
+        !self.is_neither()
     }
 
     /// True if [Either].
@@ -362,7 +362,7 @@ impl<L, R> AnyOf<L, R> {
 
     /// True if not [Either]
     pub fn is_neither_or_both(&self) -> bool {
-        matches!(self, Neither | Both(_))
+        !self.is_either()
     }
 
     /// Returns `Some((&L, &R))` if `self.is_both()` is true, or `None`.
@@ -552,7 +552,7 @@ impl<L, R> AnyOf<L, R> {
 impl<L, R> Add for AnyOf<L, R> {
     type Output = Self;
 
-    /// See : [Self::combine].
+    /// See: [Self::combine].
     fn add(self, rhs: Self) -> Self::Output {
         self.combine(rhs)
     }
@@ -561,7 +561,7 @@ impl<L, R> Add for AnyOf<L, R> {
 impl<L, R> Sub for AnyOf<L, R> {
     type Output = Self;
 
-    /// See : [Self::filter].
+    /// See: [Self::filter].
     fn sub(self, rhs: Self) -> Self::Output {
         self.filter(rhs)
     }
@@ -577,8 +577,8 @@ impl<L, R> Not for AnyOf<L, R> {
     /// A new `AnyOf<R, L>` instance where the left and right components have been swapped.
     ///
     /// - If `self` is `Neither`, the result will also be `Neither`.
-    /// - If `self` is an `Left`, the result will contain the value as an `Right`.
-    /// - If `self` is an `Right`, the result will contain the value as an `Left`.
+    /// - If `self` is a `Left`, the result will contain the value as a `Right`.
+    /// - If `self` is a `Right`, the result will contain the value as a `Left`.
     /// - If `self` is a `Both`, the left and right values are swapped in the result.
     fn not(self) -> Self::Output {
         match self {

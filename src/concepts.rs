@@ -15,7 +15,36 @@ pub type Pair<T> = Couple<T, T>;
 /// A shortcut for `(Option<T>, Option<U>)`.
 ///
 /// It is a valid representation of a [crate::AnyOf].
-pub type Any<T, U> = Couple<Option<T>, Option<U>>;
+pub type Opt2<T, U> = Couple<Option<T>, Option<U>>;
+pub type Opt4<T, U, V, W> = (Option<T>, Option<U>, Option<V>, Option<W>);
+pub type Opt8<T, U, V, W, X, Y, Z, A> = (
+    Option<T>,
+    Option<U>,
+    Option<V>,
+    Option<W>,
+    Option<X>,
+    Option<Y>,
+    Option<Z>,
+    Option<A>,
+);
+pub type Opt16<T, U, V, W, X, Y, Z, A, B, C, D, E, F, G, H, I> = (
+    Option<T>,
+    Option<U>,
+    Option<V>,
+    Option<W>,
+    Option<X>,
+    Option<Y>,
+    Option<Z>,
+    Option<A>,
+    Option<B>,
+    Option<C>,
+    Option<D>,
+    Option<E>,
+    Option<F>,
+    Option<G>,
+    Option<H>,
+    Option<I>,
+);
 
 /// The `LeftOrRight` trait provides utility methods for working with types that
 /// can represent one of two possible variants: a "left" variant (`L`) or a
@@ -73,7 +102,7 @@ pub trait LeftOrRight<L, R> {
     ///
     /// A tuple containing an `Option` reference to the left value and an `Option`
     /// reference to the right value.
-    fn any(&self) -> Couple<Option<&L>, Option<&R>> {
+    fn opt2(&self) -> Opt2<&L, &R> {
         (self.left(), self.right())
     }
 }

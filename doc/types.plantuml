@@ -9,7 +9,7 @@ struct Pair<T> {
 }
 Couple <-- Pair
 
-struct Any<T, U> {
+struct Opt2<T, U> {
     ..
     Couple<Option< T >, Option< U >>
 }
@@ -21,7 +21,7 @@ interface LeftOrRight<L, R> {
     + {abstract} right&self) -> Option<& R>
     + is_left(&self) -> bool
     + is_right(&self) -> bool
-    + any(&self) -> Any<& L, & R>
+    + any(&self) -> Opt2<& L, & R>
 }
 
 LeftOrRight <|-- Map
@@ -149,7 +149,7 @@ enum AnyOf<L, R> {
     + {static} new_both(l: L, r: R) -> Self
     + {static} from_both(both: BothOf<L, R>) -> Self
     + {static} from_either(either: EitherOf<L, R>) -> Self
-    + {static} from_any(any: Any<L, R>) -> Self
+    + {static} from_opt2(any: Opt2<L, R>) -> Self
     + filter_left(self) -> Self
     + filter_right(self) -> Self
     + with_left(self, l: L) -> Self

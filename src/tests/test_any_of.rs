@@ -132,9 +132,9 @@ fn test_from_both() {
 }
 
 #[test]
-fn test_from_any() {
+fn test_from_opt2() {
     let any = (Some(42), None);
-    let any_of: AnyOf<i32, &str> = AnyOf::from_any(any);
+    let any_of: AnyOf<i32, &str> = AnyOf::from_opt2(any);
     assert!(any_of.is_left());
 }
 

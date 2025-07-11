@@ -21,7 +21,7 @@
 //! - [`EitherOf::is_right`]: Returns `true` if the value is `Right`.
 //! - [`EitherOf::Left`]: Returns a reference to the left value if it exists.
 //! - [`EitherOf::Right`]: Returns a reference to the right value if it exists.
-//! - [`EitherOf::any`]: Returns a tuple of `Option` references to either the left
+//! - [`EitherOf::opt2`]: Returns a tuple of `Option` references to either the left
 //!   or the right value, depending on the variant.
 //!
 //! ## Default Values
