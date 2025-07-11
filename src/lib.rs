@@ -70,7 +70,7 @@ use core::ops::{Add, Not, Shr, Sub};
 pub use crate::{
     any_of_x::{AnyOf16, AnyOf4, AnyOf8},
     both::BothOf,
-    concepts::{Opt2, Couple, LeftOrRight, Map, Pair, Swap, Unwrap},
+    concepts::{Couple, LeftOrRight, Map, Opt16, Opt2, Opt4, Opt8, Pair, Swap, Unwrap},
     either::EitherOf,
     either::EitherOf::{Left, Right},
     AnyOf::{Both, Either, Neither},
