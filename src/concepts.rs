@@ -78,6 +78,26 @@ pub type Opt16<T, U, V, W, X, Y, Z, A, B, C, D, E, F, G, H, I> = (
     Option<I>,
 );
 
+pub type Opt3<T, U, V> = (Option<T>, Option<U>, Option<V>);
+pub type Opt5<T, U, V, W, X> = (Option<T>, Option<U>, Option<V>, Option<W>, Option<X>);
+pub type Opt6<T, U, V, W, X, Y> = (
+    Option<T>,
+    Option<U>,
+    Option<V>,
+    Option<W>,
+    Option<X>,
+    Option<Y>,
+);
+pub type Opt7<T, U, V, W, X, Y, Z> = (
+    Option<T>,
+    Option<U>,
+    Option<V>,
+    Option<W>,
+    Option<X>,
+    Option<Y>,
+    Option<Z>,
+);
+
 /// The `LeftOrRight` trait provides utility methods for working with types that
 /// can represent one of two possible variants: a "left" variant (`L`) or a
 /// "right" variant (`R`) (or possibly both).

@@ -78,7 +78,7 @@ manner.
     - A `Couple<T, U>` is a `(T, U)`,
     - A `Pair<T>` is a `Couple<T, T>`,
     - An `Opt2<T, U>` is a `Couple<Option<T>, Option<U>>`,
-    - Complex types like `AnyOf4`, `AnyOf8`, and `AnyOf16` are implemented for handling larger,
+    - Complex types like `AnyOf4` (`Opt4`), `AnyOf8` (`Opt8`), and `AnyOf16` (`Opt16`) are implemented for handling larger,
       structured combinations via nested `AnyOf` structures.
     - The `LeftOrRight` trait :
         - Provides the methods `is_right()`, `is_left()`, `opt2()`, `left()` and `right()`.
@@ -129,10 +129,6 @@ It is inspired by the Haskel's `Either` type.
   AnyOf<AnyOf<LL, LR>, AnyOf<RL, RR>>
   vs
   (Option<(Option<LL>, Option<LR>)>, Option<(Option<RL>, Option<RR>)>)
-  
-  AnyOf<AnyOf<AnyOf<LLL, LLR>, AnyOf<LRL, LRR>>, AnyOf<AnyOf<RLL, RLR>, AnyOf<RRL, RRR>>>
-  vs
-  (Option<(Option<(Option<LLL>, Option<LLR>)>, Option<(Option<LRL>, Option<LRR>)>)>, Option<(Option<(Option<RLL>, Option<RLR>)>, Option<(Option<RRL>, Option<RRR>)>)>)
   ```
 
 ## Status

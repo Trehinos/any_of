@@ -138,12 +138,12 @@ impl<L, R> From<Opt2<L, R>> for EitherOf<L, R> {
         let (left, right) = value;
         if let Some(left_value) = left {
             if right.is_some() {
-                panic!("Cannot convert an Any type into an Either type because both values are present.");
+                panic!("Cannot convert an Opt2 into an Either type because both values are present.");
             }
             EitherOf::Left(left_value)
         } else {
             EitherOf::Right(right.expect(
-                "Cannot convert an Any type into an Either type because no value is present.",
+                "Cannot convert an Opt2 into an Either type because no value is present.",
             ))
         }
     }

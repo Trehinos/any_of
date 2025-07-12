@@ -13,15 +13,15 @@ struct Opt2<T, U> {
     ..
     Couple<Option< T >, Option< U >>
 }
-Couple <-- Any
+Couple <-- Opt2
 
-Any <-- LeftOrRight
+Opt2 <-- LeftOrRight
 interface LeftOrRight<L, R> {
     + {abstract} left&self) -> Option<& L>
     + {abstract} right&self) -> Option<& R>
     + is_left(&self) -> bool
     + is_right(&self) -> bool
-    + any(&self) -> Opt2<& L, & R>
+    + opt2(&self) -> Opt2<& L, & R>
 }
 
 LeftOrRight <|-- Map
