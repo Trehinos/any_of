@@ -31,7 +31,7 @@ fn test_is_right() {
 }
 
 #[test]
-fn test_any() {
+fn test_opt2() {
     let either: EitherOf<i32, &str> = EitherOf::new_left(25);
     assert_eq!(either.opt2(), (Some(&25), None));
     let either: EitherOf<i32, &str> = EitherOf::new_right("Option");

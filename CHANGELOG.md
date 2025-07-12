@@ -2,6 +2,14 @@
 
 # `v2`
 
+## `2.2.1`
+
+- Introduce `Opt3` through `Opt7` types.
+- Update metadata in Cargo.toml: amend description, add author info, readme, repository, and refine keywords.
+- Update `any_of-type-diagram.png` graphic.
+- Rename AnyOfX optional constructors.
+- Update terminology and panic messages in `AnyOf` implementation; rename `any()` to `opt2()` for consistency.
+
 ## `2.2.0`
 
 - Alias `Any<T, U>` of `(Option<T>, Option<U>)` renamed to `Opt2<T, U>` for clarity.
