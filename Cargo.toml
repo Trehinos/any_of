@@ -2,10 +2,12 @@
 name = "any_of"
 version = "2.2.0"
 edition = "2024"
-description = "A general optional sum of product type which can be Neither, Left, Right or Both."
+description = "A general ADT which can be Neither, Either (Left or Right) or Both (left and right)."
+authors = ["Sébastien GELDREICH <dev@trehinos.eu>"]
 license = "MIT"
+readme = "README.md"
 repository = "https://github.com/Trehinos/any_of"
 categories = ["data-structures", "no-std", "rust-patterns"]
-keywords = ["either", "any", "left_right", "both", "ADT"]
+keywords = ["either", "neither", "both", "left", "right"]
 
 [dependencies]
