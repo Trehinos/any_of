@@ -1,32 +1,27 @@
 @startuml
-
 struct Couple<T, U> {
+    ..
     (T, U)
 }
 struct Pair<T> {
+    ..
     Couple(T, T)
 }
-Couple <- Pair
+Couple <-- Pair
 
-struct Any<T, U> {
+struct Opt2<T, U> {
+    ..
     Couple<Option< T >, Option< U >>
 }
-Couple <-- Any
+Couple <-- Opt2
 
-Any <-- LeftOrRight
+Opt2 <-- LeftOrRight
 interface LeftOrRight<L, R> {
     + {abstract} left&self) -> Option<& L>
     + {abstract} right&self) -> Option<& R>
     + is_left(&self) -> bool
     + is_right(&self) -> bool
-    + any(&self) -> Any<& L, & R>
-}
-
-LeftOrRight <|-- Swap
-interface Swap<L, R> {
-    + {abstract}{static} type Output: LeftOrRight<L, R>
-    __
-    + {abstract} swap(self) -> Self::Output
+    + opt2(&self) -> Opt2<& L, & R>
 }
 
 LeftOrRight <|-- Map
@@ -56,43 +51,73 @@ abstract Unwrap<L, R> {
     + unwrap_right(self) -> R
 }
 
-diamond "LeftOrRight+Swap+Map+Unwrap+Not"
-
-interface BitAnd {
-    a & b
-}
-interface BitOr {
-    a | b
-}
 interface Not {
     !a
+    ..
+}
+Not <-- Swap
+LeftOrRight <|-- Swap
+interface Swap<L, R> {
+    + {abstract}{static} type Output: LeftOrRight<R, L>
+    __
+    + swap(self) -> Self::Output = !self
 }
 
-Not <-- "LeftOrRight+Swap+Map+Unwrap+Not"
-LeftOrRight <-- "LeftOrRight+Swap+Map+Unwrap+Not"
-Swap <-- "LeftOrRight+Swap+Map+Unwrap+Not"
-Map <-- "LeftOrRight+Swap+Map+Unwrap+Not"
-Unwrap <-- "LeftOrRight+Swap+Map+Unwrap+Not"
+interface From< T > {
+    {abstract} {static} from(T) -> Self
+    into(self) -> T
+}
+metaclass "Copy, Clone, Eq, PartialEq, Debug, Hash"
+interface Add {
+    a + b
+    ..
+    self.combine()
+}
+interface Sub {
+    a - b
+    ..
+    self.filter()
+}
+interface Shr<L, R, FL, FR, L2, R2> {
+    a >> b:BothOf<FL, FR>(fl, fr)
+    __
+    * FL: FnOnce(L) -> L2
+    * FR: FnOnce(R) -> R2
+    ..
+    self.map(fl, fr)
+}
 
-"LeftOrRight+Swap+Map+Unwrap+Not" <|.. Either
-enum Either<L, R> {
+diamond "LeftOrRight+Swap+Map+Unwrap+Not"
+
+
+"Copy, Clone, Eq, PartialEq, Debug, Hash" <... "LeftOrRight+Swap+Map+Unwrap+Not"
+From <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
+LeftOrRight <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
+Swap <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
+Shr <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
+Map <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
+Unwrap <|.. "LeftOrRight+Swap+Map+Unwrap+Not"
+
+"LeftOrRight+Swap+Map+Unwrap+Not" <|.. EitherOf
+enum EitherOf<L, R> {
     * Left(L)
     * Right(R)
     __
-    Swap::Output = Either<R, L>
-    Map::Output<L2, R2> = Either<L2, R2>
+    Swap::Output = EitherOf<R, L>
+    Not::Output = EitherOf<R, L>
+    Map::Output<L2, R2> = EitherOf<L2, R2>
     ==
-    __
     + {static} new_left(l: L) -> Self
     + {static} new_right(r: R) -> Self
 }
 
-struct Both<L, R> {
+struct BothOf<L, R> {
     + left: L
     + right: R
     __
-    Swap::Output = Both<R, L>
-    Map::Output<L2, R2> = Both<L2, R2>
+    Swap::Output = BothOf<R, L>
+    Not::Output = BothOf<R, L>
+    Map::Output<L2, R2> = BothOf<L2, R2>
     ==
     + {static} new(l: L, r: R) -> Self
     + {static} from_couple(couple: Couple<L, R>) -> Self
@@ -100,61 +125,95 @@ struct Both<L, R> {
     + into_left(self) -> L
     + into_right(self) -> R
 }
-"LeftOrRight+Swap+Map+Unwrap+Not" <|.. Both
+"LeftOrRight+Swap+Map+Unwrap+Not" <|.. BothOf
 
-BitAnd <|.. AnyOf
-BitOr <|.. AnyOf
-"LeftOrRight+Swap+Map+Unwrap+Not" <|. AnyOf
+Add <|... AnyOf
+Sub <|... AnyOf
+"LeftOrRight+Swap+Map+Unwrap+Not" <|.. AnyOf
 enum AnyOf<L, R> {
     * Neither
-    * Either(Either<L, R>)
-    * Both(Both<L, R>)
+    * Either(EitherOf<L, R>)
+    * Both(BothOf<L, R>)
     __
     Swap::Output = AnyOf<R, L>
+    Not::Output = AnyOf<R, L>
     Map::Output<L2, R2> = AnyOf<L2, R2>
+    Add::Output = Self
+    Sub::Output = Self
     ==
-    * FB: FnOnce() -> Both<L, R>
+    * FB: FnOnce() -> Self
     + {static} new(l: Option<L>, r: Option<R>) -> Self
     + {static} new_neither() -> Self
     + {static} new_left(l: L) -> Self
     + {static} new_right(r: R) -> Self
     + {static} new_both(l: L, r: R) -> Self
-    + {static} from_both(both: Both<L, R>) -> Self
-    + {static} from_either(either: Either<L, R>) -> Self
-    + {static} from_any(any: Any<L, R>) -> Self
+    + {static} from_both(both: BothOf<L, R>) -> Self
+    + {static} from_either(either: EitherOf<L, R>) -> Self
+    + {static} from_opt2(any: Opt2<L, R>) -> Self
     + filter_left(self) -> Self
     + filter_right(self) -> Self
     + with_left(self, l: L) -> Self
     + with_right(self, r: R) -> Self
     + combine(self, other: Self) -> Self
     + filter(self, other: Self) -> Self
-    + to_either_pair(&self) -> Pair<Option<Either<L, R>>
+    + to_either_pair(&self) -> Pair<Option<EitherOf<L, R>>
     + has_left(&self) -> bool
     + has_right(&self) -> bool
     + is_any(&self) -> bool
-    + is_one(&self) -> bool
+    + is_either(&self) -> bool
     + is_both(&self) -> bool
     + is_neither(&self) -> bool
     + is_neither_or_both(&self) -> bool
-    + into_both(self) -> Both<L, R>
-    + into_either(self) -> Either<L, R>
+    + into_both(self) -> BothOf<L, R>
+    + into_either(self) -> EitherOf<L, R>
     + both_or_none(self) -> Option<Couple<&L, &R>>
-    + both_or_else(self, f: FB) -> Both<L, R>
-    + both_or(self, default: Both<L, R>) -> Both<L, R>
-    + unwrap_both(self) -> Both<L, R>
+    + both_or_else(self, f: FB) -> BothOf<L, R>
+    + both_or(self, default: BothOf<L, R>) -> BothOf<L, R>
+    + unwrap_both(self) -> BothOf<L, R>
 }
 
+struct AnyOf4<LL, LR, RL, RR> {
+    AnyOf<AnyOf<LL, LR>, AnyOf<RL, RR>>
+    __
+    + ll(&self) -> Option<& LL>
+    + lr(&self) -> Option<& LR>
+    + rl(&self) -> Option<& RL>
+    + rr(&self) -> Option<& RR>
+}
 AnyOf o-- AnyOf4
-class AnyOf4< ... > {
-    AnyOf<AnyOf, AnyOf>
+struct AnyOf8< ... > {
+    AnyOf<AnyOf4, AnyOf4>
+    __
+    + lll(&self) -> Option<& LLL>
+    + llr(&self) -> Option<& LLR>
+    + lrl(&self) -> Option<& LRL>
+    + lrr(&self) -> Option<& LRR>
+    + rll(&self) -> Option<& RLL>
+    + rlr(&self) -> Option<& RLR>
+    + rrl(&self) -> Option<& RRL>
+    + rrr(&self) -> Option<& RRR>
 }
 AnyOf o-- AnyOf8
-class AnyOf8< ... > {
-    AnyOf<AnyOf4, AnyOf4>
+struct AnyOf16< ... > {
+    AnyOf<AnyOf8, AnyOf8>
+    __
+    + llll(&self) -> Option<& LLLL>
+    + lllr(&self) -> Option<& LLLR>
+    + llrl(&self) -> Option<& LLRL>
+    + llrr(&self) -> Option<& LLRR>
+    + lrll(&self) -> Option<& LRLL>
+    + lrlr(&self) -> Option<& LRLR>
+    + lrrl(&self) -> Option<& LRRL>
+    + lrrr(&self) -> Option<& LRRR>
+    + rlll(&self) -> Option<& RLLL>
+    + rllr(&self) -> Option<& RLLR>
+    + rlrl(&self) -> Option<& RLRL>
+    + rlrr(&self) -> Option<& RLRR>
+    + rrll(&self) -> Option<& RRLL>
+    + rrlr(&self) -> Option<& RRLR>
+    + rrrl(&self) -> Option<& RRRL>
+    + rrrr(&self) -> Option<& RRRR>
 }
 AnyOf o-- AnyOf16
-class AnyOf16< ... > {
-    AnyOf<AnyOf8, AnyOf8>
-}
 
 @enduml
